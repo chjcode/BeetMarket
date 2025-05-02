@@ -29,6 +29,9 @@ public class User extends BaseTimeEntity {
     @Column(unique = true)
     private String nickname;
 
+    @Column(unique = true)
+    private String oauthName;
+
     private String birthDate;
 
     @Enumerated(EnumType.STRING)
@@ -45,7 +48,8 @@ public class User extends BaseTimeEntity {
     private String region;
 
     @Builder
-    public User(String email, String oauthProvider) {
+    public User(String oauthName, String email, String oauthProvider) {
+        this.oauthName = oauthName;
         this.email = email;
         this.oauthProvider = oauthProvider;
     }
@@ -56,4 +60,6 @@ public class User extends BaseTimeEntity {
         this.gender = gender;
         this.region = region;
     }
+
+
 }
