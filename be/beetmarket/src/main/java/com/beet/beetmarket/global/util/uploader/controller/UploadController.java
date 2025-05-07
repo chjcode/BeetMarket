@@ -24,14 +24,14 @@ public class UploadController {
 	private final UploadService uploadService;
 
 	@PostMapping("/uploads/pre-signed-url")
-	public ResponseEntity<ResponseWrapper<PreSignedResponseDto>> getBlueprintPreSignedUrl(
+	public ResponseEntity<ResponseWrapper<PreSignedResponseDto>> getPreSignedUrl(
 		@RequestBody PreSignedRequestDto requestDto,
 		@AuthenticationPrincipal User user
 	) {
 		return ResponseWrapperFactory.setResponse(
 			HttpStatus.OK,
 			null,
-			uploadService.generateImageUrls(requestDto, user)
+			uploadService.generateUrls(requestDto, user)
 		);
 	}
 }

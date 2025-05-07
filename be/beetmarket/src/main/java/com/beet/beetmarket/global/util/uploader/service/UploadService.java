@@ -30,7 +30,7 @@ public class UploadService {
 	private final MinioClient minioClient;
 	private final MinioConfig minioConfig;
 
-	public PreSignedResponseDto generateImageUrls(PreSignedRequestDto requestDto, User user) {
+	public PreSignedResponseDto generateUrls(PreSignedRequestDto requestDto, User user) {
 
 		String postUuid = UUID.randomUUID().toString();
 
