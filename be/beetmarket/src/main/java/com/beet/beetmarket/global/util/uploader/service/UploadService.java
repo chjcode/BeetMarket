@@ -69,7 +69,7 @@ public class UploadService {
 	}
 
 	private String generateObjectPath(Long userId, String postUuid, FileType fileType) {
-		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"));
+		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
 		String fileUuid = UUID.randomUUID().toString();
 
 		return String.format("%d/%s/%s/%s.%s",
