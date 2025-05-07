@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,7 +34,7 @@ public class User extends BaseTimeEntity {
     @Column(unique = true)
     private String oauthName;
 
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     private GenderType gender;
@@ -54,11 +56,15 @@ public class User extends BaseTimeEntity {
         this.oauthProvider = oauthProvider;
     }
 
-    public void updateAdditionalInfo(String nickname, String birthDate, GenderType gender, String region) {
+    public void updateAdditionalInfo(String nickname, LocalDate birthDate, GenderType gender, String region) {
         this.nickname = nickname;
         this.birthDate = birthDate;
         this.gender = gender;
         this.region = region;
+    }
+
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
 

@@ -5,7 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.beet.beetmarket.domain.user.entity.User;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	User getUserByOauthName(String oauthName);
+
+    Optional<User> findByNickname(String nickname);
 }

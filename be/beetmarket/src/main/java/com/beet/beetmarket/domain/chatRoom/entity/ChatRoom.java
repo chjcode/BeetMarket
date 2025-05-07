@@ -5,17 +5,13 @@ import com.beet.beetmarket.domain.post.entity.Post;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.global.jpa.base.BaseTimeEntity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -26,7 +22,7 @@ public class ChatRoom extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String schedule;
+    private LocalDateTime schedule;
 
     private String location;
 
@@ -55,7 +51,7 @@ public class ChatRoom extends BaseTimeEntity {
         this.location = location;
     }
 
-    public void updateSchedule(String schedule) {
+    public void updateSchedule(LocalDateTime schedule) {
         this.schedule = schedule;
     }
 
