@@ -77,12 +77,10 @@ public class UserController {
     @GetMapping("/my/schedule")
     public ResponseEntity<ResponseWrapper<List<ScheduleResponseDto>>> getUserSchedule(
             @AuthenticationPrincipal User user,
-            @RequestParam String start,
-            @RequestParam String end
+            @RequestParam LocalDateTime start,
+            @RequestParam LocalDateTime end
     ) {
-        LocalDateTime startTime = LocalDateTime.parse(start);
-        LocalDateTime endTime = LocalDateTime.parse(end);
-        List<ScheduleResponseDto> scheduleResponseDtoList = userService.getUserSchedule(user.getId(), startTime, endTime);
+        List<ScheduleResponseDto> scheduleResponseDtoList = userService.getUserSchedule(user.getId(), start, end);
 
         return ResponseWrapperFactory.setResponse(
                 HttpStatus.OK,
