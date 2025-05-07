@@ -1,4 +1,7 @@
 import { NavItem } from "./NavItem";
+import ChatIcon from '@/shared/ui/icons/ChatIcon';
+import HomeIcon from '@/shared/ui/icons/HomeIcon';
+import MyIcon from '@/shared/ui/icons/MyIcon';
 
 export const BottomNav = () => {
   return (
@@ -6,8 +9,8 @@ export const BottomNav = () => {
       <NavItem to="/" label="홈" icon = {<HomeIcon />} />
       <NavItem to="/1" label="??" />
       <NavItem to="/2" label="+" />
-      <NavItem to="/chatting" label="채팅" />
-      <NavItem to="/mypage" label="마이페이지" />
+      <NavItem to="/chatting" label="채팅"  icon = {<ChatIcon />} />
+      <NavItem to="/mypage" label="마이" icon = {<MyIcon />} />
     </nav>
   );
 };
