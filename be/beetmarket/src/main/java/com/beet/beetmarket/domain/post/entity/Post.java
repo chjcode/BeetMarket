@@ -55,6 +55,9 @@ public class Post extends BaseTimeEntity {
 
     private Long view;
 
+    // bucket에서 경로 구분을 위한 post uuid
+    private String uuid;
+
     @Builder
     public Post(User user, Category category, String title, String content, Integer price,
                 String status, String region, String location,

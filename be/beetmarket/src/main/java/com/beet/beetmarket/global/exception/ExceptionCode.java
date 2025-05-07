@@ -16,7 +16,13 @@ public enum ExceptionCode implements ResponseCode {
 	USER_NOT_FOUND("user-404-2", "해당 사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 	USER_ALREADY_EXISTS("user-400-1", "이미 존재하는 사용자입니다", HttpStatus.BAD_REQUEST),
 	INVALID_USER_DATA("user-400-2", "잘못된 사용자 데이터입니다", HttpStatus.BAD_REQUEST),
-	NICKNAME_ALREADY_TAKEN("user-400-3", "이미 사용 중인 닉네임입니다", HttpStatus.BAD_REQUEST);
+	NICKNAME_ALREADY_TAKEN("user-400-3", "이미 사용 중인 닉네임입니다", HttpStatus.BAD_REQUEST),
+
+	INVALID_FILE_TYPE("file-400-1", "허용되지 않은 파일 형식입니다. ", HttpStatus.BAD_REQUEST),
+	INVALID_IMAGE_FILE_TYPE("file-400-2", "이미지에 허용되지 않은 파일 형식입니다. ", HttpStatus.BAD_REQUEST),
+	INVALID_VIDEO_FILE_TYPE("file-400-3", "동영상에 허용되지 않은 파일 형식입니다. ", HttpStatus.BAD_REQUEST),
+	PRESIGNED_URL_GENERATION_FAILED("file-500-1", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+
 
 	private String code;
 	private String message;
