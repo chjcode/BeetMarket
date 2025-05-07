@@ -32,13 +32,13 @@ public class UserService {
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        return com.beet.beetmarket.domain.user.dto.UserResponseDto.from(user);
+        return UserResponseDto.from(user);
     }
 
     public UserResponseDto getUserByNickname(String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
 
-        return com.beet.beetmarket.domain.user.dto.UserResponseDto.from(user);
+        return UserResponseDto.from(user);
     }
 
 
