@@ -1,20 +1,18 @@
 package com.beet.beetmarket.domain.post.entity;
 
 import com.beet.beetmarket.domain.category.entity.Category;
+import com.beet.beetmarket.domain.image.entity.Image;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.global.jpa.base.BaseTimeEntity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -49,6 +47,12 @@ public class Post extends BaseTimeEntity {
 
     private String model3dUrl;
 
+    @OneToMany(mappedBy = "post")
+    @OrderBy("sequence ASC")
+    private List<Image> imageUrls = new ArrayList<>();
+
+    private String thumbnailUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "buyer_id")
     private User buyer;
@@ -61,7 +65,7 @@ public class Post extends BaseTimeEntity {
     @Builder
     public Post(User user, Category category, String title, String content, Integer price,
                 String status, String region, String location,
-                String videoUrl, String model3dUrl, User buyer, Long view) {
+                String videoUrl, String model3dUrl, List<Image> imageUrls, String thumbnailUrl, User buyer, Long view) {
         this.user = user;
         this.category = category;
         this.title = title;
@@ -72,6 +76,8 @@ public class Post extends BaseTimeEntity {
         this.location = location;
         this.videoUrl = videoUrl;
         this.model3dUrl = model3dUrl;
+        this.imageUrls = imageUrls;
+        this.thumbnailUrl = thumbnailUrl;
         this.buyer = buyer;
         this.view = view;
     }
