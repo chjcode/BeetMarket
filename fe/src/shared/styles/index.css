@@ -7,6 +7,25 @@
     font-style: normal;
 }
 
+:root {
+  /* 색상 설정 */
+  --color-primary: #A349A4;
+  --color-error: #EE1414;
+  --color-alarm: #FF0000;
+  --color-text-primary: #000000;  /* 검정 */
+  --color-text-secondary: #4F4F4F;  /* 가장 진한 회색 */
+  --color-text-label: #8C8C8C;  /* 연한 회색 */
+  --color-input-stroke: #CBCBCB;  /* input form 테두리 색상 */
+  --color-text-placeholder: #888888;  /* placeholder text color */
+  --color-like: #F24822; /* 찜 활성화 빨간색 */
+  --color-dislike: #7E7E7E; /* 찜 비활성화 회색 */
+  --color-deactivate-bottom-bar: #B0B3BA;  /* 바텀 바 비활성화 회색*/
+  --color-filter-activate: #832A2A; /* 필터링 활성화 색상 */
+  --color-filter-deactivate: #D9D9D9;  /* 필터링 비활성화 색상 */
+  --color-selling: #D53A3A;  /* 판매 색상 */
+  --color-buying: #4B72DE;  /* 구매 색상 */
+}
+
 body {
   font-family: 'Pretendard', sans-serif;
 }
