@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage/ProductPage/HomePage";
-import LoginPage from "@/pages/LoginPage";
+import AuthPage from "@/pages/AuthPage";
 import MyPage from "@/pages/MyPage";
 import ChatsPage from "@/pages/ChattingPage";
 
@@ -11,7 +11,7 @@ export const routes: RouteObject[] = [
     element: <MainLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "login", element: <LoginPage /> },
+      { path: "auth", element: <AuthPage /> },
       { path: "chatting", element: <ChatsPage /> },
       { path: "mypage", element: <MyPage /> },
     ],
