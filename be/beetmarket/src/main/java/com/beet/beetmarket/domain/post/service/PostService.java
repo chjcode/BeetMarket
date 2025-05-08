@@ -4,6 +4,7 @@ import com.beet.beetmarket.domain.category.entity.Category;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
 import com.beet.beetmarket.domain.image.entity.Image;
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
+import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
 import com.beet.beetmarket.domain.post.entity.Post;
 import com.beet.beetmarket.domain.post.entity.Status;
@@ -66,5 +67,38 @@ public class PostService {
         }
 
         postRepository.save(post);
+    }
+
+    public void updatePost(Long userId, Long postId, UpdatePostRequestDto request) {
+        User user = userRepository.findById(userId).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
+        if(!post.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException();
+        }
+
+        Category category = categoryRepository.findByName(request.category()).orElseThrow();
+
+        List<Image> newImages = new ArrayList<>();
+
+        for (int i = 0; i < request.images().size(); i++) {
+            Image newImg = Image.builder()
+                    .post(post)
+                    .imageOrigin(request.images().get(i))
+                    .sequence(i)
+                    .build();
+            newImages.add(newImg);
+        }
+
+        post.updatePost(
+                category,
+                request.title(),
+                request.content(),
+                request.price(),
+                request.region(),
+                request.location(),
+                request.video(),
+                newImages
+        );
+
     }
 }
