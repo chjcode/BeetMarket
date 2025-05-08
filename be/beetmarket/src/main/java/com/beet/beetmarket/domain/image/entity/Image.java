@@ -30,6 +30,8 @@ public class Image extends BaseTimeEntity {
 
     private String imageOrigin;
 
+    private String imagePreview;
+
     private Integer sequence;
 
     @Builder

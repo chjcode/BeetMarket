@@ -32,7 +32,9 @@ public class UploadService {
 
 	public PreSignedResponseDto generateUrls(PreSignedRequestDto requestDto, User user) {
 
-		String postUuid = UUID.randomUUID().toString();
+		String postUuid = (requestDto.uuid() != null && !requestDto.uuid().isBlank())
+			? requestDto.uuid()
+			: UUID.randomUUID().toString();
 
 		List<FileUrlDto> fileResponses = new ArrayList<>();
 		for (FileRequestDto file : requestDto.files()) {
