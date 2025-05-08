@@ -11,7 +11,7 @@ type NavItemProps = {
 
 export const NavItem: FC<NavItemProps> = ({ to, icon, label }) => {
   const iconClass =
-    icon === "plus" ? "w-10 h-10 stroke-[0.5] overflow-visible mt-1.5" : "w-6 h-6 mt-2";
+    icon === "plus" ? "w-8 h-8 stroke-[0.5] overflow-visible mt-2" : "w-6 h-6 mt-2 mb-1";
 
   return (
     <NavLink
