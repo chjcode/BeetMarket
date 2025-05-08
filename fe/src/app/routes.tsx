@@ -3,7 +3,7 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/LoginPage";
 import MyPage from "@/pages/MyPage";
-import ChattingListPage from "@/pages/ChattingPage";
+import ChatsPage from "@/pages/ChattingPage";
 
 export const routes: RouteObject[] = [
   {
@@ -12,7 +12,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
-      { path: "chatting", element: <ChattingListPage /> },
+      { path: "chatting", element: <ChatsPage /> },
       { path: "mypage", element: <MyPage /> },
     ],
   },

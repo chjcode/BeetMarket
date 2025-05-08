@@ -1,1 +1,1 @@
-export { default } from "./ui/ChattingListPage";
+export { default } from "./ui/ChatsPage";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const ChatListPage = () => {
+const ChatsPage = () => {
   const [filter, setFilter] = useState<"전체" | "구매" | "판매">("전체");
 
   const filters = ["전체", "구매", "판매"] as const;
@@ -168,4 +168,4 @@ const ChatListPage = () => {
   );
 };
 
-export default ChatListPage;
+export default ChatsPage;
