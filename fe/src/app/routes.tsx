@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
-import LoginPage from "@/pages/LoginPage";
+import LoginPage from "@/pages/AuthPage";
 import MyPage from "@/pages/MyPage";
 import ChatsPage from "@/pages/ChattingPage";
 
