@@ -16,9 +16,9 @@ const Button: React.FC<ButtonProps> = ({ width = '100%', height = '48px', label,
         backgroundColor: '#a64ca6',
         color: '#fff',
         border: 'none',
-        borderRadius: '16px',
-        fontSize: '2rem',
-        fontWeight: 'bold',
+        borderRadius: '0.5rem',
+        fontSize: '1.15em',
+        fontWeight: '500',
         cursor: 'pointer',
       }}
       onClick={onClick}
