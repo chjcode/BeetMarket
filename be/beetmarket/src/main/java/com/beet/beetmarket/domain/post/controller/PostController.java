@@ -25,7 +25,7 @@ public class PostController {
     }
 
 
-    @GetMapping("{postId}")
+    @GetMapping("/{postId}")
     public ResponseEntity<ResponseWrapper<PostDto>> getPost(@PathVariable Long postId) {
         return ResponseWrapperFactory.setResponse(
                 HttpStatus.OK,
