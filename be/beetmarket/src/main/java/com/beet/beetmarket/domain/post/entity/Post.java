@@ -37,7 +37,7 @@ public class Post extends BaseTimeEntity {
 
     private Integer price;
 
-    private String status;
+    private Status status;
 
     private String region;
 
@@ -47,11 +47,14 @@ public class Post extends BaseTimeEntity {
 
     private String model3dUrl;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     @OrderBy("sequence ASC")
     private List<Image> imageUrls = new ArrayList<>();
 
-    private String thumbnailUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "buyer_id")
@@ -64,8 +67,8 @@ public class Post extends BaseTimeEntity {
 
     @Builder
     public Post(User user, Category category, String title, String content, Integer price,
-                String status, String region, String location,
-                String videoUrl, String model3dUrl, List<Image> imageUrls, String thumbnailUrl, User buyer, Long view) {
+                Status status, String region, String location,
+                String videoUrl, String model3dUrl, List<Image> imageUrls, User buyer,  String uuid) {
         this.user = user;
         this.category = category;
         this.title = title;
@@ -77,8 +80,21 @@ public class Post extends BaseTimeEntity {
         this.videoUrl = videoUrl;
         this.model3dUrl = model3dUrl;
         this.imageUrls = imageUrls;
-        this.thumbnailUrl = thumbnailUrl;
         this.buyer = buyer;
-        this.view = view;
+        this.view = 0L;
+        this.uuid = uuid;
+    }
+
+    public void reserve() {
+        this.status = Status.RESERVED;
+    }
+
+    public void cancel() {
+        this.status = Status.AVAILABLE;
+    }
+
+    public void complete(User buyer) {
+        this.status = Status.COMPLETED;
+        this.buyer = buyer;
     }
 }
