@@ -35,12 +35,28 @@
 #
 # CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port"]
 
-FROM python:3.13-slim
+FROM python:3.13
 
 # 필수 시스템 패키지 설치 (AliceVision 실행에 필요한 라이브러리 포함)
 RUN apt-get update && \
     apt-get install -y \
+        cmake \
+        git \
+        gcc \
+        libtool nasm \
+        automake autoconf \
+        build-essential \
+        libboost-all-dev \
+        libeigen3-dev \
+        libtiff-dev \
+        libpng-dev \
+        libraw-dev \
+        libopenexr-dev \
+        libceres-dev \
+        libsuitesparse-dev \
+        libgoogle-glog-dev \
         wget \
+        zip \
         unzip \
         ffmpeg \
         libgl1 \
@@ -65,12 +81,21 @@ RUN apt-get update && \
 
 # AliceVision CLI 바이너리 다운로드 및 설치
 WORKDIR /opt
-RUN wget https://github.com/alicevision/AliceVision/archive/refs/tags/v3.2.0.tar.gz && \
-    tar -xzf v3.2.0.tar.gz && \
-    rm v3.2.0.tar.gz
+# RUN wget https://github.com/alicevision/AliceVision/archive/refs/tags/v3.2.0.tar.gz && \
+#     tar -xzf v3.2.0.tar.gz && \
+#     rm v3.2.0.tar.gz
+RUN git clone https://github.com/alicevision/AliceVision.git --recursive
+WORKDIR /opt/AliceVision
+RUN git submodule update -i
+WORKDIR /opt
+RUN mkdir build
+WORKDIR /opt/build
+RUN cmake -DALICEVISION_BUILD_DEPENDENCIES=ON -DCMAKE_INSTALL_PREFIX=$PWD/../install ../AliceVision
+RUN make VERBOSE=1 2>&1 | tee make.log
+RUN make install
 
 # PATH 환경변수에 AliceVision 바이너리 등록
-ENV PATH="/opt/v3.2.0/bin:$PATH"
+ENV PATH="/opt/AliceVision/bin:$PATH"
 
 # FastAPI, 기타 Python 패키지 설치
 WORKDIR /app
@@ -81,3 +106,51 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
+
+# FROM ubuntu:22.04
+#
+# ENV DEBIAN_FRONTEND=noninteractive
+# WORKDIR /opt
+#
+# # 🧱 기본 의존성 설치 (Python + C++ 빌드용)
+# RUN apt-get update && apt-get install -y \
+#     wget curl git build-essential cmake \
+#     libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev \
+#     libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev \
+#     libbz2-dev libexpat1-dev liblzma-dev tk-dev libffi-dev \
+#     libgl1 libglu1-mesa libxrender1 libxi6 libxcomposite1 \
+#     libxcursor1 libxdamage1 libxext6 libxtst6 libxrandr2 \
+#     libdbus-1-3 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+#     libxss1 libasound2 libgtk-3-0 ffmpeg zip unzip \
+#     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#
+# # 🐍 Python 3.13.0 설치
+# RUN wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0.tgz && \
+#     tar xzf Python-3.13.0.tgz && \
+#     cd Python-3.13.0 && \
+#     ./configure --enable-optimizations && \
+#     make -j$(nproc) && \
+#     make altinstall && \
+#     ln -s /usr/local/bin/python3.13 /usr/bin/python && \
+#     ln -s /usr/local/bin/pip3.13 /usr/bin/pip && \
+#     cd .. && rm -rf Python-3.13.0*
+#
+# # 🛠️ AliceVision 소스 클론 및 빌드
+# RUN git clone https://github.com/alicevision/AliceVision.git --recursive
+# RUN mkdir /opt/build
+# WORKDIR /opt/build
+# RUN cmake -DALICEVISION_BUILD_DEPENDENCIES=ON -DCMAKE_INSTALL_PREFIX=/opt/install /opt/AliceVision
+# RUN make -j10 VERBOSE=1
+# RUN make install
+#
+# # 🔧 PATH 설정
+# ENV PATH="/opt/install/bin:$PATH"
+#
+# # 🐍 FastAPI 및 Python 패키지 설치
+# WORKDIR /app
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
+#
+# # 💼 앱 소스 복사 및 실행
+# COPY . .
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
