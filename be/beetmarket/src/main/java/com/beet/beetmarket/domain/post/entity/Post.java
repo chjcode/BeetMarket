@@ -68,7 +68,7 @@ public class Post extends BaseTimeEntity {
     @Builder
     public Post(User user, Category category, String title, String content, Integer price,
                 Status status, String region, String location,
-                String videoUrl, String model3dUrl, List<Image> imageUrls, User buyer,  String uuid) {
+                String videoUrl, String model3dUrl, List<Image> imageUrls, String uuid) {
         this.user = user;
         this.category = category;
         this.title = title;
@@ -80,9 +80,22 @@ public class Post extends BaseTimeEntity {
         this.videoUrl = videoUrl;
         this.model3dUrl = model3dUrl;
         this.imageUrls = imageUrls;
-        this.buyer = buyer;
         this.view = 0L;
         this.uuid = uuid;
+    }
+
+    public void updatePost(Category category, String title, String content, Integer price,
+                           String region, String location, String videoUrl,
+                           List<Image> newImages) {
+        this.category = category;
+        this.title = title;
+        this.content = content;
+        this.price = price;
+        this.region = region;
+        this.location = location;
+        this.videoUrl = videoUrl;
+        this.imageUrls.clear();
+        this.imageUrls.addAll(newImages);
     }
 
     public void reserve() {

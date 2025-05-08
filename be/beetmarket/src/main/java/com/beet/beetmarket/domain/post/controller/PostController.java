@@ -1,6 +1,7 @@
 package com.beet.beetmarket.domain.post.controller;
 
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
+import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
 import com.beet.beetmarket.domain.post.service.PostService;
 import com.beet.beetmarket.domain.user.entity.User;
@@ -40,6 +41,20 @@ public class PostController {
             @RequestBody CreatePostRequestDto request) {
 
         postService.createPost(user.getId(), request);
+
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null
+        );
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<ResponseWrapper<Void>> updatePost(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long postId,
+            @RequestBody UpdatePostRequestDto request
+    ) {
+        postService.updatePost(user.getId(), postId, request);
 
         return ResponseWrapperFactory.setResponse(
                 HttpStatus.OK,
