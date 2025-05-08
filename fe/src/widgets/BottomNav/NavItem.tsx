@@ -18,7 +18,7 @@ export const NavItem: FC<NavItemProps> = ({ to, icon, label }) => {
       to={to}
       className={({ isActive }) =>
         `flex flex-col items-center w-full h-full text-xs overflow-visible hover:bg-gray-100 rounded-2xl ${
-          isActive ? "text-purple-600" : "text-gray-500"
+          isActive ? "text-[#A349A4]" : "text-gray-500"
         }`
       }
     >
