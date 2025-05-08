@@ -17,7 +17,7 @@ const Layout = () => {
         className="
           w-full 
           min-w-[360px] 
-          max-w-[600px] 
+          max-w-[480px] 
           flex flex-col 
           bg-white 
           shadow-md 
@@ -25,7 +25,7 @@ const Layout = () => {
       >
         {showHeader && (
           <header className="sticky top-0 bg-white z-10">
-            <TopBar/>
+            <TopBar />
           </header>
         )}
 
