@@ -9,4 +9,4 @@ export const Icon = ({
 }) => {
   const IconComponent = iconMap[name];
   return <IconComponent className={className} />;
-};
+}; 
