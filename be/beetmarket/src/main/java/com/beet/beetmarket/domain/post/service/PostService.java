@@ -76,7 +76,7 @@ public class PostService {
 
         imageProcessPublisher.publishImages(post.getId(), post.getUuid(), request.images());
         if(request.video() != null) {
-            videoProcessPublisher.publishVideos(post.getId(), post.getUuid(), request.video());
+            videoProcessPublisher.publishVideos(userId, post.getId(), post.getUuid(), request.video());
         }
     }
 
@@ -113,7 +113,7 @@ public class PostService {
 
         imageProcessPublisher.publishImages(post.getId(), post.getUuid(), request.images());
         if(request.video() != null) {
-            videoProcessPublisher.publishVideos(post.getId(), post.getUuid(), request.video());
+            videoProcessPublisher.publishVideos(userId, post.getId(), post.getUuid(), request.video());
         }
     }
 }
