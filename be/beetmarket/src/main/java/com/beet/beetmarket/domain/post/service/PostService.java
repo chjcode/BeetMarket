@@ -11,6 +11,8 @@ import com.beet.beetmarket.domain.post.entity.Status;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.domain.user.repository.UserRepository;
+import com.beet.beetmarket.global.redis.ImageProcessPublisher;
+import com.beet.beetmarket.global.redis.VideoProcessPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +27,16 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageProcessPublisher imageProcessPublisher;
+    private final VideoProcessPublisher videoProcessPublisher;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CategoryRepository categoryRepository, ImageProcessPublisher imageProcessPublisher, VideoProcessPublisher videoProcessPublisher) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.imageProcessPublisher = imageProcessPublisher;
+        this.videoProcessPublisher = videoProcessPublisher;
     }
 
 
@@ -67,6 +73,11 @@ public class PostService {
         }
 
         postRepository.save(post);
+
+        imageProcessPublisher.publishImages(post.getId(), post.getUuid(), request.images());
+        if(request.video() != null) {
+            videoProcessPublisher.publishVideos(post.getId(), post.getUuid(), request.video());
+        }
     }
 
     public void updatePost(Long userId, Long postId, UpdatePostRequestDto request) {
@@ -100,5 +111,9 @@ public class PostService {
                 newImages
         );
 
+        imageProcessPublisher.publishImages(post.getId(), post.getUuid(), request.images());
+        if(request.video() != null) {
+            videoProcessPublisher.publishVideos(post.getId(), post.getUuid(), request.video());
+        }
     }
 }
