@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import beetsad from "./beetsad.png";
+import beetsad from "@/shared/assets/beetsad.png";
+import Button from "@/shared/ui/Button/Button";
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
@@ -27,22 +28,11 @@ const NotFoundPage = () => {
       <div style={{ color: "#6B4A7C", fontSize: 20, marginBottom: 40 }}>
         페이지를 찾을 수 없습니다.
       </div>
-      <button
-        style={{
-          background: "#A349A4",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          padding: "12px 0",
-          width: 240,
-          fontSize: 16,
-          fontWeight: 600,
-          cursor: "pointer"
-        }}
+      <Button
+        width="240px"
+        label="이전 페이지로 돌아가기"
         onClick={() => navigate(-1)}
-      >
-        이전 페이지로 돌아가기
-      </button>
+      />
     </div>
   );
 };
