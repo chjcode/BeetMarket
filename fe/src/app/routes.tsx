@@ -5,7 +5,7 @@ import AuthPage from "@/pages/AuthPage";
 import MyPage from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
-
+import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -16,6 +16,7 @@ export const routes: RouteObject[] = [
       { path: "auth", element: <AuthPage /> },
       { path: "chatting", element: <ChatsPage /> },
       { path: "mypage", element: <MyPage /> },
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ];
