@@ -2,10 +2,11 @@ import { RouteObject } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage/ProductPage/HomePage";
 import AuthPage from "@/pages/AuthPage";
-import MyPage from "@/pages/MyPage";
+import {MyPage, PurchasesPage, SalesPage, FavoritesPage} from "@/pages/mypage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
+
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -15,7 +16,15 @@ export const routes: RouteObject[] = [
       { path: "pick", element: <PickPage /> },
       { path: "auth", element: <AuthPage /> },
       { path: "chatting", element: <ChatsPage /> },
-      { path: "mypage", element: <MyPage /> },
+      {
+        path: "mypage",
+        children: [
+          { index: true, element: <MyPage /> },
+          { path: "purchases", element: <PurchasesPage /> },
+          { path: "sales", element: <SalesPage /> },
+          { path: "favorites", element: <FavoritesPage /> },
+        ],
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
