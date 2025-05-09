@@ -5,8 +5,8 @@ import {BottomNav} from "@/widgets/BottomNav";
 const Layout = () => {
   const { pathname } = useLocation();
 
-  const noHeaderRoutes = ["/login"];
-  const noBottomNavRoutes = ["/login"];
+  const noHeaderRoutes = ["/login", "/signup"];
+  const noBottomNavRoutes = ["/login", "/signup"];
 
   const showHeader = !noHeaderRoutes.includes(pathname);
   const showBottomNav = !noBottomNavRoutes.includes(pathname);
