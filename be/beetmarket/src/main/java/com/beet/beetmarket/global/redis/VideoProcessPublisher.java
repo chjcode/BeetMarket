@@ -15,11 +15,11 @@ public class VideoProcessPublisher {
     private static final String STREAM_KEY = "video-process-stream";
     private final StringRedisTemplate redisTemplate;
 
-    public void publishVideos(Long postId,String videoUrl) {
+    public void publishVideos(String postUuid,String videoUrl) {
         if (videoUrl == null || videoUrl.isBlank()) return;
 
         Map<String,String> msg = new HashMap<>();
-        msg.put("postId",  postId.toString());
+        msg.put("postId",  postUuid);
         msg.put("videoUrl", videoUrl);
 
         redisTemplate.opsForStream()
