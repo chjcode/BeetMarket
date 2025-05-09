@@ -74,7 +74,7 @@ public class UploadService {
 		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
 		String fileUuid = UUID.randomUUID().toString();
 
-		return String.format("%d/%s/%s/%s.%s",
+		return String.format("%d/%s/%s%s.%s",
 			userId,
 			postUuid,
 			timestamp,
