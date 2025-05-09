@@ -17,11 +17,11 @@ public class ImageProcessPublisher {
 
     private final StringRedisTemplate redisTemplate;
 
-    public void publishImages(Long postId, List<String> imageUrls) {
+    public void publishImages(String postUuid, List<String> imageUrls) {
         if (imageUrls == null || imageUrls.isEmpty()) return;
 
         Map<String,String> msg = new HashMap<>();
-        msg.put("postId",  postId.toString());
+        msg.put("postId",  postUuid);
         msg.put("imageUrls", String.join(",", imageUrls));
 
         redisTemplate.opsForStream()
