@@ -5,6 +5,7 @@ import AuthPage from "@/pages/AuthPage";
 import MyPage from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
+import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
 
 export const routes: RouteObject[] = [
   {
@@ -16,6 +17,7 @@ export const routes: RouteObject[] = [
       { path: "auth", element: <AuthPage /> },
       { path: "chatting", element: <ChatsPage /> },
       { path: "mypage", element: <MyPage /> },
+      { path: "product/:id", element: <ProductDetailPage />}
     ],
   },
 ];
