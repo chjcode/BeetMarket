@@ -11,4 +11,4 @@ export const MyPage = () => {
       <NavLink to="favorites">찜</NavLink>
     </div>
   );
-};
+}; 
