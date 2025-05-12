@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage/ProductPage/HomePage";
-import {LoginPage, SignUpPage } from "@/pages/AuthPage";
+import  LoginPage  from "@/pages/login"
 import {MyPage, PurchasesPage, SalesPage, FavoritesPage} from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
@@ -30,6 +30,6 @@ export const routes: RouteObject[] = [
     ],
   },
   { path: "login", element: <LoginPage /> },
-  { path: "signup", element: <SignUpPage /> },
+  // { path: "signup", element: <SignupPage /> },
   { path: "*", element: <NotFoundPage /> },
 ];
