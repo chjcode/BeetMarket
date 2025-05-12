@@ -49,7 +49,7 @@
 //   },
 // ];
 
-export const FavoritesPage = () => {
+const FavoritesPage = () => {
 	return (
 		<div>
 			찜
@@ -57,3 +57,5 @@ export const FavoritesPage = () => {
 		</div>
 	)
 }
+
+export default FavoritesPage

@@ -51,7 +51,7 @@ import { Product } from "@/features/mypage/api/types";
 //   },
 // ];
 
-export const SalesPage = () => {
+const SalesPage = () => {
   const { data, isLoading, error } = useSalesProductsQuery();
   const [filter, setFilter] = useState<"all" | "selling" | "sold">("all");
 
@@ -75,3 +75,5 @@ export const SalesPage = () => {
     </div>
   );
 };
+
+export default SalesPage;
