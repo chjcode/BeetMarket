@@ -60,8 +60,8 @@ export const SalesPage = () => {
 
   const filteredData: Product[] = data.content.filter((item) => {
     if (filter === "all") return true;
-    if (filter === "selling") return item.status === "true";
-    if (filter === "sold") return item.status === "false";
+    if (filter === "selling") return item.status === true;
+    if (filter === "sold") return item.status === false;
   });
 
   return (
