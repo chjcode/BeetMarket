@@ -3,6 +3,7 @@ import ProductDetailBottomBar from "@/widgets/ProductDetailBottomBar/ProductDeta
 import ProductImageCarousel from "@/entities/Products/ui/ProductImageCarousel";
 import { TopBarDetail } from "@/widgets/TopBar/TopBarDetail"
 import { useParams, useNavigate } from "react-router-dom"
+import { useDragScroll } from "@/shared/hooks/useDragScroll";
 import { productList, sameCategoryProducts, sameCategorySoldHistory } from "@/entities/Products/DummyProducts";
 
 
@@ -10,6 +11,9 @@ const ProductDetailPage = () => {
 
   const { id } = useParams();
   const navigate = useNavigate()
+
+  const sameProductScrollRef = useDragScroll<HTMLDivElement>();
+  const soldHistoryScrollRef = useDragScroll<HTMLDivElement>();
 
   const productId = parseInt(id ?? "", 10)
   const product = productList.find((p) => p.id === productId)
@@ -19,7 +23,7 @@ const ProductDetailPage = () => {
   }
 
   return (
-    <div className="relative pb-24">
+    <div className="relative pb-16">
       <div className="absolute top-0 left-0 w-full z-10">
         <TopBarDetail />
       </div>
@@ -58,7 +62,7 @@ const ProductDetailPage = () => {
         {/* 동일 카테고리 다른 물건 */}
         <div className="mb-[14px]">
           <div className="font-bold mb-[8px]">동일 카테고리 다른 물건</div>
-          <div className="flex overflow-x-auto gap-2 no-scrollbar">
+          <div ref={sameProductScrollRef} className="flex overflow-x-auto gap-2 no-scrollbar select-none">
             {sameCategoryProducts.map((item, idx) => (
               <DetailProductCard key={idx} {...item} />
             ))}
@@ -71,7 +75,7 @@ const ProductDetailPage = () => {
         {/* 동일 카테고리 거래 내역 */}
         <div className="mb-4">
           <div className="font-bold mb-[8px]">동일 카테고리 거래 내역</div>
-          <div className="flex overflow-x-auto gap-2 no-scrollbar">
+          <div ref={soldHistoryScrollRef} className="flex overflow-x-auto gap-2 no-scrollbar select-none">
             {sameCategorySoldHistory.map((item, idx) => (
               <DetailProductCard key={idx} {...item} />
             ))}

@@ -11,7 +11,7 @@ const HomeProductCard = ({ id, name, price, imageUrl }: Product) => {
 
   return (
     <div onClick={handleClick} className="flex flex-col cursor-pointer">
-      <img src={imageUrl} alt={name} className="w-full aspect-square rounded-[12px] object-cover" />
+      <img src={imageUrl} alt={name} className="w-full aspect-square rounded-[12px] object-cover" draggable={false}/>
       <div className="mt-[5px] text-sm">{name}</div>
       <div className="text-sm font-semibold">{price.toLocaleString()}원</div>
     </div>

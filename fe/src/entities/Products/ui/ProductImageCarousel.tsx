@@ -13,7 +13,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ imageUrls }
     slideChanged(slider) {
       setCurrentSlide(slider.track.details.rel);
     },
-    mode: "snap", // snap or free-snap
+    mode: "snap",
     rubberband: false,
   });
 
@@ -22,7 +22,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ imageUrls }
       {/* 슬라이더 영역 */}
       <div
         ref={sliderRef}
-        className="keen-slider w-full h-full rounded-md"
+        className="keen-slider w-full h-full"
       >
         {imageUrls.map((url, idx) => (
           <div

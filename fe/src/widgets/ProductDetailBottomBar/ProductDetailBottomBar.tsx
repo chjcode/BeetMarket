@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaHeart, FaRegHeart } from "react-icons/fa"; // react-icons 사용할 경우
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 interface ProductDetailBottomBarProps {
   price: number;

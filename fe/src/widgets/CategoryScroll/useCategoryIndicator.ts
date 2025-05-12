@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, RefObject } from "react";
 
-export const useCategoryIndicator = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
+export const useCategoryIndicator = (scrollRef: RefObject<HTMLDivElement>) => {
   const [scrollPercent, setScrollPercent] = useState(0);
 
   useEffect(() => {
@@ -16,7 +15,7 @@ export const useCategoryIndicator = () => {
 
     el.addEventListener("scroll", handleScroll);
     return () => el.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [scrollRef]);
 
-  return { scrollRef, scrollPercent };
+  return scrollPercent;
 };
