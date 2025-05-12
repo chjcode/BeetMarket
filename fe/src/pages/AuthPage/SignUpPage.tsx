@@ -1,5 +1,5 @@
 import Button from "@/shared/ui/Button/Button";
-import InputTextField  from "@/shared/ui/TextForm"
+// import InputTextField  from "@/shared/ui/TextForm"
 
 export const SignUpPage = () => {
   return (
@@ -7,7 +7,7 @@ export const SignUpPage = () => {
       <h2 className="text-2xl font-bold h-[52px] flex items-center">
         회원 정보 입력
       </h2>
-      <InputTextField/>
+      {/* <InputTextField/> */}
       <Button label="서비스 시작하기" />
     </div>
   );

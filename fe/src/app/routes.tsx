@@ -14,8 +14,6 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
-      { path: "login", element: <LoginPage /> },
-      { path: "signup", element: <SignUpPage /> },
       { path: "chatting", element: <ChatsPage /> },
       {
         path: "mypage",
@@ -26,7 +24,9 @@ export const routes: RouteObject[] = [
           { path: "favorites", element: <FavoritesPage /> },
         ],
       },
-      { path: "*", element: <NotFoundPage /> },
     ],
   },
+  { path: "login", element: <LoginPage /> },
+  { path: "signup", element: <SignUpPage /> },
+  { path: "*", element: <NotFoundPage /> },
 ];
