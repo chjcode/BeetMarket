@@ -39,7 +39,10 @@ const ProductDetailPage = () => {
             <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="프로필" className="w-8 h-8 rounded-full" />
             <div className="text-sm">{product.sellerName} · {product.sellerLocation}</div>
           </div>
-          <button className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full">3D 보기</button>
+          <button 
+            className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full"
+            onClick={() => navigate(`/product/${id}/3d`)}
+          >3D 보기</button>
         </div>
 
         <div className="border-t border-gray-200 my-[12px]" />
