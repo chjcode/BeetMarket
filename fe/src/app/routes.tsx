@@ -6,6 +6,7 @@ import {MyPage, PurchasesPage, SalesPage, FavoritesPage} from "@/pages/mypage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
+import AlarmPage from "@/pages/UtilPage/AlarmPage";
 
 export const routes: RouteObject[] = [
   {
@@ -24,6 +25,8 @@ export const routes: RouteObject[] = [
           { path: "favorites", element: <FavoritesPage /> },
         ],
       },
+
+      { path: "alarm", element: <AlarmPage /> },
     ],
   },
   { path: "login", element: <LoginPage /> },
