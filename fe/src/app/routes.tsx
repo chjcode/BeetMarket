@@ -6,6 +6,7 @@ import MyPage from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
+import AlarmPage from "@/pages/UtilPage/AlarmPage";
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -17,6 +18,7 @@ export const routes: RouteObject[] = [
       { path: "chatting", element: <ChatsPage /> },
       { path: "mypage", element: <MyPage /> },
       { path: "*", element: <NotFoundPage /> },
+      { path: "alarm", element: <AlarmPage /> },
     ],
   },
 ];
