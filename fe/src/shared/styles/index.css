@@ -7,6 +7,18 @@
     font-style: normal;
 }
 
+@font-face {
+  font-family: 'MoneygraphyRounded';
+  src: url('/src/shared/assets/fonts/Moneygraphy-Rounded.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@theme {
+  --font-moneygraphy: 'MoneygraphyRounded', sans-serif;
+}
+
 :root {
   /* 색상 설정 */
   --color-primary: #A349A4;
