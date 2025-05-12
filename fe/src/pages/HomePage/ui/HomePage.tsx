@@ -1,4 +1,4 @@
-import {TopBar} from "@/widgets/TopBar";
+// import {TopBar} from "@/widgets/TopBar";
 import Button from "@/shared/ui/Button/Button"
 const HomePage = () => {
   return (

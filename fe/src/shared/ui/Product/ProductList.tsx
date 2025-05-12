@@ -1,11 +1,15 @@
 import { ProductItem, ProductItemProps } from "./ProductItem";
 
-export const ProductList = ({products}: ProductItemProps[]) => {
-	return (
+interface ProductListProps {
+  products: ProductItemProps[];
+}
+
+export const ProductList = ({ products }: ProductListProps) => {
+  return (
     <div className="flex flex-col gap-2">
       {products.map((item) => (
-        <ProductItem key={item.postId} product={item} />
+        <ProductItem key={item.postId} {...item} />
       ))}
     </div>
   );
-}
+};

@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import beetsad from "@/shared/assets/beetsad.png";
 import Button from "@/shared/ui/Button/Button";

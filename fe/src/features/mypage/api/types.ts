@@ -1,11 +1,11 @@
 export interface Product {
-  postId: string;
+  postId: number;
   title: string;
-  price: string;
-  status: string;
+  price: number;
+  status: boolean;
   thumbnail: string;
-  view: string;
-  like: string;
+  view: number;
+  like: number;
 }
 
 export interface ProductResponse {
