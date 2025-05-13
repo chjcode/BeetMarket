@@ -84,6 +84,7 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
 
     print(f"사진 추출 완료: postId={postId}, filename={filename}")
 
+    # photogrammetry 파이프라인 수행
     OUTPUT_DIR = Path(LOCAL_MODELS_DIR) / uuid
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     INPUT_DIR = str(frames_dir)
@@ -96,9 +97,10 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     print(result.stdout)
 
+    # 3D 모델 minio에 업로드
     UPLOAD_DIR = Path(f"/{userId}/{uuid}")
     MODEL_BUCKET = "model"
-    OBJECT_NAMES = ['texture_1001.png', 'texturedMesh.mtl', 'texturedMesh.obj']
+    OBJECT_NAMES = ['texturedMesh.mtl', 'texturedMesh.obj']
     for object in OBJECT_NAMES:
         try:
             minio_client.fput_object(
@@ -108,6 +110,17 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
             )
         except S3Error as err:
             print(f"에러 : {err}")
+    for png_file in OUTPUT_DIR.glob("*.png"):
+        try:
+            minio_client.fput_object(
+                MODEL_BUCKET,
+                str(UPLOAD_DIR / png_file.name),
+                str(png_file)
+            )
+        except S3Error as err:
+            print(f"에러 : {err}")
+
+    # DB에 3D모델 파일 주소 업데이트
     model_public_url = f"https://k12a307.p.ssafy.io:8100/{MODEL_BUCKET}" + str(UPLOAD_DIR) + "/"
     cursor.execute("UPDATE post SET model_3d_url = %s WHERE id = %s", (model_public_url, postId))
     conn.commit()
@@ -123,7 +136,7 @@ while True:
                     print("Data:", message_data)
                     # do something
 
-                    uuid = message_data['uuid']
+                    uuid = message_data['postUuid']
                     filename = message_data['videoUrl']
                     prefix = "https://k12a307.p.ssafy.io:8100/uploads"
                     filename = filename.replace(prefix, "")
