@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface InputTextFieldProps {
     label: string;
     placeholder?: string;

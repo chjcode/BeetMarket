@@ -1,8 +1,10 @@
 export const TopBarDetail = () => {
   return (
-    <div className="w-full flex justify-between items-center px-4 py-3 text-black">
-      <div className="text-lg font-bold">Detail Bar</div>
-      <button className="text-xl">알림</button>
+    <div className="h-[54px] flex items-center justify-between px-4 shadow-sm">
+      <div className="text-lg font-bold">서브 페이지</div>
+      {/* <button className="text-xl">알림</button>  */}
     </div>
   );
 };
+
+

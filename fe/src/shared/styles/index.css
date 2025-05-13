@@ -7,6 +7,36 @@
     font-style: normal;
 }
 
+@font-face {
+  font-family: 'MoneygraphyRounded';
+  src: url('/src/shared/assets/fonts/Moneygraphy-Rounded.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@theme {
+  --font-moneygraphy: 'MoneygraphyRounded', sans-serif;
+}
+
+
+@theme {
+  --animate-bounce: bounce 5s linear infinite;
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(-1%);
+      /* animation-timing-function: cubic-bezier(0.8, 0, 1, 1); */
+    }
+    50% {
+      transform: translateY(0);
+      /* animation-timing-function: cubic-bezier(0, 0, 0.2, 1); */
+    }
+  }
+}
+
+
+
 :root {
   /* 색상 설정 */
   --color-primary: #A349A4;
