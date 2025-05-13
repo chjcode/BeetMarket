@@ -46,10 +46,10 @@ spring:
       port: 6379
       password: ${REDIS_PWD}
   elasticsearch:
+    uris: ${ELASTIC_URI}
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
     restclient:
-      uris: ${ELASTIC_URI}
-      username: ${ELASTIC_USERNAME}
-      password: ${ELASTIC_PASSWORD}
       ssl:
         bundle: es-ca
   ssl:
