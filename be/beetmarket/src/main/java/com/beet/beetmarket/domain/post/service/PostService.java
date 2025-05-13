@@ -2,39 +2,57 @@ package com.beet.beetmarket.domain.post.service;
 
 import com.beet.beetmarket.domain.category.entity.Category;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
+import com.beet.beetmarket.domain.favorite.entity.FavoriteRepository;
 import com.beet.beetmarket.domain.image.entity.Image;
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
+import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Post;
+import com.beet.beetmarket.domain.post.entity.PostDocument;
 import com.beet.beetmarket.domain.post.entity.Status;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
+import com.beet.beetmarket.domain.post.repository.PostSearchRepository;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.domain.user.repository.UserRepository;
 import com.beet.beetmarket.global.redis.ImageProcessPublisher;
 import com.beet.beetmarket.global.redis.VideoProcessPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostSearchRepository searchRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final FavoriteRepository favoriteRepository;
     private final ImageProcessPublisher imageProcessPublisher;
     private final VideoProcessPublisher videoProcessPublisher;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CategoryRepository categoryRepository, ImageProcessPublisher imageProcessPublisher, VideoProcessPublisher videoProcessPublisher) {
+    public PostService(
+            PostRepository postRepository,
+            PostSearchRepository searchRepository,
+            UserRepository userRepository,
+            CategoryRepository categoryRepository,
+            FavoriteRepository favoriteRepository,
+            ImageProcessPublisher imageProcessPublisher,
+            VideoProcessPublisher videoProcessPublisher
+    ) {
         this.postRepository = postRepository;
+        this.searchRepository = searchRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.favoriteRepository = favoriteRepository;
         this.imageProcessPublisher = imageProcessPublisher;
         this.videoProcessPublisher = videoProcessPublisher;
     }
@@ -44,6 +62,25 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow();
 
         return PostDto.from(post);
+    }
+
+    public Page<PostListDto> searchPosts(Long userId, String keyword, String category, String region, Status status, Pageable pageable) {
+        Page<PostDocument> docs = searchRepository.search(keyword, category, region, status, pageable);
+
+        List<Long> postIds = docs.stream().map(PostDocument::getId).toList();
+
+        Set<Long> likeIds = (userId ==null || postIds.isEmpty())
+        ? Collections.emptySet()
+        : favoriteRepository.findLikedPostIds(userId, postIds);
+
+        List<PostListDto> content = docs.stream()
+                .map(doc -> PostListDto.from(
+                        doc,
+                        likeIds.contains(doc.getId())
+                ))
+                .toList();
+
+        return new PageImpl<>(content, pageable, docs.getTotalElements());
     }
 
     public void createPost(Long userId, CreatePostRequestDto request) {
