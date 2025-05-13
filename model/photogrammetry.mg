@@ -5,17 +5,18 @@
         "fileVersion": "1.1",
         "template": false,
         "nodesVersions": {
+            "Publish": "1.3",
             "DepthMap": "5.0",
+            "Meshing": "7.0",
+            "Texturing": "6.0",
             "ImageMatching": "2.0",
             "CameraInit": "9.0",
-            "Meshing": "7.0",
-            "FeatureExtraction": "1.3",
-            "Texturing": "6.0",
-            "PrepareDenseScene": "3.1",
-            "DepthMapFilter": "4.0",
-            "MeshFiltering": "3.0",
+            "FeatureMatching": "2.0",
             "StructureFromMotion": "3.3",
-            "FeatureMatching": "2.0"
+            "MeshFiltering": "3.0",
+            "PrepareDenseScene": "3.1",
+            "FeatureExtraction": "1.3",
+            "DepthMapFilter": "4.0"
         }
     },
     "graph": {
@@ -31,7 +32,7 @@
                 "split": 1
             },
             "uids": {
-                "0": "1f5e6181dff188f46adf974577c7ec2a7e150b6d"
+                "0": "5ac0f9b990da581246554835ac8101bc965f5956"
             },
             "internalFolder": "{cache}/{nodeType}/{uid0}/",
             "inputs": {
@@ -44,7 +45,7 @@
                 "outputMeshFileType": "obj",
                 "colorMapping": {
                     "enable": true,
-                    "colorMappingFileType": "exr"
+                    "colorMappingFileType": "png"
                 },
                 "bumpMapping": {
                     "enable": true,
@@ -89,7 +90,7 @@
                 "output": "{cache}/{nodeType}/{uid0}/",
                 "outputMesh": "{cache}/{nodeType}/{uid0}/texturedMesh.{outputMeshFileTypeValue}",
                 "outputMaterial": "{cache}/{nodeType}/{uid0}/texturedMesh.mtl",
-                "outputTextures": "{cache}/{nodeType}/{uid0}/texture_*.exr"
+                "outputTextures": "{cache}/{nodeType}/{uid0}/texture_*.png"
             }
         },
         "Meshing_1": {
@@ -645,6 +646,38 @@
             "outputs": {
                 "output": "{cache}/{nodeType}/{uid0}/"
             }
+        },
+        "Publish_1": {
+            "nodeType": "Publish",
+            "position": [
+                2234,
+                8
+            ],
+            "parallelization": {
+                "blockSize": 0,
+                "size": 3,
+                "split": 1
+            },
+            "uids": {
+                "0": "ec17a02808f573f6c7d69d1b1179936a7682cdfc"
+            },
+            "internalFolder": "{cache}/{nodeType}/{uid0}/",
+            "inputs": {
+                "inputFiles": [
+                    "{Texturing_1.outputMesh}",
+                    "{Texturing_1.outputMaterial}",
+                    "{Texturing_1.outputTextures}"
+                ],
+                "output": "",
+                "verboseLevel": "info"
+            },
+            "internalInputs": {
+                "invalidation": "",
+                "comment": "",
+                "label": "",
+                "color": ""
+            },
+            "outputs": {}
         }
     }
 }

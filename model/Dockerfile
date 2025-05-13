@@ -46,6 +46,7 @@ RUN apt-get update && \
         libtool nasm \
         automake autoconf \
         build-essential \
+        pkg-config liblz4-dev libbz2-dev \
         libboost-all-dev \
         libeigen3-dev \
         libtiff-dev \
@@ -91,7 +92,7 @@ WORKDIR /opt
 RUN mkdir build
 WORKDIR /opt/build
 RUN cmake -DALICEVISION_BUILD_DEPENDENCIES=ON -DCMAKE_INSTALL_PREFIX=$PWD/../install ../AliceVision
-RUN make VERBOSE=1 2>&1 | tee make.log
+RUN make j10 VERBOSE=1 2>&1 | tee make.log
 RUN make install
 
 # PATH 환경변수에 AliceVision 바이너리 등록
