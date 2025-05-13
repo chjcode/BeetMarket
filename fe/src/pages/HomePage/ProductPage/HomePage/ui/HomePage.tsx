@@ -3,10 +3,12 @@ import HomeProductGrid from "@/widgets/HomeProductGrid/HomeProductGrid";
 
 const HomePage = () => {
   return (
-    <div className="pt-[20px] pb-[10px]">
+    <div className="pt-[20px] pb-[10px] w-full max-w-[480px] mx-auto overflow-x-hidden">
       <CategoryScroll />
       <div className="mt-[13px]">
-        <h2 className="text-base font-semibold mb-[15px]">상품 추천 or 랜덤 or 기간별 인기</h2>
+        <h2 className="text-base font-semibold mb-[15px]">
+          상품 추천 or 랜덤 or 기간별 인기
+        </h2>
         <HomeProductGrid />
       </div>
     </div>

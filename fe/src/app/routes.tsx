@@ -9,7 +9,7 @@ import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 import AlarmPage from "@/pages/UtilPage/AlarmPage";
 import { RequireAuth } from "@/app/providers/RequireAuth";
 import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
-import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage/Product3DViewerPage";
+import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage";
 import AddPage from "@/pages/AddPage/AddPage";
 export const routes: RouteObject[] = [
   {

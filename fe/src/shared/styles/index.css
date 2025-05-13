@@ -60,6 +60,10 @@ body {
   font-family: 'Pretendard', sans-serif;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
