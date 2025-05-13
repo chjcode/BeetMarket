@@ -30,7 +30,7 @@ const Layout = () => {
           )
         )}
 
-        <main className="flex-1 overflow-auto p-4">
+        <main className="flex-1 overflow-auto p-4 pb-[56px]">
           <Outlet />
         </main>
 

@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage/ProductPage/HomePage";
 import { LoginPage }  from "@/pages/login"
+import { SignupPage } from "@/pages/signup"
 import { MyPage, PurchasesPage, SalesPage, FavoritesPage } from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
@@ -22,7 +23,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
-      { path: "chatting", element: <ChatsPage /> },
+      { path: "chats", element: <ChatsPage /> },
       {
         path: "mypage",
         children: [
@@ -39,6 +40,6 @@ export const routes: RouteObject[] = [
     ],
   },
   { path: "login", element: <LoginPage /> },
-  // { path: "signup", element: <SignupPage /> },
+  { path: "signup", element: <SignupPage /> },
   { path: "*", element: <NotFoundPage /> },
 ];

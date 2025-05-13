@@ -6,6 +6,9 @@ import { IoIosArrowBack } from "react-icons/io";
 import { BsPlusCircle } from "react-icons/bs";
 import { VscBell, VscBellDot } from "react-icons/vsc";
 import { GoHeart, GoHeartFill } from "react-icons/go";
+import { HiOutlineTrash } from "react-icons/hi";
+import { LuMap } from "react-icons/lu";
+import { IoEllipsisVerticalSharp } from "react-icons/io5";
 
 export const iconMap = {
   home: HiHome,
@@ -20,6 +23,9 @@ export const iconMap = {
   bellDot: VscBellDot,
   heartfill: GoHeartFill,
   heart: GoHeart,
+  trash: HiOutlineTrash,
+  map: LuMap,
+  dots: IoEllipsisVerticalSharp,
 };
 
 export type IconName = keyof typeof iconMap;
