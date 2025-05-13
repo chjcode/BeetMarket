@@ -5,11 +5,11 @@ import {BottomNav} from "@/widgets/BottomNav";
 const Layout = () => {
   const { pathname } = useLocation();
 
-  const noHeaderRoutes = ["/login", "/signup"];
-  const noBottomNavRoutes = ["/login", "/signup"];
+  const noHeaderRoutes = ["/login", "/signup", "/product"];
+  const noBottomNavRoutes = ["/login", "/signup", "/product"];
 
-  const showHeader = !noHeaderRoutes.includes(pathname);
-  const showBottomNav = !noBottomNavRoutes.includes(pathname);
+  const showHeader = !noHeaderRoutes.some(route => pathname.startsWith(route));
+  const showBottomNav = !noBottomNavRoutes.some(route => pathname.startsWith(route));
 
   return (
     (
@@ -23,16 +23,18 @@ const Layout = () => {
           bg-white 
           shadow-md 
         "
-        >
-          {showHeader && (
+      >
+        {showHeader && (
+          pathname.startsWith("/product/") ? null : (
             <header className="sticky top-0 bg-white z-10">
               <TopBar />
             </header>
-          )}
+          )
+        )}
 
-          <main className="flex-1 overflow-auto p-4 ">
-            <Outlet />
-          </main>
+        <main className="flex-1 overflow-auto p-4">
+          <Outlet />
+        </main>
 
           {showBottomNav && (
             <footer className="sticky bottom-0 bg-white z-10">

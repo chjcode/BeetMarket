@@ -8,6 +8,8 @@ import ChatsPage from "@/pages/ChattingPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 import AlarmPage from "@/pages/UtilPage/AlarmPage";
 import { RequireAuth } from "@/app/providers/RequireAuth";
+import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
+import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage/Product3DViewerPage";
 
 export const routes: RouteObject[] = [
   {
@@ -28,9 +30,10 @@ export const routes: RouteObject[] = [
           { path: "purchases", element: <PurchasesPage /> },
           { path: "sales", element: <SalesPage /> },
           { path: "favorites", element: <FavoritesPage /> },
-        ],
+    ],
       },
-
+      { path: "product/:id", element: <ProductDetailPage />},
+      { path: "product/:id/3d", element: <Product3DViewerPage /> },
       { path: "alarm", element: <AlarmPage /> },
     ],
   },
