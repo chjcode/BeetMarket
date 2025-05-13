@@ -6,7 +6,7 @@ const HomeProductCard = ({ id, name, price, imageUrl }: Product) => {
 
   return (
     <div onClick={() => navigate(`/product/${id}`)} className="flex flex-col cursor-pointer mb-1">
-      <div className="w-full aspect-square relative overflow-hidden rounded-2xl">
+      <div className="w-full aspect-square relative overflow-hidden rounded-2xl shadow-md">
         <img
           src={imageUrl}
           alt={name}
