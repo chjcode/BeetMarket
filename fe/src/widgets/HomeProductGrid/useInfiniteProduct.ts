@@ -36,7 +36,7 @@ const dummyProducts = [
 ];
 
 export const useInfiniteProducts = create<ProductStore>((set, get) => ({
-//   products: [],
+//   products: [],  <- api 연결하면 이렇게 하면 될듯?
   products: dummyProducts,
   hasMore: true,
   fetchNext: () => {

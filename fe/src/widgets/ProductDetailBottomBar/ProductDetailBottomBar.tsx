@@ -12,6 +12,7 @@ const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, 
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-white border-t border-gray-200 z-50 w-full max-w-[480px] min-w-[360px] px-4">
       <div className="h-[54px] flex items-center justify-between">
+        
         {/* 하트 + 가격 */}
         <div className="flex items-center gap-2">
           <button

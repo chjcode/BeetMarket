@@ -5,11 +5,11 @@ import {BottomNav} from "@/widgets/BottomNav";
 const Layout = () => {
   const { pathname } = useLocation();
 
-  const noHeaderRoutes = ["/login, /product"];
-  const noBottomNavRoutes = ["/login, /product"];
+  const noHeaderRoutes = ["/login", "/product"];
+  const noBottomNavRoutes = ["/login", "/product"];
 
-  const showHeader = !noHeaderRoutes.includes(pathname);
-  const showBottomNav = !noBottomNavRoutes.includes(pathname);
+  const showHeader = !noHeaderRoutes.some(route => pathname.startsWith(route));
+  const showBottomNav = !noBottomNavRoutes.some(route => pathname.startsWith(route));
 
   return (
     <div className="flex justify-center bg-gray-50 min-h-screen">

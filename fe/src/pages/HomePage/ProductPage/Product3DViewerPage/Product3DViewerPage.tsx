@@ -5,9 +5,11 @@ const Product3DViewerPage = () => {
   const { id } = useParams();
 
   return (
-    <div className="p-4">
+    <div className="h-full flex flex-col overflow-hidden bg-white">
       <h1 className="text-xl font-bold mb-4">3D 보기</h1>
-      {id && <ModelViewer productId={id} />}
+      <div className="flex-1 overflow-hidden">
+        {id && <ModelViewer productId={id} />}
+      </div>
     </div>
   );
 };

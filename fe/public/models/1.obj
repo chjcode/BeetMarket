@@ -1,7 +1,7 @@
 # Blender 4.0.0
 # www.blender.org
-mtllib Unknown_Person_0508043731_texture.mtl
-o Unknown_Person_0508043731_texture
+mtllib 1.mtl
+o 1
 v 0.433155 0.420865 0.275577
 v 0.433958 0.444524 0.269986
 v 0.449410 0.420035 0.242705
