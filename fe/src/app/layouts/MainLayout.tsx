@@ -20,7 +20,6 @@ const Layout = () => {
           max-w-[480px] 
           flex flex-col 
           bg-white 
-          shadow-[0_1px_10px_rgba(0,0,0,0.1)]
         "
       >
         {showHeader && (
@@ -32,7 +31,6 @@ const Layout = () => {
         )}
 
         <main className="flex-1 overflow-auto p-4">
-
           <Outlet />
         </main>
 

@@ -1,11 +1,16 @@
 export interface Product {
-  postId: number;
+  id: number;
+  status: "AVAILABLE" | "RESERVED" | "COMPLETED";
   title: string;
+  categoryName: string;
   price: number;
-  status: boolean;
-  thumbnail: string;
-  view: number;
-  like: number;
+  region: string;
+  createdAt: string;
+  thumbnailUrl: string;
+  viewCount: number;
+  favoriteCount: number;
+  authorNickname: string;
+  isLiked: boolean;
 }
 
 export interface ProductResponse {
