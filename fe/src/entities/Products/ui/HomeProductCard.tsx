@@ -5,8 +5,8 @@ const HomeProductCard = ({ id, name, price, imageUrl }: Product) => {
   const navigate = useNavigate();
 
   return (
-    <div onClick={() => navigate(`/product/${id}`)} className="flex flex-col cursor-pointer">
-      <div className="w-full aspect-square relative overflow-hidden rounded-[12px]">
+    <div onClick={() => navigate(`/product/${id}`)} className="flex flex-col cursor-pointer mb-1">
+      <div className="w-full aspect-square relative overflow-hidden rounded-2xl">
         <img
           src={imageUrl}
           alt={name}
@@ -14,8 +14,8 @@ const HomeProductCard = ({ id, name, price, imageUrl }: Product) => {
           draggable={false}
         />
       </div>
-      <div className="mt-[5px] text-sm">{name}</div>
-      <div className="text-sm font-semibold">{price.toLocaleString()}원</div>
+      <div className="pl-2 mt-1 text-base ">{name}</div>
+      <div className="pl-2 text-base font-semibold">{price.toLocaleString()}원</div>
     </div>
   );
 };
