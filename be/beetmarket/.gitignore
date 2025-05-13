@@ -39,3 +39,4 @@ out/
 ### .env ###
 **/.env
 **/src/main/resources/.env.properties
+/src/main/resources/es-truststore.jks

@@ -45,6 +45,21 @@ spring:
       host: ${REDIS_HOST}
       port: 6379
       password: ${REDIS_PWD}
+  elasticsearch:
+    uris: ${ELASTIC_URI}
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
+    restclient:
+      ssl:
+        bundle: es-ca
+  ssl:
+    bundle:
+      jks:
+        es-ca:
+          truststore:
+            location: ${ES_TRUSTSTORE_PATH}
+            password: ${ES_TRUSTSTORE_PASSWORD}
+
 
 server:
   ssl:
