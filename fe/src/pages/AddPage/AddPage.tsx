@@ -2,14 +2,11 @@ import React, { useRef, useState } from "react";
 import InputTextField from "@/shared/ui/TextForm/TextForm";
 import Button from "@/shared/ui/Button/Button";
 
-const inputClass = "border-2 border-[#CBCBCB] focus:outline-none focus:border-2 rounded-xl px-4 py-3 placeholder-[#8B8B8B] text-[#000000] w-full";
-const labelClass = "text-lg font-bold mb-2";
 
 const AddPage = () => {
   const [price, setPrice] = useState("");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
-  const [subcategory, setSubcategory] = useState("");
   const [place, setPlace] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
