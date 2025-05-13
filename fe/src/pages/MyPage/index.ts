@@ -1,5 +1,4 @@
-
-export { MyPage } from "./Mypage";
-export { SalesPage } from "./SalesPage";
-export { FavoritesPage } from "./FavoritesPage";
-export { PurchasesPage } from "./PurchasesPage";
+export { default as MyPage } from "./Mypage";
+export { default as SalesPage } from "./SalesPage";
+export { default as FavoritesPage } from "./FavoritesPage";
+export { default as PurchasesPage } from "./PurchasesPage";

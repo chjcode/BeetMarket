@@ -12,9 +12,10 @@ const Layout = () => {
   const showBottomNav = !noBottomNavRoutes.includes(pathname);
 
   return (
-    <div className="flex justify-center bg-gray-50 min-h-screen">
-      <div
-        className="
+    (
+      <div className="flex justify-center w-screen bg-gray-100 min-h-screen">
+        <div
+          className="
           w-full 
           min-w-[360px] 
           max-w-[480px] 
@@ -22,25 +23,25 @@ const Layout = () => {
           bg-white 
           shadow-md 
         "
-      >
-        {showHeader && (
-          <header className="sticky top-0 bg-white z-10">
-            <TopBar />
-          </header>
-        )}
+        >
+          {showHeader && (
+            <header className="sticky top-0 bg-white z-10">
+              <TopBar />
+            </header>
+          )}
 
-        <main className="flex-1 overflow-auto p-4">
-          
-          <Outlet />
-        </main>
+          <main className="flex-1 overflow-auto p-4 ">
+            <Outlet />
+          </main>
 
-        {showBottomNav && (
-          <footer className="sticky bottom-0 bg-white z-10">
-            <BottomNav />
-          </footer>
-        )}
+          {showBottomNav && (
+            <footer className="sticky bottom-0 bg-white z-10">
+              <BottomNav />
+            </footer>
+          )}
+        </div>
       </div>
-    </div>
+    )
   );
 };
 

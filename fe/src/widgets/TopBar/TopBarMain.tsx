@@ -1,8 +1,21 @@
+import { NavLink } from "react-router-dom";
+import { Icon } from "@/shared/ui/Icon";
+
 export const TopBarMain = () => {
   return (
     <div className="h-[54px] flex items-center justify-between px-4 shadow-sm">
-      <div className="text-lg font-bold">비트마켓</div>
-      <button className="text-xl">알림</button>
+      <div className="flex items-center gap-3">
+        <img src="src/shared/assets/beet.png" className="h-[36px]" />
+        <div className="text-2xl font-bold font-moneygraphy pt-1">
+          비트마켓
+        </div>
+      </div>
+      <NavLink
+        to="/alarm"
+        className="flex w-[36px] h-[36px] justify-end items-center pointer-cursor"
+      >
+        <Icon name="bell" className="w-6 h-6 stroke-[0.5]" />
+      </NavLink>
     </div>
   );
 };

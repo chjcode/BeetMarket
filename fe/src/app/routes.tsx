@@ -1,17 +1,22 @@
 import { RouteObject } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage/ProductPage/HomePage";
-import {LoginPage, SignUpPage } from "@/pages/AuthPage";
-import {MyPage, PurchasesPage, SalesPage, FavoritesPage} from "@/pages/MyPage";
+import { LoginPage }  from "@/pages/login"
+import { MyPage, PurchasesPage, SalesPage, FavoritesPage } from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
 import ChatsPage from "@/pages/ChattingPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 import AlarmPage from "@/pages/UtilPage/AlarmPage";
+import { RequireAuth } from "@/app/providers/RequireAuth";
 
 export const routes: RouteObject[] = [
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <RequireAuth>
+        <MainLayout />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
@@ -30,6 +35,6 @@ export const routes: RouteObject[] = [
     ],
   },
   { path: "login", element: <LoginPage /> },
-  { path: "signup", element: <SignUpPage /> },
+  // { path: "signup", element: <SignupPage /> },
   { path: "*", element: <NotFoundPage /> },
 ];
