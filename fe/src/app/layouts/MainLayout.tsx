@@ -12,16 +12,15 @@ const Layout = () => {
   const showBottomNav = !noBottomNavRoutes.some(route => pathname.startsWith(route));
 
   return (
-    (
-      <div className="flex justify-center w-screen bg-gray-100 min-h-screen">
-        <div
-          className="
+    <div className="flex justify-center w-screen bg-gray-100 min-h-screen">
+      <div
+        className="
           w-full 
           min-w-[360px] 
           max-w-[480px] 
           flex flex-col 
           bg-white 
-          shadow-md 
+          shadow-[0_1px_10px_rgba(0,0,0,0.1)]
         "
       >
         {showHeader && (
@@ -33,17 +32,17 @@ const Layout = () => {
         )}
 
         <main className="flex-1 overflow-auto p-4">
+
           <Outlet />
         </main>
 
-          {showBottomNav && (
-            <footer className="sticky bottom-0 bg-white z-10">
-              <BottomNav />
-            </footer>
-          )}
-        </div>
+        {showBottomNav && (
+          <footer className="sticky bottom-0 bg-white z-10">
+            <BottomNav />
+          </footer>
+        )}
       </div>
-    )
+    </div>
   );
 };
 
