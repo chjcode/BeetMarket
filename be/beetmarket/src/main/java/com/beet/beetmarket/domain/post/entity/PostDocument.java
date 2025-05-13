@@ -20,10 +20,10 @@ public class PostDocument {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
+    @Field(type = FieldType.Text)
     private String title;
 
-    @Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
+    @Field(type = FieldType.Text)
     private String content;
 
     @Field(type = FieldType.Keyword)
