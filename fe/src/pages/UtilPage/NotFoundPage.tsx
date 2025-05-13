@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import beetsad from "@/shared/assets/beetsad.png";
+import beetsad from "/beetsad.png";
 import Button from "@/shared/ui/Button/Button";
 
 const NotFoundPage = () => {
