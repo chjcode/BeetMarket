@@ -2,8 +2,10 @@ package com.beet.beetmarket.domain.post.service;
 
 import com.beet.beetmarket.domain.category.entity.Category;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
-import com.beet.beetmarket.domain.favorite.entity.FavoriteRepository;
+import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
+import com.beet.beetmarket.domain.favorite.repository.FavoriteRepository;
 import com.beet.beetmarket.domain.image.entity.Image;
+import com.beet.beetmarket.domain.image.repository.ImageRepository;
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
@@ -37,6 +39,7 @@ public class PostService {
     private final FavoriteRepository favoriteRepository;
     private final ImageProcessPublisher imageProcessPublisher;
     private final VideoProcessPublisher videoProcessPublisher;
+    private final ImageRepository imageRepository;
 
     @Autowired
     public PostService(
@@ -46,8 +49,8 @@ public class PostService {
             CategoryRepository categoryRepository,
             FavoriteRepository favoriteRepository,
             ImageProcessPublisher imageProcessPublisher,
-            VideoProcessPublisher videoProcessPublisher
-    ) {
+            VideoProcessPublisher videoProcessPublisher,
+            ImageRepository imageRepository) {
         this.postRepository = postRepository;
         this.searchRepository = searchRepository;
         this.userRepository = userRepository;
@@ -55,13 +58,17 @@ public class PostService {
         this.favoriteRepository = favoriteRepository;
         this.imageProcessPublisher = imageProcessPublisher;
         this.videoProcessPublisher = videoProcessPublisher;
+        this.imageRepository = imageRepository;
     }
 
 
-    public PostDto getPost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow();
+    public PostDto getPost(Long userId, Long postId) {
+        Post post = postRepository.findByIdWithUserAndCategory(postId).orElseThrow();
+        List<String> images = imageRepository.findImageUrlsByPostIdOrderBySequence(postId);
+        LikeInfoDto likeInfo = favoriteRepository.fetchLikeInfo(postId, userId);
 
-        return PostDto.from(post);
+        post.viewPost();
+        return PostDto.from(post, images, likeInfo.likeCount(), likeInfo.liked());
     }
 
     public Page<PostListDto> searchPosts(Long userId, String keyword, String category, String region, Status status, Pageable pageable) {
