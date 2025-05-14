@@ -25,7 +25,7 @@ public record PostDto (
     Long like,
     Boolean isLiked
 ) {
-    public static PostDto from(Post post, List<String> imageUrls, Long likes, Boolean isLiked) {
+    public static PostDto from(Post post, List<String> imageUrls, Long view, Long likes, Boolean isLiked) {
         User seller = post.getUser();
         String category = post.getCategory().getName();
 
@@ -43,7 +43,7 @@ public record PostDto (
                 post.getCreatedAt(),
                 imageUrls,
                 post.getModel3dUrl(),
-                post.getView(),
+                view,
                 likes,
                 isLiked
         );

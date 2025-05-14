@@ -14,16 +14,21 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
 
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
 public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
     private final ElasticsearchOperations ops;
+    private static final IndexCoordinates INDEX = IndexCoordinates.of("post");
 
     public PostSearchRepositoryImpl(ElasticsearchOperations ops) {
         this.ops = ops;
@@ -108,5 +113,16 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
         long total = hits.getTotalHits();
 
         return new PageImpl<>(docs, pageable, total);
+    }
+
+    @Override
+    public void updateViewInEs(Long postId, Long newView) {
+        Document doc = Document.from(Map.of("view", newView));
+
+        UpdateQuery uq = UpdateQuery.builder(postId.toString())
+                .withDocument(doc)
+                .build();
+
+        ops.update(uq, INDEX);
     }
 }

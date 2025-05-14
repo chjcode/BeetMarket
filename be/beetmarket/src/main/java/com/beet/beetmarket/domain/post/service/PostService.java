@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,9 @@ public class PostService {
     private final ImageProcessPublisher imageProcessPublisher;
     private final VideoProcessPublisher videoProcessPublisher;
     private final ImageRepository imageRepository;
+    private final StringRedisTemplate redisTemplate;
+
+    private static final String REDIS_VIEW_PREFIX = "post:view:";
 
     @Autowired
     public PostService(
@@ -50,7 +54,8 @@ public class PostService {
             FavoriteRepository favoriteRepository,
             ImageProcessPublisher imageProcessPublisher,
             VideoProcessPublisher videoProcessPublisher,
-            ImageRepository imageRepository) {
+            ImageRepository imageRepository,
+            StringRedisTemplate redisTemplate) {
         this.postRepository = postRepository;
         this.searchRepository = searchRepository;
         this.userRepository = userRepository;
@@ -59,6 +64,7 @@ public class PostService {
         this.imageProcessPublisher = imageProcessPublisher;
         this.videoProcessPublisher = videoProcessPublisher;
         this.imageRepository = imageRepository;
+        this.redisTemplate = redisTemplate;
     }
 
 
@@ -66,9 +72,18 @@ public class PostService {
         Post post = postRepository.findByIdWithUserAndCategory(postId).orElseThrow();
         List<String> images = imageRepository.findImageUrlsByPostIdOrderBySequence(postId);
         LikeInfoDto likeInfo = favoriteRepository.fetchLikeInfo(postId, userId);
+        String key = REDIS_VIEW_PREFIX + postId;
+        Long view = redisTemplate.opsForValue().increment(key);
 
-        post.viewPost();
-        return PostDto.from(post, images, likeInfo.likeCount(), likeInfo.liked());
+        searchRepository.updateViewInEs(postId, view);
+
+        return PostDto.from(
+                post,
+                images,
+                view,
+                likeInfo.likeCount(),
+                likeInfo.liked()
+        );
     }
 
     public Page<PostListDto> searchPosts(Long userId, String keyword, String category, String region, Status status, Pageable pageable) {
@@ -76,7 +91,7 @@ public class PostService {
 
         List<Long> postIds = docs.stream().map(PostDocument::getId).toList();
 
-        Set<Long> likeIds = (userId ==null || postIds.isEmpty())
+        Set<Long> likeIds = (userId == null || postIds.isEmpty())
         ? Collections.emptySet()
         : favoriteRepository.findLikedPostIds(userId, postIds);
 
