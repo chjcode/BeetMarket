@@ -21,7 +21,6 @@ public class CategoryController {
     @GetMapping
     public List<String> getCategories() {
 
-        System.out.println("slakdfj");
         return categoryService.findAll();
     }
 }
