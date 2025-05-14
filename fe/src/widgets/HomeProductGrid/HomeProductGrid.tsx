@@ -8,7 +8,7 @@ const HomeProductGrid = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-[15px]">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-2">
         {products.map((product) => (
           <HomeProductCard key={product.id} {...product} />
         ))}

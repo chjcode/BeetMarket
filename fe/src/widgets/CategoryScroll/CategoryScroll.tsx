@@ -101,11 +101,11 @@ const CategoryScroll = () => {
         ref={scrollRef}
         className="overflow-x-auto no-scrollbar pb-4 w-full select-none"
       >
-        <div className="flex w-max gap-[12px]">
+        <div className="flex w-max gap-3">
           {row1.map((category, i) => (
             <div
               key={i}
-              className="shrink-0 w-[20vw] max-w-[96px] flex flex-col gap-[12px] items-center"
+              className="shrink-0 w-[20vw] max-w-[96px] flex flex-col gap-3 items-center"
             >
               <CategoryItem label={category.label} imageName={category.image} />
               {row2[i] && (
