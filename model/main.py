@@ -84,6 +84,8 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
 
     print(f"사진 추출 완료: postId={postId}, filename={filename}")
 
+
+
     # photogrammetry 파이프라인 수행
     OUTPUT_DIR = Path(LOCAL_MODELS_DIR) / uuid
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -122,7 +124,7 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
 
     # DB에 3D모델 파일 주소 업데이트
     model_public_url = f"https://k12a307.p.ssafy.io:8100/{MODEL_BUCKET}" + str(UPLOAD_DIR) + "/"
-    cursor.execute("UPDATE post SET model_3d_url = %s WHERE id = %s", (model_public_url, postId))
+    cursor.execute("UPDATE post SET model3d_url = %s WHERE id = %s", (model_public_url, postId))
     conn.commit()
 
 
