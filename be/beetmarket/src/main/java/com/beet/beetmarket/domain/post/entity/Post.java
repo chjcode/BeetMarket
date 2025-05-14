@@ -98,6 +98,10 @@ public class Post extends BaseTimeEntity {
         this.imageUrls.addAll(newImages);
     }
 
+    public void viewPost() {
+        this.view++;
+    }
+
     public void reserve() {
         this.status = Status.RESERVED;
     }

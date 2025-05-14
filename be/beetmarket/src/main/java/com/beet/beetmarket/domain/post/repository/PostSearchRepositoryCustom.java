@@ -13,4 +13,6 @@ public interface PostSearchRepositoryCustom {
             Status status,
             Pageable pageable
     );
+
+    void updateViewInEs(Long postId, Long newView);
 }

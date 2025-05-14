@@ -51,11 +51,16 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ResponseWrapper<PostDto>> getPost(@PathVariable Long postId) {
+    public ResponseEntity<ResponseWrapper<PostDto>> getPost(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long postId
+    ) {
+        Long userId = user != null ? user.getId() : null;
+
         return ResponseWrapperFactory.setResponse(
                 HttpStatus.OK,
                 null,
-                postService.getPost(postId)
+                postService.getPost(userId, postId)
         );
     }
 
