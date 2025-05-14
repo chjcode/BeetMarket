@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaShoppingBag, FaHeart } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegListAlt } from "react-icons/fa";
@@ -6,16 +6,12 @@ import { FiSettings } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi2";
 
 export const MyPage = () => {
-  const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center bg-white min-h-screen pt-6">
       {/* 프로필 영역 */}
       <div className="relative mb-2">
         <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-5xl text-gray-400" />
-        <button
-          className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow"
-          onClick={() => navigate("/mypage/edit")}
-        >
+        <button className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow">
           <FiSettings className="text-2xl text-black" />
         </button>
       </div>
