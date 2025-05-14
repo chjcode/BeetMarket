@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { FaShoppingBag, FaRegHeart, FaRegCalendarAlt } from "react-icons/fa";
+import { FaShoppingBag, FaHeart } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegListAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi2";
@@ -34,7 +35,7 @@ export const MyPage = () => {
         </NavLink>
         <NavLink to="/mypage/favorites" className="flex flex-col items-center">
           <div className="w-12 h-12 rounded-full bg-[#F7DAF1] flex items-center justify-center mb-1">
-            <FaRegHeart className="text-2xl text-[#A349A4]" />
+            <FaHeart className="text-2xl text-[#A349A4]" />
           </div>
           <span className="text-xs">관심목록</span>
         </NavLink>
