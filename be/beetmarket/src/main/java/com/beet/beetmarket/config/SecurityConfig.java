@@ -116,6 +116,8 @@ public class SecurityConfig {
 			.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
 				.userService(customOAuth2UserService)
 			)
+				.authorizationEndpoint(a -> a.baseUri("/api/oauth2/authorization"))
+				.redirectionEndpoint(r -> r.baseUri("/api/oauth2/code/*"))
 			.successHandler(customOAuth2SuccessHandler)
 		);
 
