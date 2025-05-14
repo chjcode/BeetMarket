@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import InputTextField from "@/shared/ui/TextForm/TextForm";
 import Button from "@/shared/ui/Button/Button";
 import { FiSettings } from "react-icons/fi";
