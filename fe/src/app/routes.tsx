@@ -11,7 +11,6 @@ import { RequireAuth } from "@/app/providers/RequireAuth";
 import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
 import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage";
 import AddPage from "@/pages/AddPage/AddPage";
-import MyPageEdit from "@/pages/MyPage/MyPageEdit";
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -31,7 +30,6 @@ export const routes: RouteObject[] = [
           { path: "purchases", element: <PurchasesPage /> },
           { path: "sales", element: <SalesPage /> },
           { path: "favorites", element: <FavoritesPage /> },
-          { path: "edit", element: <MyPageEdit /> },
     ],
       },
       { path: "product/:id", element: <ProductDetailPage />},
