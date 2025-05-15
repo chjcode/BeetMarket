@@ -20,7 +20,7 @@ const LoginPage = () => {
         <div className="flex flex-col justify-center items-center">
           <img src="/beet3.png" className="w-[140px] mb-4 animate-bounce" />
           <h1 className="text-[#370035] text-4xl font-extrabold font-moneygraphy tracking-wide">
-            비트마켓
+            비트마켓  
           </h1>
         </div>
         <GoogleLoginButton />

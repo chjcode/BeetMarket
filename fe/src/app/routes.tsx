@@ -13,7 +13,10 @@ import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPag
 import AddPage from "@/pages/AddPage/AddPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
 import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
+import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
+
 export const routes: RouteObject[] = [
+  { path: "auth-redirect", element: <AuthRedirectPage /> },
   {
     path: "/",
     element: (
@@ -34,9 +37,9 @@ export const routes: RouteObject[] = [
           { path: "sales", element: <SalesPage /> },
           { path: "favorites", element: <FavoritesPage /> },
           { path: "edit", element: <MyPageEdit /> },
-    ],
+        ],
       },
-      { path: "product/:id", element: <ProductDetailPage />},
+      { path: "product/:id", element: <ProductDetailPage /> },
       { path: "product/:id/3d", element: <Product3DViewerPage /> },
       { path: "alarm", element: <AlarmPage /> },
       { path: "add", element: <AddPage /> },
