@@ -1,5 +1,3 @@
-import React from "react";
-
 const categories = [
   { label: "전체보기", img: "/categoryImage/total_icon.png" },
   { label: "최근 본 상품", img: "/categoryImage/recent_icon.png" },
