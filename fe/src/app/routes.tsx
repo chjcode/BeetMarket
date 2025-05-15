@@ -15,6 +15,8 @@ import SchedulePage from "@/pages/MyPage/SchedulePage";
 import SearchPage from "@/pages/HomePage/SearchPage/SearchPage";
 import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/SearchResultPage";
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
+import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
+import MyPageEdit from "@/pages/MyPage/MyPageEdit";
 
 export const routes: RouteObject[] = [
   { path: "auth-redirect", element: <AuthRedirectPage /> },
@@ -29,6 +31,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
       { path: "chatting", element: <ChatsPage /> },
+      { path: "category", element: <CategoryPage /> },
       {
         path: "mypage",
         children: [
@@ -37,6 +40,7 @@ export const routes: RouteObject[] = [
           { path: "sales", element: <SalesPage /> },
           { path: "favorites", element: <FavoritesPage /> },
           { path: "schedule", element: <SchedulePage /> },
+          { path: "edit", element: <MyPageEdit /> },
         ],
       },
       { path: "product/:id",

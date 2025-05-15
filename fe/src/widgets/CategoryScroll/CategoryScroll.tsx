@@ -32,7 +32,7 @@ const CategoryScroll = () => {
         ref={scrollRef}
         className="overflow-x-auto no-scrollbar pb-4 w-full select-none"
       >
-        <div className="flex w-max gap-3">
+        <div className="flex w-max gap-3 px-1">
           {row1.map((category, i) => (
             <div
               key={i}
