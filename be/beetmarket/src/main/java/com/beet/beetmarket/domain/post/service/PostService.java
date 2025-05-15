@@ -1,6 +1,7 @@
 package com.beet.beetmarket.domain.post.service;
 
 import com.beet.beetmarket.domain.category.entity.Category;
+import com.beet.beetmarket.domain.category.exception.CategoryNotFoundException;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
 import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
 import com.beet.beetmarket.domain.favorite.repository.FavoriteRepository;
@@ -13,10 +14,13 @@ import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Post;
 import com.beet.beetmarket.domain.post.entity.PostDocument;
 import com.beet.beetmarket.domain.post.entity.Status;
+import com.beet.beetmarket.domain.post.exception.PostAccessDeniedException;
+import com.beet.beetmarket.domain.post.exception.PostNotFountException;
 import com.beet.beetmarket.domain.post.mapper.PostMapper;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
 import com.beet.beetmarket.domain.post.repository.PostSearchRepository;
 import com.beet.beetmarket.domain.user.entity.User;
+import com.beet.beetmarket.domain.user.exception.UserNotFoundException;
 import com.beet.beetmarket.domain.user.repository.UserRepository;
 import com.beet.beetmarket.global.redis.ImageProcessPublisher;
 import com.beet.beetmarket.global.redis.VideoProcessPublisher;
@@ -70,7 +74,7 @@ public class PostService {
 
 
     public PostDto getPost(Long userId, Long postId) {
-        Post post = postRepository.findByIdWithUserAndCategory(postId).orElseThrow();
+        Post post = postRepository.findByIdWithUserAndCategory(postId).orElseThrow(PostNotFountException::new);
         List<String> images = imageRepository.findImageUrlsByPostIdOrderBySequence(postId);
         LikeInfoDto likeInfo = favoriteRepository.fetchLikeInfo(postId, userId);
         String key = REDIS_VIEW_PREFIX + postId;
@@ -107,8 +111,8 @@ public class PostService {
     }
 
     public void createPost(Long userId, CreatePostRequestDto request) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Category category = categoryRepository.findByName(request.category()).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Category category = categoryRepository.findByName(request.category()).orElseThrow(CategoryNotFoundException::new);
         List<Image> images = new ArrayList<>();
         Post post = Post.builder()
                 .user(user)
@@ -144,13 +148,13 @@ public class PostService {
     }
 
     public void updatePost(Long userId, Long postId, UpdatePostRequestDto request) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Post post = postRepository.findById(postId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFountException::new);
         if(!post.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException();
+            throw new PostAccessDeniedException();
         }
 
-        Category category = categoryRepository.findByName(request.category()).orElseThrow();
+        Category category = categoryRepository.findByName(request.category()).orElseThrow(CategoryNotFoundException::new);
 
         List<Image> newImages = new ArrayList<>();
 
