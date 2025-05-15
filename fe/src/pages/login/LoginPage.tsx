@@ -1,7 +1,4 @@
 import { GoogleLoginButton } from "@/features/auth/ui/GoogleLoginButton";
-import { GoogleLoginButton2 } from "@/features/auth/ui/GoogleLoginButton2";
-import { GoogleLoginButton3 } from "@/features/auth/ui/GoogleLoginButton3";
-import { GoogleLoginButton4 } from "@/features/auth/ui/GoogleLoginButton4";
 
 const LoginPage = () => {
   return (
@@ -23,14 +20,10 @@ const LoginPage = () => {
         <div className="flex flex-col justify-center items-center">
           <img src="/beet3.png" className="w-[140px] mb-4 animate-bounce" />
           <h1 className="text-[#370035] text-4xl font-extrabold font-moneygraphy tracking-wide">
-            비트마켓
+            비트마켓  
           </h1>
         </div>
         <GoogleLoginButton />
-        <GoogleLoginButton3 />
-        <div className="mt-10"></div>
-        <GoogleLoginButton2 />
-        <GoogleLoginButton4 />
       </div>
     </div>
   );
