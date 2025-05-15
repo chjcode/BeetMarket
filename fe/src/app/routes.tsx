@@ -11,8 +11,9 @@ import { RequireAuth } from "@/app/providers/RequireAuth";
 import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
 import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage";
 import AddPage from "@/pages/AddPage/AddPage";
-import MyPageEdit from "@/pages/MyPage/MyPageEdit";
-import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
+import SchedulePage from "@/pages/MyPage/SchedulePage";
+import SearchPage from "@/pages/HomePage/SearchPage/SearchPage";
+import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/SearchResultPage";
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
 
 export const routes: RouteObject[] = [
@@ -28,7 +29,6 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
       { path: "chatting", element: <ChatsPage /> },
-      { path: "category", element: <CategoryPage /> },
       {
         path: "mypage",
         children: [
@@ -36,11 +36,21 @@ export const routes: RouteObject[] = [
           { path: "purchases", element: <PurchasesPage /> },
           { path: "sales", element: <SalesPage /> },
           { path: "favorites", element: <FavoritesPage /> },
-          { path: "edit", element: <MyPageEdit /> },
+          { path: "schedule", element: <SchedulePage /> },
         ],
       },
-      { path: "product/:id", element: <ProductDetailPage /> },
-      { path: "product/:id/3d", element: <Product3DViewerPage /> },
+      { path: "product/:id",
+        children: [
+          { index: true, element: <ProductDetailPage />},
+          { path: "3d", element: <Product3DViewerPage /> },
+        ],
+      },
+      { path: "search",
+        children: [
+          {index: true, element: <SearchPage /> },
+          { path: "result", element: <SearchResultPage /> },
+        ]
+      },
       { path: "alarm", element: <AlarmPage /> },
       { path: "add", element: <AddPage /> },
     ],
