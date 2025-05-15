@@ -17,6 +17,7 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.ScriptType;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -121,6 +122,18 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
 
         UpdateQuery uq = UpdateQuery.builder(postId.toString())
                 .withDocument(doc)
+                .build();
+
+        ops.update(uq, INDEX);
+    }
+
+    @Override
+    public void changeFavoriteCount(Long postId, int delta) {
+        UpdateQuery uq = UpdateQuery.builder(postId.toString())
+                .withScriptType(ScriptType.INLINE)
+                .withScript("ctx._source.favoriteCount = Math.max(0, ctx._source.favoriteCount + params.delta)")
+                .withLang("painless")
+                .withParams(Map.of("delta", delta))
                 .build();
 
         ops.update(uq, INDEX);

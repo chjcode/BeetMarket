@@ -2,6 +2,8 @@ package com.beet.beetmarket.domain.favorite.repository;
 
 import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
 import com.beet.beetmarket.domain.favorite.entity.Favorite;
+import com.beet.beetmarket.domain.post.entity.Post;
+import com.beet.beetmarket.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -34,4 +36,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     LikeInfoDto fetchLikeInfo(Long postId, Long userId);
 
     long countByPostId(Long postId);
+
+    int deleteByPostAndUser(Post post, User user);
 }

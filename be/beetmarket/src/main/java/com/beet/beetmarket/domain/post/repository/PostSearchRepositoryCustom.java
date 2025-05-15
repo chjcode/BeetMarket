@@ -15,4 +15,5 @@ public interface PostSearchRepositoryCustom {
     );
 
     void updateViewInEs(Long postId, Long newView);
+    void changeFavoriteCount(Long postId, int delta);
 }
