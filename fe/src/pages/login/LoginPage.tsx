@@ -1,7 +1,4 @@
 import { GoogleLoginButton } from "@/features/auth/ui/GoogleLoginButton";
-import { GoogleLoginButton2 } from "@/features/auth/ui/GoogleLoginButton2";
-import { GoogleLoginButton3 } from "@/features/auth/ui/GoogleLoginButton3";
-import { GoogleLoginButton4 } from "@/features/auth/ui/GoogleLoginButton4";
 
 const LoginPage = () => {
   return (
@@ -27,10 +24,6 @@ const LoginPage = () => {
           </h1>
         </div>
         <GoogleLoginButton />
-        <GoogleLoginButton3 />
-        <div className="mt-10"></div>
-        <GoogleLoginButton2 />
-        <GoogleLoginButton4 />
       </div>
     </div>
   );
