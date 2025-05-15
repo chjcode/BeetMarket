@@ -9,7 +9,7 @@ export const BottomNav = () => {
       <NavItem to="/" label="홈" icon="home" />
       <NavItem to="/pick" label="추천" icon="pick" />
       <NavItem to="/add" label="" icon="plus" />
-      <NavItem to="/chatting" label="채팅" icon="chat" />
+      <NavItem to="/chats" label="채팅" icon="chat" />
       <NavItem to="/mypage" label="마이" icon="user" />
     </nav>
   );

@@ -1,10 +1,9 @@
+import { ChatList } from "@/widgets/ChatList";
 
 const ChatsPage = () => {
-	return (
-		<div>
-
-		</div>
-	)
-}
+  return (
+		<ChatList />
+  );
+};
 
 export default ChatsPage;

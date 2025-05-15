@@ -4,7 +4,7 @@ import HomePage from "@/pages/HomePage/ProductPage/HomePage";
 import { LoginPage }  from "@/pages/login"
 import { MyPage, PurchasesPage, SalesPage, FavoritesPage } from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
-import ChatsPage from "@/pages/ChattingPage";
+import ChatsPage from "@/pages/chats";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 import AlarmPage from "@/pages/UtilPage/AlarmPage";
 import { RequireAuth } from "@/app/providers/RequireAuth";
@@ -12,6 +12,8 @@ import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
 import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage";
 import AddPage from "@/pages/AddPage/AddPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
+// import ChatRoomPage from "@/pages/chats/ChatRoomPage";
+
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -23,7 +25,13 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
-      { path: "chatting", element: <ChatsPage /> },
+      {   
+        path: "chats", 
+        children: [
+          { index: true, element: <ChatsPage /> },
+          // { path: ":id", element: <ChatRoomPage />},
+        ]
+      },
       {
         path: "mypage",
         children: [
