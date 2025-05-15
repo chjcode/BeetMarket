@@ -26,10 +26,16 @@ public class PostDocument {
     @Field(type = FieldType.Text)
     private String content;
 
+    @Field(type = FieldType.Long)
+    private Long authorId;
+
     @Field(type = FieldType.Keyword)
     private String authorNickname;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Long)
+    private Long buyerId;
+
+    @Field(type = FieldType.Keyword)    
     private String categoryName;
 
     @Field(type = FieldType.Integer)
