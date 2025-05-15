@@ -13,6 +13,7 @@ import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Post;
 import com.beet.beetmarket.domain.post.entity.PostDocument;
 import com.beet.beetmarket.domain.post.entity.Status;
+import com.beet.beetmarket.domain.post.mapper.PostMapper;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
 import com.beet.beetmarket.domain.post.repository.PostSearchRepository;
 import com.beet.beetmarket.domain.user.entity.User;
@@ -133,6 +134,9 @@ public class PostService {
 
         postRepository.save(post);
 
+        PostDocument document = PostMapper.toDocument(post, 0L);
+        searchRepository.save(document);
+
         imageProcessPublisher.publishImages(post.getId(), post.getUuid(), request.images());
         if(request.video() != null) {
             videoProcessPublisher.publishVideos(userId, post.getId(), post.getUuid(), request.video());
@@ -169,6 +173,11 @@ public class PostService {
                 request.video(),
                 newImages
         );
+
+        long likeCount = favoriteRepository.countByPostId(postId);
+        PostDocument document = PostMapper.toDocument(post, likeCount);
+
+        searchRepository.save(document);
 
         imageProcessPublisher.publishImages(post.getId(), post.getUuid(), request.images());
         if(request.video() != null) {
