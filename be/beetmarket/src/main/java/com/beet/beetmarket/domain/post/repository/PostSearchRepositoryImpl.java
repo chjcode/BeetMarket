@@ -28,7 +28,7 @@ import java.util.Map;
 @Repository
 public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
     private final ElasticsearchOperations ops;
-    private static final IndexCoordinates INDEX = IndexCoordinates.of("post");
+    private static final IndexCoordinates INDEX = IndexCoordinates.of("posts");
 
     public PostSearchRepositoryImpl(ElasticsearchOperations ops) {
         this.ops = ops;
@@ -117,7 +117,7 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
 
     @Override
     public void updateViewInEs(Long postId, Long newView) {
-        Document doc = Document.from(Map.of("view", newView));
+        Document doc = Document.from(Map.of("viewCount", newView));
 
         UpdateQuery uq = UpdateQuery.builder(postId.toString())
                 .withDocument(doc)

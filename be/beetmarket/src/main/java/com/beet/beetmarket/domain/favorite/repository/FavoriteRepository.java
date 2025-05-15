@@ -16,7 +16,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
         SELECT f.post.id
         FROM Favorite f
         WHERE f.user.id = :userId
-        AND f.post.id IN :postId
+        AND f.post.id IN :postIds
         """)
     Set<Long> findLikedPostIds(
             Long userId,
@@ -29,8 +29,9 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             (sum(case when f.user.id = :userId then 1 else 0 end) > 0)
         )
         FROM Favorite f
-        WHERE f.user.id = :userId
+        WHERE f.post.id = :postId
     """)
     LikeInfoDto fetchLikeInfo(Long postId, Long userId);
 
+    long countByPostId(Long postId);
 }

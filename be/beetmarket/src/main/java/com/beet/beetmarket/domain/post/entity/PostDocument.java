@@ -26,10 +26,16 @@ public class PostDocument {
     @Field(type = FieldType.Text)
     private String content;
 
+    @Field(type = FieldType.Long)
+    private Long authorId;
+
     @Field(type = FieldType.Keyword)
     private String authorNickname;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Long)
+    private Long buyerId;
+
+    @Field(type = FieldType.Keyword)    
     private String categoryName;
 
     @Field(type = FieldType.Integer)
@@ -41,7 +47,7 @@ public class PostDocument {
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime createdAt;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Keyword, index = false)
     private String thumbnailUrl;
 
     @Field(type = FieldType.Long)
