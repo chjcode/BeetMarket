@@ -12,6 +12,7 @@ import ProductDetailPage from "@/pages/HomePage/ProductPage/ProductDetailPage";
 import Product3DViewerPage from "@/pages/HomePage/ProductPage/Product3DViewerPage";
 import AddPage from "@/pages/AddPage/AddPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
+import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -24,6 +25,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
       { path: "chatting", element: <ChatsPage /> },
+      { path: "category", element: <CategoryPage /> },
       {
         path: "mypage",
         children: [
