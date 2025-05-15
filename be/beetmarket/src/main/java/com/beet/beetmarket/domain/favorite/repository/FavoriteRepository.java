@@ -29,7 +29,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             (sum(case when f.user.id = :userId then 1 else 0 end) > 0)
         )
         FROM Favorite f
-        WHERE f.user.id = :userId
+        WHERE f.post.id = :postId
     """)
     LikeInfoDto fetchLikeInfo(Long postId, Long userId);
 
