@@ -79,7 +79,6 @@ const ModelViewer = ({ productId }: ModelViewerProps) => {
   const [isInteracting, setIsInteracting] = useState(false);
   const interactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 모델 로드
   useEffect(() => {
     const loadModel = async () => {
       try {
@@ -95,16 +94,13 @@ const ModelViewer = ({ productId }: ModelViewerProps) => {
     loadModel();
   }, [productId]);
 
-  // 카메라 리셋
   const handleReset = () => setResetTrigger((prev) => prev + 1);
 
-  // 안내문 리셋
   const handleClickCanvas = () => {
     setShowHint(false);
     setTimeout(() => setShowHint(true), 3000);
   };
 
-  // pointer 이벤트 하나로 통합 (터치/마우스/펜 모두 감지)
   const handlePointerMove = () => {
     setIsInteracting(true);
     setShowHint(false);
@@ -114,7 +110,7 @@ const ModelViewer = ({ productId }: ModelViewerProps) => {
     interactionTimerRef.current = setTimeout(() => {
       setIsInteracting(false);
       setShowHint(true);
-    }, 2000); // 2초 후 안내문 다시 표시
+    }, 2000);
   };
 
   useEffect(() => {
