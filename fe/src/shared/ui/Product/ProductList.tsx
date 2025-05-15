@@ -6,12 +6,12 @@ interface ProductListProps {
 
 export const ProductList = ({ products }: ProductListProps) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       {products.map((item) => (
-        <>
-          <ProductItem key={item.id} {...item} />
-          <hr className="border-gray-200"/>
-        </>
+        <div key={item.id} className="flex flex-col gap-2">
+          <ProductItem {...item} />
+          <hr className="border-gray-100" />
+        </div>
       ))}
     </div>
   );
