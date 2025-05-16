@@ -9,16 +9,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Document(collection = "chat_messages")
+@Document("chat_room_reads")
 @Builder
-@Getter
 @Setter
-public class ChatMessage {
+@Getter
+public class ChatRoomRead {
     @Id
     private String id;
     private String roomId;
-    private String senderNickname;
-    private MessageType type;
-    private String content;
-    private Instant timestamp;
+    private String userNickname;
+    private String lastReadMessageId;
+    private Instant lastReadAt;
 }
