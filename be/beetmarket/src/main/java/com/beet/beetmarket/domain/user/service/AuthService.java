@@ -34,10 +34,10 @@ public class AuthService {
 	// refreshToken이 유효한지 확인하고 db에 있는 토큰인지 확인하고
 	// "Authorization"이라는 키로 accessToken과 refreshToken을 발급함.
 	public HttpHeaders setAccessToken(String token) {
-		String nickname = jwtUtil.getKey(token, "id");	// jwt 토큰에서 user의 아이디 가져옴
+		String oauthName = jwtUtil.getKey(token, "id");	// jwt 토큰에서 user의 아이디 가져옴
 
 		// Redis에서 저장된 refreshTokenEntity 조회 (없으면 예외 발생)
-		RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findById(nickname)
+		RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findById(oauthName)
 			.orElseThrow(() -> new RefreshTokenNotFoundException());
 
 		// 저장된 토큰과 전달받은 토큰이 일치하는지 확인
@@ -45,7 +45,7 @@ public class AuthService {
 			throw new RefreshTokenMismatchException();	// 추후 더 디테일한 exception으로 수정
 		}
 
-		User user = userRepository.getUserByOauthName(nickname);	// db에서 nickname으로 조회
+		User user = userRepository.getUserByOauthName(oauthName);	// db에서 nickname으로 조회
 		if (user == null) {	//user 없으면 exception
 			throw new UserNotFoundException();
 		}
@@ -67,8 +67,14 @@ public class AuthService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
 		headers.set("Authorization", "Bearer " + accessToken);
-		headers.set("Nickname", user.getNickname());
 
 		return headers;
+	}
+
+	public String getUserNicknameByToken(String token) {
+		String oauthName = jwtUtil.getKey(token, "id");	// jwt 토큰에서 user의 아이디 가져옴
+
+		User user = userRepository.getUserByOauthName(oauthName);
+		return user.getNickname();
 	}
 }

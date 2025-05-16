@@ -22,10 +22,14 @@ public class AuthController {
 	}
 
 	@GetMapping("/auth/issue")
-	public ResponseEntity<ResponseWrapper<Void>> issue(
+	public ResponseEntity<ResponseWrapper<Boolean>> issue(
 		@CookieValue("refreshToken") String token
 	) {
+		String nickname = authService.getUserNicknameByToken(token);
+
 		return ResponseWrapperFactory.setResponse(HttpStatus.OK,
-			authService.setAccessToken(token));
+			authService.setAccessToken(token),
+			nickname != null && !nickname.isBlank()
+		);
 	}
 }
