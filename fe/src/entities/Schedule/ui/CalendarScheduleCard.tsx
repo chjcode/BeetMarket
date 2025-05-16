@@ -18,7 +18,7 @@ const CalendarScheduleCard = ({
   const isBuy = type === "BUY";
 
   return (
-    <div className="flex items-center gap-3 border-b py-3">
+    <div className="flex items-center gap-3 border-t py-3 px-4">
       <div className="flex flex-col items-center text-sm w-[60px]">
         <span className={`font-bold ${isBuy ? "text-blue-500" : "text-red-500"}`}>
           {time}
