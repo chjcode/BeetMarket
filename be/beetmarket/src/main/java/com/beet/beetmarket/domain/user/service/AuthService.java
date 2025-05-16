@@ -67,6 +67,7 @@ public class AuthService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
 		headers.set("Authorization", "Bearer " + accessToken);
+		headers.set("Nickname", user.getNickname());
 
 		return headers;
 	}
