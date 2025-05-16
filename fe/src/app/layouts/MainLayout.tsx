@@ -24,7 +24,7 @@ const Layout = () => {
           </div>
         )}
 
-        <div className="pt-[54px] pb-[54px] px-4 overflow-auto">
+        <div className="my-[54px] px-4 overflow-auto">
           <Outlet />
         </div>
 
