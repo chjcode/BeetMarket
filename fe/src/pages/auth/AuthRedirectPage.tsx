@@ -8,9 +8,10 @@ export const AuthRedirectPage = () => {
   useEffect(() => {
     const issueAccessToken = async () => {
       try {
+        localStorage.removeItem("accessToken");
         const res = await axiosInstance.get("/api/auth/issue");
-
-        const { accessToken } = res.data;
+        const accessToken = res.headers["access-token"];
+  
         localStorage.setItem("accessToken", accessToken);
 
         navigate("/");
