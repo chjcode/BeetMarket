@@ -51,13 +51,6 @@ export const MyPage = () => {
         </NavLink>
       </div>
 
-      {/* 본인 인증 */}
-      <div className="w-full max-w-md px-10 flex justify-start">
-        <button className="flex items-center gap-2 mt-2 text-lg font-medium ml-4">
-          <HiOutlineIdentification className="text-2xl text-black" />
-          본인 인증 하기
-        </button>
-      </div>
     </div>
   );
 };
