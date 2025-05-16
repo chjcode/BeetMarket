@@ -8,7 +8,7 @@ import { HiOutlineIdentification } from "react-icons/hi2";
 export const MyPage = () => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col items-center bg-white min-h-screen pt-6">
+    <div className="flex flex-col items-center bg-white pt-6">
       {/* 프로필 영역 */}
       <div className="relative mb-2">
         <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-5xl text-gray-400" />
