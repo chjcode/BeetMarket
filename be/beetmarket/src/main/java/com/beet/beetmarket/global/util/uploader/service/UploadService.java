@@ -93,6 +93,7 @@ public class UploadService {
 					.expiry(60 * 10)
 					.build());
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new PresignedUrlGenerationFailException();
 		}
 	}
