@@ -11,10 +11,17 @@ export const AuthRedirectPage = () => {
         localStorage.removeItem("accessToken");
         const res = await axiosInstance.get("/api/auth/issue");
         const accessToken = res.headers["access-token"];
-  
+        const nickname = res.headers["nickname"];
+        if (!accessToken) {
+          throw new Error("accessToken 누락");
+        }
         localStorage.setItem("accessToken", accessToken);
-
-        navigate("/");
+        if (!nickname || nickname.trim() === "") {
+          navigate("/signup");
+        } else {
+          localStorage.setItem("nickname", nickname);
+          navigate("/");
+        }
       } catch (err) {
         console.error("토큰 발급 실패:", err);
         navigate("/login");
