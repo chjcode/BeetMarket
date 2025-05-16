@@ -21,7 +21,7 @@ public record PostListDto(
         Double latitude,
         Double longitude
 ) {
-    public static PostListDto from(PostDocument postDocument, boolean liked) {
+    public static PostListDto from(PostDocument postDocument, Boolean liked) {
         return new PostListDto(
                 postDocument.getId(),
                 Status.valueOf(postDocument.getStatus()),

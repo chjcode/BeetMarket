@@ -110,6 +110,37 @@ public class PostService {
         return new PageImpl<>(content, pageable, docs.getTotalElements());
     }
 
+    public Page<PostListDto> searchAllMyPosts(Long userId, Pageable pageable) {
+        Page<PostDocument> docs = searchRepository.findByAuthorIdOrBuyerId(userId, userId, pageable);
+
+        List<PostListDto> content = docs.stream()
+                .map(doc -> PostListDto.from(doc, null))
+                .toList();
+
+        return new PageImpl<>(content, pageable, docs.getTotalElements());
+    }
+
+    public Page<PostListDto> searchAllMyBuyingPosts(Long userId, Pageable pageable) {
+        Page<PostDocument> docs = searchRepository.findByBuyerId(userId, pageable);
+
+        List<PostListDto> content = docs.stream()
+                .map(doc -> PostListDto.from(doc, null))
+                .toList();
+
+        return new PageImpl<>(content, pageable, docs.getTotalElements());
+    }
+    public Page<PostListDto> searchAllMySellingPosts(Long userId, Pageable pageable) {
+        Page<PostDocument> docs = searchRepository.findByAuthorId(userId, pageable);
+
+        List<PostListDto> content = docs.stream()
+                .map(doc -> PostListDto.from(doc, null))
+                .toList();
+
+        return new PageImpl<>(content, pageable, docs.getTotalElements());
+    }
+
+
+
     public void createPost(Long userId, CreatePostRequestDto request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Category category = categoryRepository.findByName(request.category()).orElseThrow(CategoryNotFoundException::new);
@@ -192,4 +223,5 @@ public class PostService {
             videoProcessPublisher.publishVideos(userId, post.getId(), post.getUuid(), request.video());
         }
     }
+
 }

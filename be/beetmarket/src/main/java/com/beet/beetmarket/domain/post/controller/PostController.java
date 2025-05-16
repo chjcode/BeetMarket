@@ -91,4 +91,39 @@ public class PostController {
         );
     }
 
+//    @GetMapping("/my/all")
+    public ResponseEntity<ResponseWrapper<Page<PostListDto>>> getMyAllPosts(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null,
+                postService.searchAllMyPosts(user.getId(), pageable)
+        );
+    }
+
+    @GetMapping("/my/buy")
+    public ResponseEntity<ResponseWrapper<Page<PostListDto>>> getMyBuyingPosts(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null,
+                postService.searchAllMyBuyingPosts(user.getId(), pageable)
+        );
+    }
+
+    @GetMapping("/my/sell")
+    public ResponseEntity<ResponseWrapper<Page<PostListDto>>> getMySellingPosts(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null,
+                postService.searchAllMySellingPosts(user.getId(), pageable)
+        );
+    }
 }
