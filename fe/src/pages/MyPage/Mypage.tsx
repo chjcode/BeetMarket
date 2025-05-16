@@ -3,7 +3,7 @@ import { FaShoppingBag, FaHeart } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegListAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
-import { HiOutlineIdentification } from "react-icons/hi2";
+// import { HiOutlineIdentification } from "react-icons/hi2";
 
 export const MyPage = () => {
   const navigate = useNavigate();
