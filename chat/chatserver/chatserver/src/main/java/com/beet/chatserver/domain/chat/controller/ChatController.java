@@ -26,6 +26,6 @@ public class ChatController {
     /* 읽음 ACK: /pub/chat/read */
     @MessageMapping("/chat/read")
     public void ackRead(ReadAckRequest req, Principal p) {
-        chatService.markRead(req.messageIds(), p.getName());
+        chatService.markRead(req, p.getName());
     }
 }
