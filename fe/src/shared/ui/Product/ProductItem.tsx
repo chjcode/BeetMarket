@@ -22,7 +22,7 @@ export const ProductItem = (product: ProductItemProps) => {
 
   return (
     <div
-      className="w-full h-[136px] flex cursor-pointer"
+      className="w-full h-[120px] flex cursor-pointer gap-1"
       onClick={() => navigate(`/product/${product.id}`)}
     >
       <div className="h-full aspect-square relative">
@@ -44,17 +44,19 @@ export const ProductItem = (product: ProductItemProps) => {
           isCompleted ? "text-gray-400" : "text-black"
         }`}
       >
-        <div className="text-base font-semibold">{product.title}</div>
+        <div className="font-semibold">{product.title}</div>
         <div className="">{product.region}</div>
-        <div className="">{product.price.toLocaleString()} 원</div>
         <div className="">{product.createdAt}</div>
+        <div className="">{product.price.toLocaleString()} 원</div>
         <div className="flex gap-4 justify-end">
           <div className="">조회수 {product.favoriteCount}</div>
           <div className="flex gap-1 items-center">
             <div className="">찜 {product.favoriteCount}</div>
             <Icon
               name={product.isLiked ? "heart" : "heartfill"}
-              className="w-6 h-6 rounded-full border p-1"
+              className={`w-6 h-6 rounded-full shadow-md bg-gray-100 p-1 text-red-400
+                    ${product.isLiked ? "stroke-[2]" : ""}
+              `}
             />
           </div>
         </div>

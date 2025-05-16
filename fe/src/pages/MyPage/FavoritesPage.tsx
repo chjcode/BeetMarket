@@ -1,5 +1,7 @@
 import { ProductList } from "@/shared/ui/Product/ProductList"
 import { ProductItemProps } from "@/shared/ui/Product/ProductItem";
+// import { useSalesProductsQuery } from "@/features/mypage/api/useSalesProductsQuery";
+// import { Product } from "@/features/mypage/api/types";
 
 const data: ProductItemProps[] = [
   {
@@ -89,11 +91,15 @@ const data: ProductItemProps[] = [
 ];
 
 const FavoritesPage = () => {
-	return (
-		<div>
-			<ProductList products={data}/>
-		</div>
-	)
+  // const { data, isLoading, error } = useSalesProductsQuery();
+  // if (isLoading) return <p>로딩 중</p>;
+  // if (error || !data) return <p>에러 or 데이터 없음</p>;
+  
+  return (
+    <div>
+      <ProductList products={data} />
+    </div>
+  );
 }
 
 export default FavoritesPage

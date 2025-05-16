@@ -4,7 +4,6 @@ import HomePage from "@/pages/HomePage/ProductPage/HomePage";
 import { LoginPage }  from "@/pages/login"
 import { MyPage, PurchasesPage, SalesPage, FavoritesPage } from "@/pages/MyPage";
 import PickPage from "@/pages/PickPage";
-import ChatsPage from "@/pages/ChattingPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 import AlarmPage from "@/pages/UtilPage/AlarmPage";
 import { RequireAuth } from "@/app/providers/RequireAuth";
@@ -17,6 +16,7 @@ import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/Se
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
 import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
+import ChatsPage from "@/pages/chats";
 
 export const routes: RouteObject[] = [
   { path: "auth-redirect", element: <AuthRedirectPage /> },
@@ -30,7 +30,13 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "pick", element: <PickPage /> },
-      { path: "chatting", element: <ChatsPage /> },
+      {
+        path: "chats",
+        children: [
+          { index: true, element: <ChatsPage /> },
+          // { path: ":id", element: <ChatRoomPage />},
+        ],
+      },
       { path: "category", element: <CategoryPage /> },
       {
         path: "mypage",
@@ -43,17 +49,19 @@ export const routes: RouteObject[] = [
           { path: "edit", element: <MyPageEdit /> },
         ],
       },
-      { path: "product/:id",
+      {
+        path: "product/:id",
         children: [
-          { index: true, element: <ProductDetailPage />},
+          { index: true, element: <ProductDetailPage /> },
           { path: "3d", element: <Product3DViewerPage /> },
         ],
       },
-      { path: "search",
+      {
+        path: "search",
         children: [
-          {index: true, element: <SearchPage /> },
+          { index: true, element: <SearchPage /> },
           { path: "result", element: <SearchResultPage /> },
-        ]
+        ],
       },
       { path: "alarm", element: <AlarmPage /> },
       { path: "add", element: <AddPage /> },
