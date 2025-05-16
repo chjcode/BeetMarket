@@ -25,6 +25,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
         FROM ChatRoom c
         JOIN Image i ON i.post = c.post AND i.sequence = 0
         WHERE (c.seller.id = :userId OR c.buyer.id = :userId)
+        AND c.post.status = com.beet.beetmarket.domain.post.entity.Status.RESERVED
         AND c.schedule BETWEEN :start AND :end
         ORDER BY c.schedule
     """)
