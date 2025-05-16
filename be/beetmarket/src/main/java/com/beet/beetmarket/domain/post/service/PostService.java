@@ -125,6 +125,8 @@ public class PostService {
                 .location(request.location())
                 .imageUrls(images)
                 .uuid(request.uuid())
+                .latitude(request.latitude())
+                .longitude(request.longitude())
                 .build();
 
         for(int i = 0; i < request.images().size(); i++) {
@@ -175,7 +177,9 @@ public class PostService {
                 request.region(),
                 request.location(),
                 request.video(),
-                newImages
+                newImages,
+                request.latitude(),
+                request.longitude()
         );
 
         long likeCount = favoriteRepository.countByPostId(postId);
