@@ -18,7 +18,7 @@ const alarms = [
 
 const AlarmPage = () => {
   return (
-    <div className="bg-white min-h-screen px-4 pt-2 pb-4">
+    <div className="bg-white min-h-screen px-4 pt-8 pb-4">
       <ul className="flex flex-col gap-y-10">
         {alarms.map((alarm) => (
           <li key={alarm.id} className="flex items-start">
