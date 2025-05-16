@@ -15,13 +15,16 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     @Query("""
         SELECT new com.beet.beetmarket.domain.user.dto.ScheduleResponseDto(
-            c.schedule,
-            c.location,
-            c.seller.nickname,
-            c.buyer.nickname
+           c.schedule,
+           c.location,
+           CASE WHEN c.seller.id = :userId THEN '판매' ELSE '구매' END,
+           CASE WHEN c.seller.id = :userId THEN c.buyer.nickname ELSE c.seller.nickname END,
+           c.post.title,
+           i.imagePreview
         )
         FROM ChatRoom c
-        WHERE (c.seller = :user OR c.buyer = :user)
+        JOIN Image i ON i.post = c.post AND i.sequence = 0
+        WHERE (c.seller.id = :userId OR c.buyer.id = :userId)
         AND c.schedule BETWEEN :start AND :end
         ORDER BY c.schedule
     """)

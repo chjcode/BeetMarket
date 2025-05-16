@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 public record ScheduleResponseDto(
         LocalDateTime schedule,
         String location,
-        String buyer,
-        String seller
+        String tradeType,
+        String opposite,
+        String postTitle,
+        String postThumbnail
 ) {
 
 }
