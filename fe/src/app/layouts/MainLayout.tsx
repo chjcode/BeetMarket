@@ -1,19 +1,25 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { TopBar } from "@/widgets/TopBar";
 import { BottomNav } from "@/widgets/BottomNav";
+import { match } from "path-to-regexp";
 
 const Layout = () => {
   const { pathname } = useLocation();
 
   const noHeaderRoutes = ["/login", "/signup", "/product"];
-  const noBottomNavRoutes = ["/login", "/signup", "/product"];
+  const noBottomNavRoutes = ["/login", "/signup", "/product", "/chats/:id"];
+
+  const isMatched = (patterns: string[], path: string) => {
+    return patterns.some((pattern) => {
+      const matcher = match(pattern, { decode: decodeURIComponent });
+      return matcher(path) !== false;
+    });
+  };
 
   const showHeader = !noHeaderRoutes.some((route) =>
     pathname.startsWith(route)
   );
-  const showBottomNav = !noBottomNavRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  const showBottomNav = !isMatched(noBottomNavRoutes, pathname);
 
   return (
     <div className="fixed inset-0 flex justify-center bg-gray-100">
