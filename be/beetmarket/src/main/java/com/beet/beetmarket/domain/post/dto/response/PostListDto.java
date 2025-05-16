@@ -17,7 +17,9 @@ public record PostListDto(
         Long viewCount,
         Long favoriteCount,
         String authorNickname,
-        Boolean isLiked
+        Boolean isLiked,
+        Double latitude,
+        Double longitude
 ) {
     public static PostListDto from(PostDocument postDocument, boolean liked) {
         return new PostListDto(
@@ -32,7 +34,9 @@ public record PostListDto(
                 postDocument.getViewCount(),
                 postDocument.getFavoriteCount(),
                 postDocument.getAuthorNickname(),
-                liked
+                liked,
+                postDocument.getLatitude(),
+                postDocument.getLongitude()
         );
     }
 }

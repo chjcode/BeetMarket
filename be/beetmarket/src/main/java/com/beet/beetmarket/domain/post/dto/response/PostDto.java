@@ -23,7 +23,9 @@ public record PostDto (
     String model3D,
     Long view,
     Long like,
-    Boolean isLiked
+    Boolean isLiked,
+    Double latitude,
+    Double longitude
 ) {
     public static PostDto from(Post post, List<String> imageUrls, Long view, Long likes, Boolean isLiked) {
         User seller = post.getUser();
@@ -45,7 +47,9 @@ public record PostDto (
                 post.getModel3dUrl(),
                 view,
                 likes,
-                isLiked
+                isLiked,
+                post.getLatitude(),
+                post.getLongitude()
         );
     }
 }

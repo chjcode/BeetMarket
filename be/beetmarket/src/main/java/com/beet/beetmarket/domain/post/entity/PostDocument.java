@@ -59,4 +59,9 @@ public class PostDocument {
     @Field(type = FieldType.Keyword)
     private String status;
 
+    @Field(type = FieldType.Double, index = false)
+    private Double latitude;
+
+    @Field(type = FieldType.Double, index = false)
+    private Double longitude;
 }

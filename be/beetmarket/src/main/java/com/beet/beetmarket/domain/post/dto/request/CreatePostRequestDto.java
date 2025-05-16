@@ -11,6 +11,8 @@ public record CreatePostRequestDto(
         String location,
         List<String> images,
         String video,
-        String uuid
+        String uuid,
+        Double latitude,
+        Double longitude
 ) {
 }

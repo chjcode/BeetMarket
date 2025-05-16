@@ -65,10 +65,15 @@ public class Post extends BaseTimeEntity {
     // bucket에서 경로 구분을 위한 post uuid
     private String uuid;
 
+    // 지도 표시를 위해 추가됨
+    private Double latitude;
+    private Double longitude;
+
     @Builder
     public Post(User user, Category category, String title, String content, Integer price,
                 Status status, String region, String location,
-                String videoUrl, String model3dUrl, List<Image> imageUrls, String uuid) {
+                String videoUrl, String model3dUrl, List<Image> imageUrls, String uuid,
+                Double latitude, Double longitude) {
         this.user = user;
         this.category = category;
         this.title = title;
@@ -82,11 +87,14 @@ public class Post extends BaseTimeEntity {
         this.imageUrls = imageUrls;
         this.view = 0L;
         this.uuid = uuid;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public void updatePost(Category category, String title, String content, Integer price,
                            String region, String location, String videoUrl,
-                           List<Image> newImages) {
+                           List<Image> newImages,
+                           Double latitude, Double longitude) {
         this.category = category;
         this.title = title;
         this.content = content;
@@ -96,6 +104,8 @@ public class Post extends BaseTimeEntity {
         this.videoUrl = videoUrl;
         this.imageUrls.clear();
         this.imageUrls.addAll(newImages);
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public void viewPost() {

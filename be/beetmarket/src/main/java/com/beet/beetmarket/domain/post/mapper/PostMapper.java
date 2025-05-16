@@ -27,6 +27,8 @@ public class PostMapper {
                 .viewCount(post.getView())
                 .favoriteCount(favoriteCount)
                 .status(post.getStatus().name())
+                .latitude(post.getLatitude())
+                .longitude(post.getLongitude())
                 .build();
     }
 }

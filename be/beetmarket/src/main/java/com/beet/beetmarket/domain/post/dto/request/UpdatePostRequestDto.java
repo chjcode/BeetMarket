@@ -10,6 +10,8 @@ public record UpdatePostRequestDto(
         String region,
         String location,
         List<String> images,
-        String video
+        String video,
+        Double latitude,
+        Double longitude
 ) {
 }
