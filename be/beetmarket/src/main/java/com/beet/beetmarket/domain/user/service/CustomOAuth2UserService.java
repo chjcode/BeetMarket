@@ -42,7 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			return null;
 		}
 
-		String oauthName = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
+		String oauthName = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();
 		User existUser = userRepository.getUserByOauthName(oauthName);//nickname
 
 		// 가입 안되어 있으면 회원가입
