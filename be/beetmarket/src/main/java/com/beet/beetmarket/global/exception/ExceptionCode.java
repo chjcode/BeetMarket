@@ -29,9 +29,13 @@ public enum ExceptionCode implements ResponseCode {
 	POST_ACCESS_DENIED("post-403-1", "게시글에 대한 수정/삭제 권한이 없습니다", HttpStatus.FORBIDDEN),
 
 	FAVORITE_ALREADY_EXISTS("favorite-400-1", "이미 좋아요를 누른 게시글입니다", HttpStatus.BAD_REQUEST),
-	FAVORITE_NOT_FOUND("favorite-404-1", "좋아요를 찾을 수 없습니다", HttpStatus.NOT_FOUND);
+	FAVORITE_NOT_FOUND("favorite-404-1", "좋아요를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 
-
+	CHAT_INVALID_ROOM_ID_FORMAT("chat-400-1", "올바르지 않은 채팅방 ID 형식입니다.", HttpStatus.BAD_REQUEST),
+	CANNOT_CHAT_WITH_SELF("chat-400-2", "자기 자신과는 채팅할 수 없습니다.", HttpStatus.BAD_REQUEST),
+	CHAT_ROOM_NOT_FOUND("chat-404-1", "해당 채팅방을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+	CHAT_ROOM_PARTICIPANTS_INVALID("chat-500-1", "채팅방 참여자 정보가 유효하지 않습니다. (판매자 또는 구매자 정보 누락)", HttpStatus.INTERNAL_SERVER_ERROR),
+	CHAT_USER_NOT_PARTICIPANT("chat-403-1", "해당 채팅방의 참여자가 아닙니다.", HttpStatus.FORBIDDEN);
 
 	private String code;
 	private String message;

@@ -41,6 +41,8 @@ spring:
     bucket-name: uploads
 
   data:
+    mongodb:
+      uri: ${MONGODB_URL}
     redis:
       host: ${REDIS_HOST}
       port: 6379

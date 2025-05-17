@@ -38,8 +38,6 @@ public class ChatRoom extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private String lastMessageAt;
-
     @Builder
     public ChatRoom(User seller, User buyer, Post post) {
         this.seller = seller;
@@ -53,9 +51,5 @@ public class ChatRoom extends BaseTimeEntity {
 
     public void updateSchedule(LocalDateTime schedule) {
         this.schedule = schedule;
-    }
-
-    public void updateLastMessageAt(String lastMessageAt) {
-        this.lastMessageAt = lastMessageAt;
     }
 }
