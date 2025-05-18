@@ -10,16 +10,15 @@ export const AuthRedirectPage = () => {
       try {
         localStorage.removeItem("accessToken");
         const res = await axiosInstance.get("/api/auth/issue");
-        const accessToken = res.headers["access-token"];
-        const nickname = res.headers["nickname"];
+        const accessToken = res.headers["authorization"]?.replace("Bearer ", "");
+        const hasNickname = res.data?.content;
         if (!accessToken) {
           throw new Error("accessToken 누락");
         }
         localStorage.setItem("accessToken", accessToken);
-        if (!nickname || nickname.trim() === "") {
+        if (!hasNickname) {
           navigate("/signup");
         } else {
-          localStorage.setItem("nickname", nickname);
           navigate("/");
         }
       } catch (err) {
@@ -27,7 +26,6 @@ export const AuthRedirectPage = () => {
         navigate("/login");
       }
     };
-
     issueAccessToken();
   }, []);
 

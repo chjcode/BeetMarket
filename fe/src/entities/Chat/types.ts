@@ -1,8 +1,9 @@
 export interface ChatRoom {
-  chatRoomId: string;
-  nickname: string;
-  profileImage: string;
-  lastMessage: string;
-  sentAt: string;
-  unreadCount: number;
+  roomId: string;
+  opponentUserNickname: string | null;
+  opponentUserProfileImageUrl: string | null;
+  lastMessageContent: string;
+  lastMessageTimestamp: string;
+  unreadMessageCount: number;
+  postId: number;
 }
