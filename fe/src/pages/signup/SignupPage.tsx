@@ -23,6 +23,15 @@ const SignupPage = () => {
   const [categoryError, setCategoryError] = useState<string>();
   const [genderError, setGenderError] = useState<string>();
 
+  const isValidDate = (dateStr: string) => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateStr)) return false;
+  
+    const date = new Date(dateStr);
+    const iso = date.toISOString().split("T")[0];
+    return date instanceof Date && !isNaN(date.getTime()) && iso === dateStr;
+  };
+  
   const handleNickNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNickName(value);
@@ -33,10 +42,24 @@ const SignupPage = () => {
     }
   };
 
+  const formatBirthDate = (value: string) => {
+    const numbersOnly = value.replace(/\D/g, ""); // 숫자만 남김
+  
+    if (numbersOnly.length <= 4) {
+      return numbersOnly;
+    } else if (numbersOnly.length <= 6) {
+      return `${numbersOnly.slice(0, 4)}-${numbersOnly.slice(4)}`;
+    } else {
+      return `${numbersOnly.slice(0, 4)}-${numbersOnly.slice(4, 6)}-${numbersOnly.slice(6, 8)}`;
+    }
+  };
+  
   const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setBirthDate(value);
-    if (value) {
+    const rawValue = e.target.value;
+    const formatted = formatBirthDate(rawValue);
+    setBirthDate(formatted);
+  
+    if (formatted) {
       setBirthDateError("");
     } else {
       setBirthDateError("생년월일을 입력해주세요.");
@@ -50,35 +73,39 @@ const SignupPage = () => {
 
   const handleSubmit = async () => {
     let isValid = true;
-
+  
     if (!nickName) {
       setNickNameError("닉네임을 입력해주세요.");
       isValid = false;
     }
+  
     if (!birthDate) {
       setBirthDateError("생년월일을 입력해주세요.");
       isValid = false;
+    } else if (!isValidDate(birthDate)) {
+      setBirthDateError("올바른 생년월일 형식(YYYY-MM-DD)이 아닙니다.");
+      isValid = false;
     }
+  
     if (!gender) {
       setGenderError("성별을 선택해주세요.");
       isValid = false;
     }
+  
     if (!category) {
       setCategoryError("지역을 선택해주세요.");
       isValid = false;
     }
-
+  
     if (!isValid) return;
-
+  
     const requestBody = {
       nickname: nickName,
       birthDate,
       gender,
       region: category,
     };
-
-    console.log("회원가입 요청 데이터:", requestBody);
-
+  
     try {
       const response = await axiosInstance.post(
         "/api/users/signup",
