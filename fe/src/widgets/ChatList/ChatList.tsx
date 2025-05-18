@@ -1,7 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchChatRooms } from "@/entities/Chat/api";
+import { fetchChatRooms, ChatRoomResponse } from "@/entities/Chat/api";
 import ChatListItem from "./ChatListItem";
 import { useRef, useEffect } from "react";
+import type { InfiniteData } from "@tanstack/react-query";
 
 const ChatList = () => {
   const {
@@ -11,13 +12,20 @@ const ChatList = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
+  } = useInfiniteQuery<
+    ChatRoomResponse,                // queryFn 반환 타입
+    Error,                           // error 타입
+    InfiniteData<ChatRoomResponse>, // ✅ 실제 data 타입
+    string[],                        // queryKey 타입
+    string | null                   // pageParam 타입
+  >({
     queryKey: ["chatRooms"],
     queryFn: fetchChatRooms,
-    getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.nextCursor : undefined,
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextCursor : null,
   });
 
-  // 무한 스크롤 감지용 ref
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
