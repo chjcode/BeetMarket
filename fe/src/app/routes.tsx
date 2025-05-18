@@ -24,9 +24,9 @@ export const routes: RouteObject[] = [
   {
     path: "/",
     element: (
-      <RequireAuth>
+      // <RequireAuth>
         <MainLayout />
-      </RequireAuth>
+      // </RequireAuth>
     ),
     children: [
       { index: true, element: <HomePage /> },
