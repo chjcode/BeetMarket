@@ -1,5 +1,8 @@
 package com.beet.beetmarket.domain.chat.repository;
 
+import java.time.Instant;
+import java.util.Optional;
+
 import com.beet.beetmarket.domain.chat.entity.ChatMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +28,13 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
      * @return 페이징된 채팅 메시지 목록
      */
     Page<ChatMessage> findByRoomIdOrderByTimestampAsc(String roomId, Pageable pageable);
+
+    // 특정 시간 이후, 특정 사용자가 보내지 않은 메시지 수 카운트
+    long countByRoomIdAndTimestampAfterAndSenderNicknameNot(String roomId, Instant timestamp, String senderNickname);
+
+    // 특정 사용자가 보내지 않은 해당 채팅방의 전체 메시지 수 카운트
+    long countByRoomIdAndSenderNicknameNot(String roomId, String senderNickname);
+
+    // 해당 채팅방의 가장 최근 메시지 조회
+    Optional<ChatMessage> findTopByRoomIdOrderByTimestampDesc(String roomId);
 }

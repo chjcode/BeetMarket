@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Setter; // Setter가 필요할 수 있습니다 (chatserver의 것과 동일하게).
 
-@Document("chat_room_reads") // chatserver와 동일한 컬렉션 사용
+@Document("chat_room_reads")
 @Builder
 @Getter
-@Setter // chatserver 코드에 Setter가 있으므로 동일하게 추가
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomRead {

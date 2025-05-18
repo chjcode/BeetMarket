@@ -28,7 +28,7 @@ public record ChatRoomResponseDto(
         );
     }
 
-    // 참여자 정보 DTO (중첩 레코드)
+    // 참여자 정보
     public record ParticipantDto(
         Long userId,
         String nickname,
