@@ -1,8 +1,12 @@
 package com.beet.beetmarket.domain.chat.service;
 
 import com.beet.beetmarket.domain.chat.dto.ChatMessageResponseDto;
+import com.beet.beetmarket.domain.chat.dto.ChatRoomInfoItem;
+import com.beet.beetmarket.domain.chat.dto.ChatRoomWithFirstImageDto;
 import com.beet.beetmarket.domain.chat.dto.LastReadInfoResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatMessagesResponseDto;
+import com.beet.beetmarket.domain.chat.dto.PaginatedChatRoomListResponseDto;
+import com.beet.beetmarket.domain.chat.entity.ChatMessage;
 import com.beet.beetmarket.domain.chat.entity.ChatRoomRead;
 import com.beet.beetmarket.domain.chat.exception.ChatRoomNotFoundException;
 import com.beet.beetmarket.domain.chat.exception.ChatRoomParticipantsInvalidException;
@@ -19,16 +23,23 @@ import com.beet.beetmarket.domain.post.entity.Post;
 import com.beet.beetmarket.domain.post.exception.PostNotFountException;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
 import com.beet.beetmarket.domain.user.entity.User; // User 엔티티
-import com.beet.beetmarket.global.exception.CustomException; // 예외 처리용 (필요시 생성)
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,12 +53,12 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public PaginatedChatMessagesResponseDto getChatMessagesByRoomId(
-        String roomIdStr, // roomId는 이제 JPA ChatRoom의 ID (String 형태)
+        String roomIdStr,
         String currentUserNickname,
         Pageable pageable,
         String sortOrder
     ) {
-        // 1. roomId (String)를 Long으로 변환
+        // roomId (String)를 Long으로 변환(MongoDB에서 String이라서)
         Long chatRoomId;
         try {
             chatRoomId = Long.parseLong(roomIdStr);
@@ -56,11 +67,11 @@ public class ChatService {
             throw new InvalidRoomIdFormatException();
         }
 
-        // 2. JPA ChatRoom 정보 조회 (참여자 정보 포함)
+        // ChatRoom 정보 조회
         ChatRoom chatRoom = chatRoomRepository.findByIdWithParticipants(chatRoomId)
             .orElseThrow(() -> {
                 log.warn("ChatRoom not found for id: {}", chatRoomId);
-                return new ChatRoomNotFoundException(); // 적절한 예외 처리
+                return new ChatRoomNotFoundException();
             });
 
         User seller = chatRoom.getSeller();
@@ -71,8 +82,8 @@ public class ChatService {
             throw new ChatRoomParticipantsInvalidException();
         }
 
-        // 3. 현재 사용자와 상대방 식별
-        String sellerOauthName = seller.getOauthName(); // User 엔티티에 getNickname()이 있다고 가정
+        // 현재 사용자와 상대방 식별
+        String sellerOauthName = seller.getOauthName();
         String buyerOauthName = buyer.getOauthName();
         String opponentOauthName;
 
@@ -86,7 +97,7 @@ public class ChatService {
             throw new UserNotParticipantInChatRoomException();
         }
 
-        // 4. 메시지 목록 조회 (MongoDB)
+        // 메시지 목록 조회
         Page<ChatMessageResponseDto> messagesPage;
         if ("asc".equalsIgnoreCase(sortOrder)) {
             messagesPage = chatMessageRepository.findByRoomIdOrderByTimestampAsc(roomIdStr, pageable)
@@ -96,45 +107,37 @@ public class ChatService {
                 .map(ChatMessageResponseDto::fromEntity);
         }
 
-        // 5. 현재 사용자의 마지막 읽음 정보 조회 (MongoDB)
+        // 현재 사용자의 마지막 읽음 정보 조회
         LastReadInfoResponseDto currentUserLastReadInfo = chatRoomReadRepository
             .findByRoomIdAndUserNickname(roomIdStr, currentUserNickname)
             .map(LastReadInfoResponseDto::fromEntity)
             .orElse(null);
 
-        // 6. 상대방의 마지막 읽음 정보 조회 (MongoDB)
+        // 상대방의 마지막 읽음 정보 조회
         LastReadInfoResponseDto opponentLastReadInfo = chatRoomReadRepository
             .findByRoomIdAndUserNickname(roomIdStr, opponentOauthName)
             .map(LastReadInfoResponseDto::fromEntity)
             .orElse(null);
 
-        // 7. 최종 응답 객체 생성
         return new PaginatedChatMessagesResponseDto(messagesPage, currentUserLastReadInfo, opponentLastReadInfo);
     }
 
-    /**
-     * 채팅방을 생성하거나 기존 채팅방을 반환합니다.
-     *
-     * @param buyer 현재 로그인한 사용자 (구매자)
-     * @param requestDto 게시글 ID를 담은 요청 DTO
-     * @return 생성되거나 조회된 채팅방 정보 DTO
-     */
-    @Transactional // 쓰기 작업이므로 트랜잭션 처리
+
+    @Transactional
     public ChatRoomResponseDto createOrGetChatRoom(User buyer, CreateChatRoomRequestDto requestDto) {
         Long postId = requestDto.postId();
 
-        // 1. 게시글 조회 (판매자 정보 포함)
+        // 게시글 조회
         Post post = postRepository.findByIdWithUser(postId)
             .orElseThrow(PostNotFountException::new);
         User seller = post.getUser();
 
-        // 2. 자기 자신과의 채팅 시도인지 확인
-        // User 엔티티의 ID (PK)를 비교하는 것이 좋습니다.
+        // 자기 자신과의 채팅 시도인지 확인
         if (buyer.getId().equals(seller.getId())) {
             throw new CannotChatWithSelfException();
         }
 
-        // 3. 기존 채팅방 조회
+        // 기존 채팅방 조회
         Optional<ChatRoom> existingChatRoomOpt = chatRoomRepository.findByBuyerAndSellerAndPost(buyer, seller, post);
 
         if (existingChatRoomOpt.isPresent()) {
@@ -147,11 +150,84 @@ public class ChatService {
                 .seller(seller)
                 .post(post)
                 .build();
-            // ChatRoom 엔티티의 lastMessageAt 필드는 메시지가 추가될 때 업데이트 되어야 합니다.
-            // 초기 생성 시에는 null이거나 특정 기본값일 수 있습니다.
 
             ChatRoom savedChatRoom = chatRoomRepository.save(newChatRoom);
             return ChatRoomResponseDto.fromEntity(savedChatRoom, true);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public PaginatedChatRoomListResponseDto getChatRoomsForUser(User currentUser, Pageable pageable) {
+        int requestedSize = pageable.getPageSize();
+
+        Pageable adjustedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            requestedSize + 1,
+            pageable.getSortOr(Sort.by(Sort.Direction.DESC, "chatRoom.updatedAt"))
+        );
+
+        Page<ChatRoomWithFirstImageDto> chatRoomsDtoPage = chatRoomRepository.findChatRoomsForUserWithFirstImage(currentUser.getId(), adjustedPageable);
+
+        List<ChatRoomInfoItem> chatRoomInfoItems = new ArrayList<>();
+        List<String> roomIdsAsString = chatRoomsDtoPage.getContent().stream()
+            .map(dto -> String.valueOf(dto.chatRoom().getId()))
+            .collect(Collectors.toList());
+
+        Map<String, ChatRoomRead> chatRoomReadsMap = chatRoomReadRepository
+            .findByRoomIdInAndUserNickname(roomIdsAsString, currentUser.getOauthName())
+            .stream().collect(Collectors.toMap(ChatRoomRead::getRoomId, Function.identity()));
+
+        for (ChatRoomWithFirstImageDto dto : chatRoomsDtoPage.getContent()) {
+            ChatRoom chatRoom = dto.chatRoom();
+            String firstImageUrl = dto.firstImagePreview();
+
+            String roomIdStr = String.valueOf(chatRoom.getId());
+            User opponentUser;
+            if (chatRoom.getSeller().getId().equals(currentUser.getId())) {
+                opponentUser = chatRoom.getBuyer();
+            } else {
+                opponentUser = chatRoom.getSeller(); // 구매자가 상대방일 경우 판매자를 가져옴
+            }
+
+            //읽지 않은 메시지 수 계산
+            long unreadCount = 0;
+            ChatRoomRead chatRoomRead = chatRoomReadsMap.get(roomIdStr);
+            if (chatRoomRead != null && chatRoomRead.getLastReadAt() != null) {
+                unreadCount = chatMessageRepository.countByRoomIdAndTimestampAfterAndSenderNicknameNot(
+                    roomIdStr,
+                    chatRoomRead.getLastReadAt(),
+                    currentUser.getOauthName()
+                );
+            } else {
+                unreadCount = chatMessageRepository.countByRoomIdAndSenderNicknameNot(
+                    roomIdStr,
+                    currentUser.getOauthName()
+                );
+            }
+
+            // 최근 메시지 정보
+            Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByRoomIdOrderByTimestampDesc(roomIdStr);
+            String lastMessageContent = lastMessageOpt.map(ChatMessage::getContent).orElse("대화 내용이 없습니다.");
+            Instant lastMessageTimestampForDisplay = lastMessageOpt.map(ChatMessage::getTimestamp)
+                .orElseGet(() -> chatRoom.getCreatedAt() != null ? chatRoom.getCreatedAt().toInstant(java.time.ZoneOffset.UTC) : Instant.now());
+
+            Post post = chatRoom.getPost();
+
+            chatRoomInfoItems.add(new ChatRoomInfoItem(
+                roomIdStr,
+                unreadCount,
+                opponentUser.getProfileImage(),
+                opponentUser.getNickname(),
+                firstImageUrl,
+                lastMessageContent,
+                lastMessageTimestampForDisplay,
+                post != null ? post.getId() : null
+            ));
+        }
+
+        boolean hasNext = chatRoomsDtoPage.getContent().size() > requestedSize;
+        List<ChatRoomInfoItem> finalChatRoomItems = hasNext ? new ArrayList<>(chatRoomInfoItems.subList(0, requestedSize)) : new ArrayList<>(chatRoomInfoItems);
+
+        return new PaginatedChatRoomListResponseDto(finalChatRoomItems, hasNext);
     }
 }
