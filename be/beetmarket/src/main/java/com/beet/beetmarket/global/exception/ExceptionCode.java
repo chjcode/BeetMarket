@@ -27,6 +27,7 @@ public enum ExceptionCode implements ResponseCode {
 
 	POST_NOT_FOUND("post-404-1", "해당 게시글을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 	POST_ACCESS_DENIED("post-403-1", "게시글에 대한 수정/삭제 권한이 없습니다", HttpStatus.FORBIDDEN),
+	POST_ALREADY_COMPLETED("post-400-2", "이미 판매 완료된 게시글이므로 예약할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
 	FAVORITE_ALREADY_EXISTS("favorite-400-1", "이미 좋아요를 누른 게시글입니다", HttpStatus.BAD_REQUEST),
 	FAVORITE_NOT_FOUND("favorite-404-1", "좋아요를 찾을 수 없습니다", HttpStatus.NOT_FOUND),

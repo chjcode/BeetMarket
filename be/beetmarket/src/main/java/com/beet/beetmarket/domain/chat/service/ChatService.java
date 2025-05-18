@@ -16,10 +16,13 @@ import com.beet.beetmarket.domain.chat.repository.ChatMessageRepository;
 import com.beet.beetmarket.domain.chat.repository.ChatRoomReadRepository;
 import com.beet.beetmarket.domain.chatRoom.dto.ChatRoomResponseDto;
 import com.beet.beetmarket.domain.chatRoom.dto.CreateChatRoomRequestDto;
+import com.beet.beetmarket.domain.chatRoom.dto.ReservationResponseDto;
 import com.beet.beetmarket.domain.chatRoom.entity.ChatRoom; // JPA ChatRoom 엔티티
 import com.beet.beetmarket.domain.chatRoom.exception.CannotChatWithSelfException;
 import com.beet.beetmarket.domain.chatRoom.repository.ChatRoomRepository; // JPA ChatRoom 리포지토리
 import com.beet.beetmarket.domain.post.entity.Post;
+import com.beet.beetmarket.domain.post.entity.Status;
+import com.beet.beetmarket.domain.post.exception.PostAlreadyCompletedException;
 import com.beet.beetmarket.domain.post.exception.PostNotFountException;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
 import com.beet.beetmarket.domain.user.entity.User; // User 엔티티
@@ -34,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -229,5 +233,58 @@ public class ChatService {
         List<ChatRoomInfoItem> finalChatRoomItems = hasNext ? new ArrayList<>(chatRoomInfoItems.subList(0, requestedSize)) : new ArrayList<>(chatRoomInfoItems);
 
         return new PaginatedChatRoomListResponseDto(finalChatRoomItems, hasNext);
+    }
+
+    @Transactional
+    public ReservationResponseDto createOrUpdateReservation(
+        String roomIdStr,
+        User currentUser,
+        LocalDateTime schedule,
+        String location
+    ) {
+        Long chatRoomId;
+        try {
+            chatRoomId = Long.parseLong(roomIdStr);
+        } catch (NumberFormatException e) {
+            log.error("Invalid roomId format: {}", roomIdStr, e);
+            throw new InvalidRoomIdFormatException();
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findByIdWithParticipants(chatRoomId)
+            .orElseThrow(() -> new ChatRoomNotFoundException());
+
+        // 현재 사용자가 채팅방 참여자인지 확인 (판매자 또는 구매자)
+        boolean isParticipant = chatRoom.getSeller().getId().equals(currentUser.getId()) ||
+            chatRoom.getBuyer().getId().equals(currentUser.getId());
+        if (!isParticipant) {
+            throw new UserNotParticipantInChatRoomException();
+        }
+
+        // post가 삭제된 경우 고려
+        Post post = chatRoom.getPost();
+        if (post == null) {
+            throw new PostNotFountException();
+        }
+
+        // 예약 가능 상태 (AVAILABLE) 일 때만 예약 가능하도록 처리
+        if (post.getStatus() == Status.COMPLETED) {
+            throw new PostAlreadyCompletedException();
+        }
+
+        // TODO: 만약 다른 사용자와의 예약이 이미 잡혀있는 경우를 고려
+
+
+        chatRoom.updateSchedule(schedule);
+        chatRoom.updateLocation(location);
+        chatRoomRepository.save(chatRoom);
+
+        post.reserve();
+        postRepository.save(post);
+
+        log.info("ChatRoom ID {} 예약 설정 완료. 시간: {}, 장소: {}", chatRoomId, schedule, location);
+
+        // TODO: 예약 설정 알림 메시지를 채팅방에 시스템 메시지로 추가하는 로직
+
+        return ReservationResponseDto.success(chatRoom.getId(), chatRoom.getSchedule(), chatRoom.getLocation());
     }
 }
