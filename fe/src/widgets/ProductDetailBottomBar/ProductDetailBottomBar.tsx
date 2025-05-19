@@ -3,11 +3,12 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 interface ProductDetailBottomBarProps {
   price: number;
+  isLiked: boolean;
   onChatClick: () => void;
 }
 
-const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, onChatClick }) => {
-  const [liked, setLiked] = useState(false);
+const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, isLiked, onChatClick }) => {
+  const [liked, setLiked] = useState(isLiked);
 
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-white border-t border-gray-200 z-50 w-full max-w-[480px] min-w-[360px] px-4">

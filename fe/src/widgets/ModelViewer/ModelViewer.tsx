@@ -8,15 +8,17 @@ import { RiResetLeftLine } from "react-icons/ri";
 
 interface ModelViewerProps {
   productId: string;
+  modelPath: string;
 }
 
 interface ModelProps {
   objBlob: Blob;
   mtlBlob: Blob;
   scale: number;
+  modelPath: string;
 }
 
-const Model = ({ objBlob, mtlBlob, scale }: ModelProps) => {
+const Model = ({ objBlob, mtlBlob, scale, modelPath }: ModelProps) => {
   const [obj, setObj] = useState<THREE.Object3D | null>(null);
 
   useEffect(() => {
@@ -25,12 +27,12 @@ const Model = ({ objBlob, mtlBlob, scale }: ModelProps) => {
       const mtlURL = URL.createObjectURL(mtlBlob);
 
       const materials = await new MTLLoader()
-        .setResourcePath("https://k12a307.p.ssafy.io:8100/model/test/")
+        .setResourcePath(modelPath)
         .loadAsync(mtlURL);
       materials.preload();
 
       const texture = new THREE.TextureLoader().load(
-        "https://k12a307.p.ssafy.io:8100/model/test/texture_1001.png",
+        `${modelPath}texture_1001.png`,
         () => console.log("텍스처 로드 완료"),
         undefined,
         (err) => console.error("텍스처 로드 실패", err)
@@ -58,12 +60,12 @@ const Model = ({ objBlob, mtlBlob, scale }: ModelProps) => {
     };
 
     loadModel();
-  }, [objBlob, mtlBlob, scale]);
+  }, [objBlob, mtlBlob, scale, modelPath]);
 
   return obj ? <primitive object={obj} /> : null;
 };
 
-const ModelViewer = ({ productId }: ModelViewerProps) => {
+const ModelViewer = ({ productId, modelPath }: ModelViewerProps) => {
   const [showHint, setShowHint] = useState(true);
   const [resetTrigger, setResetTrigger] = useState(0);
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
@@ -82,8 +84,8 @@ const ModelViewer = ({ productId }: ModelViewerProps) => {
   useEffect(() => {
     const loadModel = async () => {
       try {
-        const objRes = await fetch(`https://k12a307.p.ssafy.io:8100/model/test/texturedMesh.obj`);
-        const mtlRes = await fetch(`https://k12a307.p.ssafy.io:8100/model/test/texturedMesh.mtl`);
+        const objRes = await fetch(`${modelPath}texturedMesh.obj`);
+        const mtlRes = await fetch(`${modelPath}texturedMesh.mtl`);
         if (!objRes.ok || !mtlRes.ok) throw new Error("모델 파일을 불러올 수 없습니다.");
         setObjBlob(await objRes.blob());
         setMtlBlob(await mtlRes.blob());
@@ -92,7 +94,7 @@ const ModelViewer = ({ productId }: ModelViewerProps) => {
       }
     };
     loadModel();
-  }, [productId]);
+  }, [productId, modelPath]);
 
   const handleReset = () => setResetTrigger((prev) => prev + 1);
 
@@ -172,7 +174,7 @@ const ModelViewer = ({ productId }: ModelViewerProps) => {
         <directionalLight position={[0, 5, 5]} intensity={1.2} />
         <Suspense fallback={null}>
           {objBlob && mtlBlob && (
-            <Model objBlob={objBlob} mtlBlob={mtlBlob} scale={1} />
+            <Model objBlob={objBlob} mtlBlob={mtlBlob} scale={1} modelPath={modelPath} />
           )}
         </Suspense>
         <DreiOrbitControls

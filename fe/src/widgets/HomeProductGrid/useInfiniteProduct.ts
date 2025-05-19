@@ -5,6 +5,8 @@ import type { Product } from "@/entities/Products/types";
 interface ProductStore {
   products: Product[];
   hasMore: boolean;
+  page: number;
+  isLoading: boolean;
   fetchNext: () => void;
 }
 
@@ -110,27 +112,35 @@ const dummyProducts = [
 ];
 
 export const useInfiniteProducts = create<ProductStore>((set, get) => ({
-//   products: [],  <- api 연결하면 이렇게 하면 될듯?
-  products: dummyProducts,
+  products: [],
   hasMore: true,
-  fetchNext: () => {
-    const current = get().products.length;
-    if (current >= 24) {
-      set({ hasMore: false });
-      return;
+  page: 0,
+  isLoading: false,
+  fetchNext: async () => {
+    const { page, hasMore, isLoading } = get();
+    if (!hasMore || isLoading) return;
+
+    set({ isLoading: true });
+
+    try {
+      const res = await fetch(
+        `https://k12a307.p.ssafy.io/api/posts?page=${page}&sort=createdAt,DESC`
+      );
+      const data = await res.json();
+      const newProducts: Product[] = data.content.content;
+
+      set((state) => ({
+        products: [...state.products, ...newProducts],
+        hasMore: !data.content.last, // 마지막 페이지 여부에 따라 결정
+        page: state.page + 1,
+        isLoading: false,
+      }));
+      console.log("상품 불러오기 성공")
+    } catch (error) {
+      console.error("상품 불러오기 실패:", error);
+      set({ isLoading: false });
     }
-
-    const newProducts = Array.from({ length: 6 }, (_, i) => ({
-      id: current + i + 1,
-      name: `추가된 데이터입니다. ${current + i + 1}`,
-      price: 307,
-      imageUrl: `https://randomuser.me/api/portraits/men/${current + i + 1}.jpg`
-    }));
-
-    set((state) => ({
-      products: [...state.products, ...newProducts]
-    }));
-  }
+  },
 }));
 
 export const useInfiniteScroll = () => {
