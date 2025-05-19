@@ -10,6 +10,7 @@ import com.beet.beetmarket.domain.image.repository.ImageRepository;
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.request.UpdatePostStatusRequestDto;
+import com.beet.beetmarket.domain.post.dto.response.CreatePostResponseDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
 import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Post;
@@ -143,7 +144,7 @@ public class PostService {
 
 
 
-    public void createPost(Long userId, CreatePostRequestDto request) {
+    public CreatePostResponseDto createPost(Long userId, CreatePostRequestDto request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Category category = categoryRepository.findByName(request.category()).orElseThrow(CategoryNotFoundException::new);
         List<Image> images = new ArrayList<>();
@@ -180,6 +181,8 @@ public class PostService {
         if(request.video() != null) {
             videoProcessPublisher.publishVideos(userId, post.getId(), post.getUuid(), request.video());
         }
+
+        return new CreatePostResponseDto(post.getId());
     }
 
     public void updatePost(Long userId, Long postId, UpdatePostRequestDto request) {
