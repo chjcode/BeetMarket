@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ProductList } from "@/shared/ui/Product/ProductList";
-import { useSalesProductsQuery } from "@/features/mypage/api/useSalesProductsQuery";
+import { usePurchasesProductsQuery } from "@/features/mypage/api/usePurchasesProductsQuery";
 import { Product } from "@/features/mypage/api/types";
 
 const PurchasesPage = () => {
@@ -12,7 +12,7 @@ const PurchasesPage = () => {
     isFetchingNextPage,
     isLoading,
     error,
-  } = useSalesProductsQuery();
+  } = usePurchasesProductsQuery();
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 

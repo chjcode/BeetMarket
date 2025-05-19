@@ -1,4 +1,3 @@
-// src/features/mypage/api/getSalesProducts.ts
 import axiosInstance from "@/shared/api/axiosInstance";
 import { ProductResponse } from "./types";
 
