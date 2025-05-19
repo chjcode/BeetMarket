@@ -112,16 +112,10 @@ public class Post extends BaseTimeEntity {
         this.view++;
     }
 
-    public void reserve() {
-        this.status = Status.RESERVED;
-    }
-
-    public void cancel() {
-        this.status = Status.AVAILABLE;
-    }
-
-    public void complete(User buyer) {
-        this.status = Status.COMPLETED;
-        this.buyer = buyer;
+    public void changeStatus(Status status, User buyer) {
+        this.status = status;
+        if(status == Status.COMPLETED) {
+            this.buyer = buyer;
+        }
     }
 }

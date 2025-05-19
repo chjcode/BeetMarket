@@ -2,6 +2,7 @@ package com.beet.beetmarket.domain.post.controller;
 
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
+import com.beet.beetmarket.domain.post.dto.request.UpdatePostStatusRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
 import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Status;
@@ -126,6 +127,20 @@ public class PostController {
                 HttpStatus.OK,
                 null,
                 postService.searchAllMySellingPosts(user.getId(), pageable)
+        );
+    }
+
+    @PutMapping("/{postId}/status")
+    public ResponseEntity<ResponseWrapper<Void>> updatePostStatus(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long postId,
+            @RequestBody UpdatePostStatusRequestDto request
+    ) {
+        postService.updatePostStatus(user.getId(), postId, request);
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null,
+                null
         );
     }
 }

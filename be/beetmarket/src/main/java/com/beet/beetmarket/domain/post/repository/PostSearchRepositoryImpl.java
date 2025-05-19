@@ -22,6 +22,7 @@ import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -137,5 +138,28 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
                 .build();
 
         ops.update(uq, INDEX);
+    }
+
+    @Override
+    public void updateStatusAndBuyerInEs(Long postId, Status status, Long buyerId) {
+        String script;
+        Map<String, Object> params = new HashMap<>();
+        params.put("status", status);
+
+        if (buyerId != null) {
+            script = "ctx._source.status = params.status; ctx._source.buyerId = params.buyerId;";
+            params.put("buyerId", buyerId);
+        } else {
+            script = "ctx._source.status = params.status; ctx._source.remove('buyerId');";
+        }
+
+        UpdateQuery updateQuery = UpdateQuery.builder(postId.toString())
+                .withScriptType(ScriptType.INLINE)
+                .withLang("painless")
+                .withScript(script)
+                .withParams(params)
+                .build();
+
+        ops.update(updateQuery, INDEX);
     }
 }
