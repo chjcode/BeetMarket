@@ -9,6 +9,7 @@ import com.beet.beetmarket.domain.image.entity.Image;
 import com.beet.beetmarket.domain.image.repository.ImageRepository;
 import com.beet.beetmarket.domain.post.dto.request.CreatePostRequestDto;
 import com.beet.beetmarket.domain.post.dto.request.UpdatePostRequestDto;
+import com.beet.beetmarket.domain.post.dto.request.UpdatePostStatusRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
 import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Post;
@@ -224,4 +225,23 @@ public class PostService {
         }
     }
 
+    public void updatePostStatus(Long id, Long postId, UpdatePostStatusRequestDto request) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFountException::new);
+        if(!post.getUser().getId().equals(user.getId())) {
+            throw new PostAccessDeniedException();
+        }
+        User buyer = null;
+        if(request.status() == Status.COMPLETED) {
+            buyer = userRepository.findByNickname(request.buyerNickname()).orElseThrow(UserNotFoundException::new);
+        }
+
+        post.changeStatus(request.status(), buyer);
+
+        Long buyerId = buyer != null ? buyer.getId() : null;
+
+        searchRepository.updateStatusAndBuyerInEs(postId, request.status(), buyerId);
+
+
+    }
 }
