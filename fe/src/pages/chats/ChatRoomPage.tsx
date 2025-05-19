@@ -8,7 +8,7 @@ import { Icon } from "@/shared/ui/Icon";
 interface ChatMessageResponse {
   id: string;
   roomId: number;
-  senderNickname: string; // OAuth 식별자
+  senderNickname: string;
   type: "TEXT" | "IMAGE";
   content: string;
   timestamp: string;
@@ -36,6 +36,7 @@ const ChatRoomPage: React.FC = () => {
       const res = await axiosInstance.get<{ content: { nickname: string } }>(
         `/api/users/oauth/${oauthName}`
       );
+      console.log("닉네임 조회 성공:", res.data.content.nickname);
       setUserMap(prev => ({ ...prev, [oauthName]: res.data.content.nickname }));
     } catch (e) {
       console.error(`닉네임 조회 실패: ${oauthName}`, e);
@@ -76,7 +77,8 @@ const ChatRoomPage: React.FC = () => {
     }
 
     // 캐시 회피를 위한 타임스탬프 추가
-    const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}&t=${Date.now()}`;
+    const socketUrl = `https://k12a307.p.ssafy.io/ws-chat/info`;
+    // const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
 
     const client = new Client({
