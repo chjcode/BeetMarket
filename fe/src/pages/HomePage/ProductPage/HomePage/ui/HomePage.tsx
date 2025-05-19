@@ -3,7 +3,7 @@ import HomeProductGrid from "@/widgets/HomeProductGrid/HomeProductGrid";
 
 const HomePage = () => {
   return (
-    <div className=" w-full max-w-[480px] mx-auto overflow-x-hidden">
+    <div className=" w-full max-w-[480px] mx-auto overflow-x-hidden pt-3">
       <CategoryScroll />
       <div className="mt-4">
         <h2 className="text-xl font-semibold mb-2">

@@ -10,7 +10,9 @@ const AddPage = () => {
   const [place, setPlace] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [video, setVideo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -25,6 +27,17 @@ const AddPage = () => {
       Promise.all(readers).then(newImages => {
         setImages(prev => [...prev, ...newImages].slice(0, 5));
       });
+    }
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setVideo(ev.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -110,6 +123,40 @@ const AddPage = () => {
                 ref={fileInputRef}
                 className="hidden"
                 onChange={handleImageChange}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      <div>
+        <label className="text-lg font-bold mb-2 flex items-center gap-2">
+          영상 등록 <span className="text-base font-normal text-gray-400">{video ? "(1/1)" : "(0/1)"}</span>
+        </label>
+        <div className="flex items-center gap-2 flex-wrap">
+          {video && (
+            <div className="w-32 h-20 rounded-xl bg-gray-200 flex items-center justify-center border-2 border-[#CBCBCB] relative overflow-hidden">
+              <video src={video} controls className="w-full h-full object-cover rounded-xl" />
+              <button
+                type="button"
+                className="absolute top-0 right-0 bg-black bg-opacity-50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                onClick={() => setVideo(null)}
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {!video && (
+            <div
+              className="w-32 h-20 rounded-xl bg-gray-200 flex items-center justify-center cursor-pointer border-2 border-[#CBCBCB]"
+              onClick={() => videoInputRef.current?.click()}
+            >
+              <span className="text-3xl text-gray-400">+</span>
+              <input
+                type="file"
+                accept="video/*"
+                ref={videoInputRef}
+                className="hidden"
+                onChange={handleVideoChange}
               />
             </div>
           )}

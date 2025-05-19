@@ -7,7 +7,7 @@ const Product3DViewerPage = () => {
   const modelPath = location.state?.model3D;
 
   return (
-    <div className="h-full flex flex-col overflow-hidden bg-white">
+    <div className="h-[88dvh] flex flex-col overflow-hidden bg-white">
       <h1 className="text-xl font-bold mb-4">3D 보기</h1>
       <div className="flex-1 overflow-hidden">
         {id && <ModelViewer productId={id} modelPath={modelPath} />}

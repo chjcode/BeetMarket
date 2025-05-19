@@ -8,18 +8,24 @@ export const AuthRedirectPage = () => {
   useEffect(() => {
     const issueAccessToken = async () => {
       try {
+        localStorage.removeItem("accessToken");
         const res = await axiosInstance.get("/api/auth/issue");
-
-        const { accessToken } = res.data;
+        const accessToken = res.headers["authorization"]?.replace("Bearer ", "");
+        const hasNickname = res.data?.content;
+        if (!accessToken) {
+          throw new Error("accessToken 누락");
+        }
         localStorage.setItem("accessToken", accessToken);
-
-        navigate("/");
+        if (!hasNickname) {
+          navigate("/signup");
+        } else {
+          navigate("/");
+        }
       } catch (err) {
         console.error("토큰 발급 실패:", err);
         navigate("/login");
       }
     };
-
     issueAccessToken();
   }, []);
 

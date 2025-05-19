@@ -3,12 +3,12 @@ import { FaShoppingBag, FaHeart } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegListAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
-import { HiOutlineIdentification } from "react-icons/hi2";
+// import { HiOutlineIdentification } from "react-icons/hi2";
 
 export const MyPage = () => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col items-center bg-white min-h-screen pt-6">
+    <div className="flex flex-col items-center bg-white pt-6">
       {/* 프로필 영역 */}
       <div className="relative mb-2">
         <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-5xl text-gray-400" />
@@ -51,13 +51,6 @@ export const MyPage = () => {
         </NavLink>
       </div>
 
-      {/* 본인 인증 */}
-      <div className="w-full max-w-md px-10 flex justify-start">
-        <button className="flex items-center gap-2 mt-2 text-lg font-medium ml-4">
-          <HiOutlineIdentification className="text-2xl text-black" />
-          본인 인증 하기
-        </button>
-      </div>
     </div>
   );
 };

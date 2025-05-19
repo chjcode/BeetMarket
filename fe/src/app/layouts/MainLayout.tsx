@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
-import {TopBar} from "@/widgets/TopBar";
-import {BottomNav} from "@/widgets/BottomNav";
+import { TopBar } from "@/widgets/TopBar";
+import { BottomNav } from "@/widgets/BottomNav";
 
 const Layout = () => {
   const { pathname } = useLocation();
@@ -8,36 +8,30 @@ const Layout = () => {
   const noHeaderRoutes = ["/login", "/signup", "/product"];
   const noBottomNavRoutes = ["/login", "/signup", "/product"];
 
-  const showHeader = !noHeaderRoutes.some(route => pathname.startsWith(route));
-  const showBottomNav = !noBottomNavRoutes.some(route => pathname.startsWith(route));
+  const showHeader = !noHeaderRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+  const showBottomNav = !noBottomNavRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
   return (
-    <div className="flex justify-center w-screen bg-gray-100 min-h-screen">
-      <div
-        className="
-          w-full 
-          min-w-[360px] 
-          max-w-[480px] 
-          flex flex-col 
-          bg-white 
-        "
-      >
-        {showHeader && (
-          pathname.startsWith("/product/") ? null : (
-            <header className="sticky top-0 bg-white z-10">
-              <TopBar />
-            </header>
-          )
+    <div className="fixed inset-0 flex justify-center bg-gray-100">
+      <div className="relative w-full min-w-[360px] max-w-[480px] bg-white flex flex-col">
+        {showHeader && !pathname.startsWith("/product/") && (
+          <div className="fixed top-0 w-full max-w-[480px] z-10 bg-white">
+            <TopBar />
+          </div>
         )}
 
-        <main className="flex-1 overflow-auto p-4">
+        <div className="my-[54px] px-4 overflow-auto">
           <Outlet />
-        </main>
+        </div>
 
         {showBottomNav && (
-          <footer className="sticky bottom-0 bg-white z-10">
+          <div className="fixed bottom-0 w-full max-w-[480px] z-10 bg-white">
             <BottomNav />
-          </footer>
+          </div>
         )}
       </div>
     </div>
