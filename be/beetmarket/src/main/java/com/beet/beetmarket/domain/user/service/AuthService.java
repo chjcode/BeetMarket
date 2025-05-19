@@ -33,7 +33,7 @@ public class AuthService {
 	// refreshToken이 유효한지 확인하고 헤더에 "Authorization"이라는 키로 accessToken을 발급함.
 	// refreshToken이 유효한지 확인하고 db에 있는 토큰인지 확인하고
 	// "Authorization"이라는 키로 accessToken과 refreshToken을 발급함.
-	public HttpHeaders setAccessToken(String token) {
+	public HttpHeaders setAccessToken(String token, String nickname) {
 		String oauthName = jwtUtil.getKey(token, "id");	// jwt 토큰에서 user의 아이디 가져옴
 
 		// Redis에서 저장된 refreshTokenEntity 조회 (없으면 예외 발생)
@@ -51,7 +51,7 @@ public class AuthService {
 		}
 
 		// access token , refresh token 갱신
-		String accessToken = jwtUtil.generateToken(user, 24 * 60 * 60 * 1000L);
+		String accessToken = jwtUtil.generateToken(user, nickname, 24 * 60 * 60 * 1000L);
 		String refreshToken = jwtUtil.generateToken(user, 30 * 24 * 60 * 60 * 1000L);
 		refreshTokenEntity.updateToken(refreshToken);
 		refreshTokenRepository.save(refreshTokenEntity);

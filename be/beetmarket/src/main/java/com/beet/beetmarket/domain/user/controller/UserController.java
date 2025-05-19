@@ -5,6 +5,7 @@ import com.beet.beetmarket.domain.user.dto.ScheduleResponseDto;
 import com.beet.beetmarket.domain.user.dto.UpdateUserInfoRequestDto;
 import com.beet.beetmarket.domain.user.dto.UserResponseDto;
 import com.beet.beetmarket.domain.user.entity.User;
+import com.beet.beetmarket.domain.user.service.AuthService;
 import com.beet.beetmarket.domain.user.service.UserService;
 import com.beet.beetmarket.global.response.ResponseWrapper;
 import com.beet.beetmarket.global.response.ResponseWrapperFactory;
@@ -23,9 +24,11 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthService authService) {
         this.userService = userService;
+        this.authService = authService;
     }
 
     @GetMapping("/my")
@@ -52,6 +55,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<ResponseWrapper<Void>> addUserInfo(
+            @CookieValue("refreshToken") String token,
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateUserInfoRequestDto request
     ) {
@@ -59,12 +63,13 @@ public class UserController {
 
         return ResponseWrapperFactory.setResponse(
                 HttpStatus.OK,
-                null
+                authService.setAccessToken(token, user.getNickname())
         );
     }
 
     @PatchMapping("/my")
     public ResponseEntity<ResponseWrapper<Void>> updateUserInfo(
+            @CookieValue("refreshToken") String token,
             @AuthenticationPrincipal User user,
             @Valid @RequestBody UpdateUserInfoRequestDto request
     ) {
@@ -72,7 +77,7 @@ public class UserController {
 
         return ResponseWrapperFactory.setResponse(
                 HttpStatus.OK,
-                null
+                authService.setAccessToken(token, user.getNickname())
         );
     }
 

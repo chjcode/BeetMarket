@@ -28,7 +28,7 @@ public class AuthController {
 		String nickname = authService.getUserNicknameByToken(token);
 
 		return ResponseWrapperFactory.setResponse(HttpStatus.OK,
-			authService.setAccessToken(token),
+			authService.setAccessToken(token, nickname),
 			nickname != null && !nickname.isBlank()
 		);
 	}

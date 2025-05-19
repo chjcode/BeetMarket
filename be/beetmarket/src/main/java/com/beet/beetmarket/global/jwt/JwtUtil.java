@@ -55,4 +55,14 @@ public class JwtUtil {
 			.signWith(secretKey)
 			.compact();
 	}
+
+	public String generateToken(User user,String nickname, Long expireTime) {
+		return Jwts.builder()
+				.claim("id", user.getOauthName())
+				.claim("nickname", nickname)
+				.issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis() + expireTime))
+				.signWith(secretKey)
+				.compact();
+	}
 }
