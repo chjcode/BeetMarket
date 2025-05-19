@@ -34,18 +34,19 @@ const ChatRoomPage = () => {
 
     const fetchChatHistory = async () => {
       try {
-        const res = await axiosInstance.get<{
-          content: {
-            messages: {
-              content: ChatMessageResponse[];
-            };
-          };
-        }>(`/api/chat/rooms/${roomId}/messages`, {
-          params: { page: 0, size: 20, sortOrder: "desc" },
-        });
+        const res = await axiosInstance.get(
+          `/api/chat/rooms/${roomId}/messages`,
+          {
+            params: { page: 0, size: 20, sortOrder: "desc" },
+          }
+        );
 
-        const history = res.data.content.messages.content;
-        setMessages([...history].reverse());
+        const history = res.data?.content?.messages?.content;
+        if (Array.isArray(history)) {
+          setMessages([...history].reverse());
+        } else {
+          console.warn("메시지 배열이 아님:", res.data?.content);
+        }
       } catch (error) {
         console.error("채팅 기록 조회 실패:", error);
       }
@@ -56,7 +57,10 @@ const ChatRoomPage = () => {
 
   // 2. WebSocket 연결
   useEffect(() => {
-    if (!roomId || !accessToken) return;
+    if (!roomId || !accessToken) {
+      console.warn("roomId 또는 accessToken 누락:", { roomId, accessToken });
+      return;
+    }
 
     const client = new Client({
       webSocketFactory: () =>
@@ -64,11 +68,11 @@ const ChatRoomPage = () => {
           `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`
         ),
       reconnectDelay: 5000,
-      debug: (msg) => console.log("[STOMP]", msg),
+      debug: (msg) => console.log("[STOMP DEBUG]", msg),
       onConnect: () => {
-        console.log("STOMP connected");
+        console.log("✅ STOMP 연결됨");
 
-        // 2-1. 메시지 수신 구독
+        // 메시지 수신 구독
         client.subscribe(
           `/user/sub/chat/room/${roomId}`,
           (message: IMessage) => {
@@ -81,17 +85,20 @@ const ChatRoomPage = () => {
           }
         );
 
-        // 2-2. 읽음 확인 구독
+        // 읽음 확인 구독
         client.subscribe(
           `/user/sub/chat/read/${roomId}`,
           (message: IMessage) => {
             const ack = JSON.parse(message.body);
-            console.log("읽음 확인 수신:", ack);
+            console.log("📩 읽음 확인 수신:", ack);
           }
         );
       },
       onStompError: (frame) => {
-        console.error("STOMP error:", frame.headers["message"]);
+        console.error("❌ STOMP 오류:", frame.headers["message"], frame.body);
+      },
+      onWebSocketClose: () => {
+        console.warn("🔌 WebSocket 연결 종료됨");
       },
     });
 
@@ -99,6 +106,7 @@ const ChatRoomPage = () => {
     clientRef.current = client;
 
     return () => {
+      console.log("🧹 STOMP 연결 종료");
       client.deactivate();
     };
   }, [accessToken, roomId, myNickname]);
