@@ -4,6 +4,7 @@ import com.beet.beetmarket.domain.chatRoom.repository.ChatRoomRepository;
 import com.beet.beetmarket.domain.user.dto.CreateUserInfoRequestDto;
 import com.beet.beetmarket.domain.user.dto.ScheduleResponseDto;
 import com.beet.beetmarket.domain.user.dto.UpdateUserInfoRequestDto;
+import com.beet.beetmarket.domain.user.dto.UserNicknameProfileResponseDto;
 import com.beet.beetmarket.domain.user.dto.UserResponseDto;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.domain.user.exception.NicknameAlreadyTakenException;
@@ -70,5 +71,12 @@ public class UserService {
     public List<ScheduleResponseDto> getUserSchedule(Long id, LocalDateTime start, LocalDateTime end) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         return chatRoomRepository.findAllMySchedule(user, start, end);
+    }
+
+    @Transactional(readOnly = true)
+    public UserNicknameProfileResponseDto getUserNicknameAndProfileByOauthName(String oauthName) {
+        User user = userRepository.findByOauthName(oauthName)
+            .orElseThrow(UserNotFoundException::new);
+        return UserNicknameProfileResponseDto.from(user);
     }
 }
