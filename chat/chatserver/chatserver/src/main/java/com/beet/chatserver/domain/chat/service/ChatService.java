@@ -17,6 +17,7 @@ import com.beet.chatserver.domain.chat.entity.ChatRoomRead;
 import com.beet.chatserver.domain.chat.entity.MessageType; // MessageType enum이 있다고 가정
 import com.beet.chatserver.domain.chat.repository.ChatMessageRepository;
 import com.beet.chatserver.domain.chat.repository.ChatRoomReadRepository;
+import com.beet.chatserver.domain.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class ChatService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChatRoomReadRepository chatRoomReadRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void processMessage(ChatMessageRequest req, String senderNickname) {
@@ -107,9 +109,20 @@ public class ChatService {
                 });
             }
         } else {
-            // 수신자(B)가 채팅방에 없거나 오프라인: 푸시 알림, 안 읽은 메시지 카운트 로직 추가
-            log.info("Receiver {} is NOT present in room {}. TODO: Handle offline (e.g., push notification, unread count).", req.receiverNickname(), req.roomId());
-            // TODO: 푸시 알림 서비스 호출 또는 안 읽은 메시지 카운트 업데이트 등의 로직
+            // 수신자(B)가 현재 채팅방에 없음 (오프라인 또는 다른 페이지에 있음)
+            log.info("Receiver {} is NOT present in room {}. Sending notification.", req.receiverNickname(), req.roomId());
+            // 알림 서비스 호출하여 알림 생성 및 전송
+            String messagePreview = req.content();
+            if (messagePreview.length() > 50) { // 메시지 미리보기 길이 제한
+                messagePreview = messagePreview.substring(0, 47) + "...";
+            }
+            notificationService.createAndSendChatMessageNotification(
+                req.receiverNickname(),
+                senderNickname,
+                req.roomId(),
+                savedMessage.getId(), // 채팅 메시지 ID
+                messagePreview
+            );
         }
     }
 
@@ -118,10 +131,10 @@ public class ChatService {
         log.info("{} marks messages as read in room {} up to messageId {}", readerNickname, req.roomId(), req.lastReadMessageId());
 
         Instant readAt = Instant.now();
-        // 1. 읽은 사용자의 ChatRoomRead 정보 업데이트
+        // 읽은 사용자의 ChatRoomRead 정보 업데이트
         updateUserReadCursor(String.valueOf(req.roomId()), readerNickname, req.lastReadMessageId(), readAt);
 
-        // 2. 읽음 ACK 응답 페이로드 생성
+        // 읽음 ACK 응답 페이로드 생성
         ReadAckResponse readAckResponse = new ReadAckResponse(
             req.roomId(),
             readerNickname,         // 이 메시지(들)을 읽은 사람 (B)
@@ -129,7 +142,7 @@ public class ChatService {
             readAt                  // 읽은 시간
         );
 
-        // 3. 상대방(counterpartNickname)에게 읽음 상태 전송
+        // 상대방(counterpartNickname)에게 읽음 상태 전송
         // ReadAckRequest DTO에 counterpartNickname 필드가 있어야 합니다.
         // 이 counterpartNickname은 '읽음'을 당한 메시지들의 원래 발신자입니다.
         if (req.counterpartNickname() != null && !req.counterpartNickname().isEmpty()) {
@@ -149,7 +162,7 @@ public class ChatService {
             log.warn("Counterpart nickname is missing in ReadAckRequest. RoomId: {}, Reader: {}", req.roomId(), readerNickname);
         }
 
-        // 4. (선택적) 읽음 요청을 보낸 사용자 본인에게도 ACK를 보내 UI 동기화 (여러 기기 사용 등)
+        // 읽음 요청을 보낸 사용자 본인에게도 ACK를 보내 UI 동기화 (여러 기기 사용 등)
         log.debug("Sending self-confirmation of read ack to {} in room {}", readerNickname, req.roomId());
         simpMessagingTemplate.convertAndSendToUser(
             readerNickname,
