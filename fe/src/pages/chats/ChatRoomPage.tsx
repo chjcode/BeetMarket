@@ -8,57 +8,83 @@ import { Icon } from "@/shared/ui/Icon";
 interface ChatMessageResponse {
   id: string;
   roomId: number;
-  senderNickname: string;
+  senderNickname: string; // OAuth 식별자
   type: "TEXT" | "IMAGE";
   content: string;
   timestamp: string;
 }
 
-const ChatRoomPage = () => {
+export const ChatRoomPage = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
 
-  const myNickname = localStorage.getItem("myNickname") ?? "me";
-  const counterpartNickname =
-    localStorage.getItem("counterpartNickname") ?? "상대방";
+  // 로컬에 저장된 OAuth 식별자
+  const myOauthName = localStorage.getItem("myNickname") ?? "";
+  const counterpartOauthName =
+    localStorage.getItem("counterpartNickname") ?? "";
   const accessToken = localStorage.getItem("accessToken") ?? "";
 
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
+  const [userMap, setUserMap] = useState<Record<string, string>>({});
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
 
-  // 1. 채팅 내역 불러오기
+  // OAuth 식별자로 실제 닉네임 조회 및 캐싱
+  const fetchAndCacheNickname = async (oauthName: string) => {
+    if (!oauthName || userMap[oauthName]) return;
+    try {
+      const res = await axiosInstance.get<{ content: { nickname: string } }>(
+        `/api/users/oauth/${oauthName}`
+      );
+      const actual = res.data.content.nickname;
+      setUserMap((prev) => ({ ...prev, [oauthName]: actual }));
+    } catch (e) {
+      console.error(`닉네임 조회 실패: ${oauthName}`, e);
+    }
+  };
+
+  // 최초 접속 시 내/상대방 닉네임 미리 조회
+  useEffect(() => {
+    fetchAndCacheNickname(myOauthName);
+    fetchAndCacheNickname(counterpartOauthName);
+  }, []);
+
+  // 1) 과거 채팅 기록 조회
   useEffect(() => {
     if (!roomId) return;
-
     const fetchChatHistory = async () => {
       try {
-        const res = await axiosInstance.get(
-          `/api/chat/rooms/${roomId}/messages`,
-          {
-            params: { page: 0, size: 20, sortOrder: "desc" },
-          }
-        );
+        const res = await axiosInstance.get<{
+          content: { messages: { content: ChatMessageResponse[] } };
+        }>(`/api/chat/rooms/${roomId}/messages`, {
+          params: { page: 0, size: 20, sortOrder: "desc" },
+        });
 
-        const history = res.data?.content?.messages?.content;
+        const history = res.data.content.messages.content;
         if (Array.isArray(history)) {
-          setMessages([...history].reverse());
+          const chronological = [...history].reverse();
+          setMessages(chronological);
+
+          // 이력에 나온 모든 사용자 닉네임 조회
+          const unique = Array.from(
+            new Set(chronological.map((m) => m.senderNickname))
+          );
+          unique.forEach(fetchAndCacheNickname);
         } else {
-          console.warn("메시지 배열이 아님:", res.data?.content);
+          console.warn("history가 배열이 아님:", res.data.content);
         }
       } catch (error) {
         console.error("채팅 기록 조회 실패:", error);
       }
     };
-
     fetchChatHistory();
   }, [roomId]);
 
-  // 2. WebSocket 연결
+  // 2) WebSocket(STOMP) 연결 및 실시간 처리
   useEffect(() => {
     if (!roomId || !accessToken) {
-      console.warn("roomId 또는 accessToken 누락:", { roomId, accessToken });
+      console.warn("roomId 또는 accessToken 누락", { roomId, accessToken });
       return;
     }
 
@@ -68,9 +94,9 @@ const ChatRoomPage = () => {
           `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`
         ),
       reconnectDelay: 5000,
-      debug: (msg) => console.log("[STOMP DEBUG]", msg),
+      debug: (msg) => console.log("[STOMP]", msg),
       onConnect: () => {
-        console.log("✅ STOMP 연결됨");
+        console.log("STOMP connected");
 
         // 메시지 수신 구독
         client.subscribe(
@@ -78,8 +104,10 @@ const ChatRoomPage = () => {
           (message: IMessage) => {
             const body: ChatMessageResponse = JSON.parse(message.body);
             setMessages((prev) => [...prev, body]);
+            fetchAndCacheNickname(body.senderNickname);
 
-            if (body.senderNickname !== myNickname) {
+            // 상대방 메시지라면 읽음 ACK
+            if (body.senderNickname !== myOauthName) {
               sendReadAck(body.id);
             }
           }
@@ -90,15 +118,12 @@ const ChatRoomPage = () => {
           `/user/sub/chat/read/${roomId}`,
           (message: IMessage) => {
             const ack = JSON.parse(message.body);
-            console.log("📩 읽음 확인 수신:", ack);
+            console.log("읽음 확인 수신:", ack);
           }
         );
       },
       onStompError: (frame) => {
-        console.error("❌ STOMP 오류:", frame.headers["message"], frame.body);
-      },
-      onWebSocketClose: () => {
-        console.warn("🔌 WebSocket 연결 종료됨");
+        console.error("STOMP error:", frame.headers["message"], frame.body);
       },
     });
 
@@ -106,45 +131,45 @@ const ChatRoomPage = () => {
     clientRef.current = client;
 
     return () => {
-      console.log("🧹 STOMP 연결 종료");
       client.deactivate();
     };
-  }, [accessToken, roomId, myNickname]);
+  }, [accessToken, roomId]);
 
-  // 3. 자동 스크롤
+  // 3) 새 메시지에 대해서도 닉네임 조회
+  useEffect(() => {
+    const names = Array.from(new Set(messages.map((m) => m.senderNickname)));
+    names.forEach(fetchAndCacheNickname);
+  }, [messages]);
+
+  // 4) 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 4. 메시지 전송
+  // 메시지 전송
   const sendMessage = () => {
     if (!input.trim() || !clientRef.current?.connected) return;
-
     const payload = {
       roomId,
-      receiverNickname: counterpartNickname,
+      receiverNickname: counterpartOauthName,
       type: "TEXT",
       content: input.trim(),
     };
-
     clientRef.current.publish({
       destination: "/pub/chat/message",
       body: JSON.stringify(payload),
     });
-
     setInput("");
   };
 
-  // 5. 읽음 확인 전송
+  // 읽음 ACK 전송
   const sendReadAck = (messageId: string) => {
     if (!clientRef.current?.connected) return;
-
     const ackPayload = {
       roomId,
-      counterpartNickname,
+      counterpartNickname: counterpartOauthName,
       lastReadMessageId: messageId,
     };
-
     clientRef.current.publish({
       destination: "/pub/chat/read",
       body: JSON.stringify(ackPayload),
@@ -159,18 +184,25 @@ const ChatRoomPage = () => {
           <div
             key={msg.id}
             className={`flex ${
-              msg.senderNickname === myNickname
+              msg.senderNickname === myOauthName
                 ? "justify-end"
                 : "justify-start"
             }`}
           >
             <div
               className={`p-2 rounded-xl max-w-[70%] text-sm ${
-                msg.senderNickname === myNickname
+                msg.senderNickname === myOauthName
                   ? "bg-purple-200 text-right"
                   : "bg-gray-200 text-left"
               }`}
             >
+              {/* 상대방 메시지에만 실제 닉네임 표시 */}
+              {msg.senderNickname !== myOauthName && (
+                <div className="text-xs text-gray-500 mb-1">
+                  {userMap[msg.senderNickname] ?? msg.senderNickname}
+                </div>
+              )}
+
               <div>{msg.content}</div>
               <div className="text-xs text-gray-500 mt-1">
                 {new Date(msg.timestamp).toLocaleTimeString("ko-KR", {
