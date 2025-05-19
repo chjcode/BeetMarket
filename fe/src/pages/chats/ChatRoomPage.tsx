@@ -4,6 +4,7 @@ import SockJS from "sockjs-client";
 import { useParams } from "react-router-dom";
 import axiosInstance from "@/shared/api/axiosInstance";
 import { Icon } from "@/shared/ui/Icon";
+import dayjs from "dayjs";
 
 interface ChatMessageResponse {
   id: string;
@@ -18,74 +19,42 @@ const ChatRoomPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
 
-  // 로컬에 저장된 OAuth 식별자
   const myOauthName = localStorage.getItem("myNickname") ?? "";
-  const counterpartOauthName = localStorage.getItem("counterpartNickname") ?? "";
+  const counterpartOauthName =
+    localStorage.getItem("counterpartNickname") ?? "";
   const accessToken = localStorage.getItem("accessToken") ?? "";
-  const [suggestedSchedule, setSuggestedSchedule] = useState<{
-    schedule: string;
-    location: string;
-  } | null>(null);
-  
+
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
 
-  // OAuth 식별자로 실제 닉네임 조회 및 캐싱
+  const [suggestedSchedule, setSuggestedSchedule] = useState<{
+    schedule: string;
+    location: string;
+  } | null>(null);
+
   const fetchAndCacheNickname = async (oauthName: string) => {
     if (!oauthName || userMap[oauthName]) return;
     try {
       const res = await axiosInstance.get<{ content: { nickname: string } }>(
         `/api/users/oauth/${oauthName}`
       );
-      console.log("닉네임 조회 성공:", res.data.content.nickname);
-      setUserMap(prev => ({ ...prev, [oauthName]: res.data.content.nickname }));
+      setUserMap((prev) => ({
+        ...prev,
+        [oauthName]: res.data.content.nickname,
+      }));
     } catch (e) {
       console.error(`닉네임 조회 실패: ${oauthName}`, e);
     }
   };
 
-  const handleScheduleSuggestion = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/chat/rooms/${roomId}/schedule-suggestion`
-      );
-      const suggestion = res.data.content;
-      console.log("추천 일정:", suggestion);
-      setSuggestedSchedule(suggestion); // 상태에 저장
-    } catch (err) {
-      console.error("일정 추천 실패", err);
-    }
-  };
-
-  const handleScheduleReserve = async () => {
-    if (!suggestedSchedule) {
-      console.warn("추천 일정이 없습니다. 먼저 추천을 받으세요.");
-      return;
-    }
-
-    try {
-      const res = await axiosInstance.patch(
-        `/api/chat/rooms/${roomId}/reserve`,
-        {
-          schedule: suggestedSchedule.schedule,
-          location: suggestedSchedule.location,
-        }
-      );
-      console.log("일정 등록 성공:", res.data);
-    } catch (err) {
-      console.error("일정 등록 실패", err);
-    }
-  };
-  // 내/상대방 닉네임 초기 조회
   useEffect(() => {
     fetchAndCacheNickname(myOauthName);
     fetchAndCacheNickname(counterpartOauthName);
   }, []);
 
-  // 과거 채팅 기록 조회
   useEffect(() => {
     if (!roomId) return;
     (async () => {
@@ -96,66 +65,65 @@ const ChatRoomPage: React.FC = () => {
           params: { page: 0, size: 20, sortOrder: "desc" },
         });
         const history = res.data.content.messages.content;
-        const chronological = Array.isArray(history) ? [...history].reverse() : [];
+        const chronological = Array.isArray(history)
+          ? [...history].reverse()
+          : [];
         setMessages(chronological);
-        chronological.forEach(m => fetchAndCacheNickname(m.senderNickname));
+        chronological.forEach((m) => fetchAndCacheNickname(m.senderNickname));
       } catch (error) {
         console.error("채팅 기록 조회 실패:", error);
       }
     })();
   }, [roomId]);
 
-  // WebSocket(STOMP) 연결 및 실시간 처리
   useEffect(() => {
-    if (!roomId || !accessToken) {
-      console.warn("WebSocket 연결 조건 부족", { roomId, accessToken });
-      return;
-    }
+    if (!roomId || !accessToken) return;
 
-    // 캐시 회피를 위한 타임스탬프 추가
     const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
 
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
-      debug: msg => console.log("[STOMP]", msg),
+      debug: (msg) => console.log("[STOMP]", msg),
       onConnect: () => {
         console.log("[STOMP] 연결 성공");
 
-        // 메시지 수신 구독
-        client.subscribe(`/user/sub/chat/room/${roomId}`, (message: IMessage) => {
-          try {
-            const body: ChatMessageResponse = JSON.parse(message.body);
-            setMessages(prev => [...prev, body]);
-            fetchAndCacheNickname(body.senderNickname);
-
-            // 읽음 ACK 전송
-            if (body.senderNickname !== myOauthName) {
-              sendReadAck(body.id);
+        client.subscribe(
+          `/user/sub/chat/room/${roomId}`,
+          (message: IMessage) => {
+            try {
+              const body: ChatMessageResponse = JSON.parse(message.body);
+              setMessages((prev) => [...prev, body]);
+              fetchAndCacheNickname(body.senderNickname);
+              if (body.senderNickname !== myOauthName) {
+                sendReadAck(body.id);
+              }
+            } catch (e) {
+              console.error("메시지 처리 오류", e);
             }
-          } catch (e) {
-            console.error("메시지 처리 오류", e);
           }
-        });
+        );
 
-        // 읽음 확인 구독
-        client.subscribe(`/user/sub/chat/read/${roomId}`, (message: IMessage) => {
-          try {
-            const ack = JSON.parse(message.body);
-            console.log("읽음 확인 수신:", ack);
-          } catch (e) {
-            console.error("ACK 파싱 오류", e);
+        client.subscribe(
+          `/user/sub/chat/read/${roomId}`,
+          (message: IMessage) => {
+            try {
+              const ack = JSON.parse(message.body);
+              console.log("읽음 확인 수신:", ack);
+            } catch (e) {
+              console.error("ACK 파싱 오류", e);
+            }
           }
-        });
+        );
       },
-      onStompError: frame => {
+      onStompError: (frame) => {
         console.error("[STOMP ERROR]", frame.headers["message"], frame.body);
       },
-      onWebSocketClose: event => {
+      onWebSocketClose: (event) => {
         console.warn("[STOMP] WebSocket closed:", event);
       },
-      onWebSocketError: event => {
+      onWebSocketError: (event) => {
         console.error("[STOMP] WebSocket error:", event);
       },
     });
@@ -164,17 +132,14 @@ const ChatRoomPage: React.FC = () => {
     clientRef.current = client;
 
     return () => {
-      console.log("[STOMP] 연결 해제");
       client.deactivate();
     };
   }, [accessToken, roomId]);
 
-  // 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 메시지 전송
   const sendMessage = () => {
     if (!input.trim() || !clientRef.current?.connected) return;
     clientRef.current.publish({
@@ -189,7 +154,6 @@ const ChatRoomPage: React.FC = () => {
     setInput("");
   };
 
-  // 읽음 ACK 전송 helper
   const sendReadAck = (messageId: string) => {
     if (!clientRef.current?.connected) return;
     clientRef.current.publish({
@@ -201,6 +165,43 @@ const ChatRoomPage: React.FC = () => {
       }),
     });
   };
+
+  const handleScheduleSuggestion = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/chat/rooms/${roomId}/schedule-suggestion`
+      );
+      const { suggestedSchedule, suggestedLocation } = res.data.content;
+      const formatted = dayjs(suggestedSchedule).format("YYYYMMDDHHmmss");
+      const payload = {
+        schedule: formatted,
+        location: suggestedLocation,
+      };
+      setSuggestedSchedule(payload);
+      console.log("✅ 추천 일정 저장됨:", payload);
+    } catch (err) {
+      console.error("❌ 일정 추천 실패", err);
+    }
+  };
+
+  const handleScheduleReserve = async () => {
+    const scheduleToSend = suggestedSchedule?.schedule ?? "20250601120000"; // 테스트용 날짜
+    const locationToSend = suggestedSchedule?.location ?? "역삼 멀티캠퍼스 3층"; // 테스트용 장소
+
+    try {
+      const res = await axiosInstance.patch(
+        `/api/chat/rooms/${roomId}/reserve`,
+        {
+          schedule: scheduleToSend,
+          location: locationToSend,
+        }
+      );
+      console.log("✅ 일정 등록 성공:", res.data);
+    } catch (err) {
+      console.error("❌ 일정 등록 실패", err);
+    }
+  };
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -222,13 +223,11 @@ const ChatRoomPage: React.FC = () => {
                   : "bg-gray-200 text-left"
               }`}
             >
-              {/* 상대방 메시지에만 실제 닉네임 표시 */}
               {msg.senderNickname !== myOauthName && (
                 <div className="text-xs text-gray-500 mb-1">
                   {userMap[msg.senderNickname] ?? msg.senderNickname}
                 </div>
               )}
-
               <div>{msg.content}</div>
               <div className="text-xs text-gray-500 mt-1">
                 {new Date(msg.timestamp).toLocaleTimeString("ko-KR", {
@@ -243,7 +242,7 @@ const ChatRoomPage: React.FC = () => {
       </div>
 
       {/* 입력창 */}
-      <div className="py-2 bg-white flex items-center gap-2 px-4">
+      <div className="py-2 bg-white flex items-center gap-2 px-4 border-t border-gray-300">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -263,18 +262,20 @@ const ChatRoomPage: React.FC = () => {
           <Icon name="send" className="w-4 h-4" />
         </button>
       </div>
+
+      {/* 하단 기능 버튼 */}
       <div className="flex justify-between bg-gray-50 px-4 py-2 text-sm border-t border-gray-300">
         <button
           onClick={handleScheduleSuggestion}
           className="text-purple-600 font-medium hover:underline"
         >
-          AI 일정 추천
+          🧠 AI 일정 추천
         </button>
         <button
           onClick={handleScheduleReserve}
           className="text-blue-600 font-medium hover:underline"
         >
-          일정 등록
+          📅 일정 등록
         </button>
       </div>
     </div>
