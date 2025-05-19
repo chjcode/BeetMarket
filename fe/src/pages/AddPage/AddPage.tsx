@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import InputTextField from "@/shared/ui/TextForm/TextForm";
 import Button from "@/shared/ui/Button/Button";
 import axiosInstance from "@/shared/api/axiosInstance";
+import PlacePickerModal from "@/widgets/PlacePicker/PlacePickerModal";
 
 const AddPage = () => {
   const [price, setPrice] = useState("");
@@ -13,6 +14,8 @@ const AddPage = () => {
   const [video, setVideo] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const [showMap, setShowMap] = useState(false);
+  const [latlng, setLatlng] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -88,8 +91,8 @@ const AddPage = () => {
         images: imageUrls,
         video: videoUrl,
         uuid,
-        latitude: 37.36,
-        longitude: 126.98,
+        latitude: latlng?.lat ?? 37.36,
+        longitude: latlng?.lng ?? 126.98,
       };
 
       console.log("📦 서버에 보낼 payload:", payload);
@@ -236,12 +239,27 @@ const AddPage = () => {
           )}
         </div>
       </div>
+
       <InputTextField
         label="거래 장소 선택"
-        placeholder="장소선택"
+        placeholder="장소 선택"
         value={place}
-        onChange={(e) => setPlace(e.target.value)}
+        readOnly // 텍스트로 입력 불가
+        onClick={() => setShowMap(true)}
       />
+
+      {showMap && (
+        <PlacePickerModal
+          onClose={() => setShowMap(false)}
+          onSelect={({ lat, lng, address }) => {
+            console.log("선택된 위치:", lat, lng, address);
+            setPlace(address);
+            setLatlng({ lat, lng });
+          }}
+          initialLatLng={latlng ?? undefined}
+        />
+      )}
+
       <Button label="등록 하기" width="100%" onClick={() => handleSubmit()} />
     </form>
   );
