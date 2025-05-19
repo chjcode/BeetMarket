@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Client, IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { useParams } from "react-router-dom";
 import { Icon } from "@/shared/ui/Icon";
 
 interface ChatMessageResponse {
@@ -12,18 +13,21 @@ interface ChatMessageResponse {
   timestamp: string;
 }
 
-interface Props {
-  roomId: number;
-  myNickname: string;
-  counterpartNickname: string;
-}
+const ChatRoomPage = () => {
+  const { id } = useParams();
+  const roomId = Number(id); // URL에서 받은 채팅방 ID
 
-const ChatRoomPage = ({ roomId, myNickname, counterpartNickname }: Props) => {
+  const myNickname = localStorage.getItem("myNickname") ?? "me";
+  const counterpartNickname =
+    localStorage.getItem("counterpartNickname") ?? "상대방";
+
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
   const accessToken = localStorage.getItem("accessToken") ?? "";
+
+  // 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -32,7 +36,7 @@ const ChatRoomPage = ({ roomId, myNickname, counterpartNickname }: Props) => {
     const client = new Client({
       webSocketFactory: () =>
         new SockJS(
-          `https://k12a307.p.ssafy.io//ws-chat?access-token=${accessToken}`
+          `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`
         ),
       reconnectDelay: 5000,
       debug: (msg) => console.log("[STOMP]", msg),
@@ -84,7 +88,11 @@ const ChatRoomPage = ({ roomId, myNickname, counterpartNickname }: Props) => {
       content: input.trim(),
     };
 
-    clientRef.current.send("/pub/chat/message", {}, JSON.stringify(payload));
+    clientRef.current.publish({
+      destination: "/pub/chat/message",
+      body: JSON.stringify(payload),
+    });
+
     setInput("");
   };
 
@@ -97,7 +105,10 @@ const ChatRoomPage = ({ roomId, myNickname, counterpartNickname }: Props) => {
       lastReadMessageId: messageId,
     };
 
-    clientRef.current.send("/pub/chat/read", {}, JSON.stringify(ackPayload));
+    clientRef.current.publish({
+      destination: "/pub/chat/read",
+      body: JSON.stringify(ackPayload),
+    });
   };
 
   return (
