@@ -1,7 +1,7 @@
 import type { Product } from "@/entities/Products/types";
 import { useNavigate } from "react-router-dom";
 
-const HomeProductCard = ({ id, title, price, imageUrl }: Product) => {
+const HomeProductCard = ({ id, title, price, thumbnailUrl }: Product) => {
   const navigate = useNavigate();
 
   return (
@@ -9,7 +9,7 @@ const HomeProductCard = ({ id, title, price, imageUrl }: Product) => {
       <div className="w-full aspect-square relative overflow-hidden rounded-2xl shadow-md">
         <img
           loading="lazy"
-          src={imageUrl}
+          src={thumbnailUrl}
           alt={title}
           className="absolute top-0 left-0 w-full h-full object-cover"
           draggable={false}
