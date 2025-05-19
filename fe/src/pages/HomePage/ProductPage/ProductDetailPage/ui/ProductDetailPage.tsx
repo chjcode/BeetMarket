@@ -197,30 +197,28 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
-      {/* 바텀바 */}
       <ProductDetailBottomBar
         price={product.price}
         onChatClick={async () => {
           try {
-            const formData = new FormData();
-            formData.append("postId", id!);
-            // formData.append("sellerId", product.sellerNickname);
-
             const res = await fetch(
               "https://k12a307.p.ssafy.io/api/chatrooms",
               {
                 method: "POST",
                 headers: {
+                  "Content-Type": "application/json",
                   Authorization: `Bearer ${
                     localStorage.getItem("accessToken") ?? ""
                   }`,
                 },
-                body: formData,
+                body: JSON.stringify({
+                  postId: Number(id),
+                }),
               }
             );
 
             const data = await res.json();
-            const chatRoomId = data.content.id;
+            const chatRoomId = data.content?.id;
 
             if (chatRoomId) {
               navigate(`/chats/${chatRoomId}`);
