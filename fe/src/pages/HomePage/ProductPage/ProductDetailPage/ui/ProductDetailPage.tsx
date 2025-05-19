@@ -202,7 +202,7 @@ const ProductDetailPage = () => {
         onChatClick={async () => {
           try {
             const res = await fetch(
-              "https://k12a307.p.ssafy.io/api/chatrooms",
+              "https://k12a307.p.ssafy.io/api/chat/rooms",
               {
                 method: "POST",
                 headers: {
