@@ -1,10 +1,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getSalesProducts } from "./getSalesProducts";
+import { getPurchasesProducts } from "./getPurchasesProducts";
 
-export const useSalesProductsQuery = () => {
+export const usePurchasesProductsQuery = () => {
   return useInfiniteQuery({
     queryKey: ["mypage", "sales"],
-    queryFn: getSalesProducts,
+    queryFn: getPurchasesProducts,
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       const { number: currentPage, totalPages } = lastPage.content;

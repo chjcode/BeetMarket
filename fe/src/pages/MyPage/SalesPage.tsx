@@ -3,7 +3,7 @@ import { ProductList } from "@/shared/ui/Product/ProductList";
 import { useSalesProductsQuery } from "@/features/mypage/api/useSalesProductsQuery";
 import { Product } from "@/features/mypage/api/types";
 
-const PurchasesPage = () => {
+const SalesPage = () => {
   const [filter, setFilter] = useState<"all" | "selling" | "sold">("all");
   const {
     data,
@@ -50,8 +50,8 @@ const PurchasesPage = () => {
     <div className="flex flex-col">
       <div className="flex gap-2 mb-4">
         <button onClick={() => setFilter("all")}>전체</button>
-        <button onClick={() => setFilter("selling")}>판매중</button>
-        <button onClick={() => setFilter("sold")}>판매완료</button>
+        <button onClick={() => setFilter("selling")}>구매중</button>
+        <button onClick={() => setFilter("sold")}>구매완료</button>
       </div>
 
       <ProductList products={allProducts} />
@@ -62,4 +62,4 @@ const PurchasesPage = () => {
   );
 };
 
-export default PurchasesPage;
+export default SalesPage;
