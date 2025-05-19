@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/posts")
@@ -67,7 +69,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<ResponseWrapper<Void>> createPost(
             @AuthenticationPrincipal User user,
-            @RequestBody CreatePostRequestDto request) {
+            @Valid @RequestBody CreatePostRequestDto request) {
 
         postService.createPost(user.getId(), request);
 
@@ -81,7 +83,7 @@ public class PostController {
     public ResponseEntity<ResponseWrapper<Void>> updatePost(
             @AuthenticationPrincipal User user,
             @PathVariable Long postId,
-            @RequestBody UpdatePostRequestDto request
+            @Valid @RequestBody UpdatePostRequestDto request
     ) {
         postService.updatePost(user.getId(), postId, request);
 

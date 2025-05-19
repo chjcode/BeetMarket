@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -51,7 +53,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<ResponseWrapper<Void>> addUserInfo(
             @AuthenticationPrincipal User user,
-            @RequestBody CreateUserInfoRequestDto request
+            @Valid @RequestBody CreateUserInfoRequestDto request
     ) {
         userService.addUserInfo(user.getId(), request);
 
@@ -64,7 +66,7 @@ public class UserController {
     @PatchMapping("/my")
     public ResponseEntity<ResponseWrapper<Void>> updateUserInfo(
             @AuthenticationPrincipal User user,
-            @RequestBody UpdateUserInfoRequestDto request
+            @Valid @RequestBody UpdateUserInfoRequestDto request
     ) {
         userService.updateUserInfo(user.getId(), request);
 
