@@ -18,5 +18,13 @@ export interface ProductResponse {
     code: string;
     message: string;
   };
-  content: Product[];
+  content: {
+    content: Product[];
+    totalElements: number;
+    totalPages: number;
+    pageable: object;
+    size: number;
+    number: number;
+    sort: object;
+  };
 }

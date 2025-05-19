@@ -16,7 +16,7 @@ import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/Se
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
 import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
-import ChatsPage from "@/pages/chats";
+import { ChatsPage, ChatRoomPage }from "@/pages/chats";
 import { SignupPage } from "@/pages/signup"
 
 export const routes: RouteObject[] = [
@@ -35,7 +35,7 @@ export const routes: RouteObject[] = [
         path: "chats",
         children: [
           { index: true, element: <ChatsPage /> },
-          // { path: ":id", element: <ChatRoomPage />},
+          { path: ":id", element: <ChatRoomPage />},
         ],
       },
       { path: "category", element: <CategoryPage /> },

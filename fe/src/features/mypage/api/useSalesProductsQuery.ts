@@ -1,9 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+// src/features/mypage/api/useSalesProductsQuery.ts
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getSalesProducts } from "./getSalesProducts";
 
 export const useSalesProductsQuery = () => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["mypage", "sales"],
     queryFn: getSalesProducts,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      const { number: currentPage, totalPages } = lastPage.content;
+      return currentPage + 1 < totalPages ? currentPage + 1 : undefined;
+    },
   });
 };
