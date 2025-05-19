@@ -77,8 +77,7 @@ const ChatRoomPage: React.FC = () => {
     }
 
     // 캐시 회피를 위한 타임스탬프 추가
-    const socketUrl = `https://k12a307.p.ssafy.io/ws-chat/info`;
-    // const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
+    const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
 
     const client = new Client({
