@@ -3,6 +3,7 @@ package com.beet.beetmarket.domain.user.controller;
 import com.beet.beetmarket.domain.user.dto.CreateUserInfoRequestDto;
 import com.beet.beetmarket.domain.user.dto.ScheduleResponseDto;
 import com.beet.beetmarket.domain.user.dto.UpdateUserInfoRequestDto;
+import com.beet.beetmarket.domain.user.dto.UserNicknameProfileResponseDto;
 import com.beet.beetmarket.domain.user.dto.UserResponseDto;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.domain.user.service.UserService;
@@ -88,6 +89,18 @@ public class UserController {
                 HttpStatus.OK,
                 null,
                 scheduleResponseDtoList
+        );
+    }
+
+    @GetMapping("/oauth/{oauthName}")
+    public ResponseEntity<ResponseWrapper<UserNicknameProfileResponseDto>> getUserNicknameAndProfileByOauthName(
+        @PathVariable String oauthName
+    ) {
+        UserNicknameProfileResponseDto responseDto = userService.getUserNicknameAndProfileByOauthName(oauthName);
+        return ResponseWrapperFactory.setResponse(
+            HttpStatus.OK,
+            null,
+            responseDto
         );
     }
 }
