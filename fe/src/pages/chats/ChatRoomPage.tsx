@@ -22,7 +22,11 @@ const ChatRoomPage: React.FC = () => {
   const myOauthName = localStorage.getItem("myNickname") ?? "";
   const counterpartOauthName = localStorage.getItem("counterpartNickname") ?? "";
   const accessToken = localStorage.getItem("accessToken") ?? "";
-
+  const [suggestedSchedule, setSuggestedSchedule] = useState<{
+    schedule: string;
+    location: string;
+  } | null>(null);
+  
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const [input, setInput] = useState("");
@@ -49,33 +53,30 @@ const ChatRoomPage: React.FC = () => {
         `/api/chat/rooms/${roomId}/schedule-suggestion`
       );
       const suggestion = res.data.content;
-      alert(
-        `추천 일정:\n시간: ${suggestion.schedule}\n장소: ${suggestion.location}`
-      );
+      console.log("추천 일정:", suggestion);
+      setSuggestedSchedule(suggestion); // 상태에 저장
     } catch (err) {
       console.error("일정 추천 실패", err);
-      alert("일정 추천 요청에 실패했습니다.");
     }
   };
 
   const handleScheduleReserve = async () => {
-    const schedule = prompt("일정 시간(예: 20250601093000)을 입력하세요:");
-    const location = prompt("장소를 입력하세요:");
-    if (!schedule || !location) return;
+    if (!suggestedSchedule) {
+      console.warn("추천 일정이 없습니다. 먼저 추천을 받으세요.");
+      return;
+    }
 
     try {
       const res = await axiosInstance.patch(
         `/api/chat/rooms/${roomId}/reserve`,
         {
-          schedule,
-          location,
+          schedule: suggestedSchedule.schedule,
+          location: suggestedSchedule.location,
         }
       );
-      alert("일정이 성공적으로 등록되었습니다!");
-      console.log("예약 응답:", res.data);
+      console.log("일정 등록 성공:", res.data);
     } catch (err) {
       console.error("일정 등록 실패", err);
-      alert("일정 등록 요청에 실패했습니다.");
     }
   };
   // 내/상대방 닉네임 초기 조회
