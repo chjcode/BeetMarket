@@ -3,10 +3,13 @@ package com.beet.beetmarket.domain.chat.controller;
 import com.beet.beetmarket.domain.chat.dto.ChatMessageResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatMessagesResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatRoomListResponseDto;
+import com.beet.beetmarket.domain.chat.dto.SuggestedScheduleResponseDto;
 import com.beet.beetmarket.domain.chat.service.ChatService;
 import com.beet.beetmarket.domain.chatRoom.dto.ChatRoomResponseDto;
 import com.beet.beetmarket.domain.chatRoom.dto.ChatRoomSummaryDto;
 import com.beet.beetmarket.domain.chatRoom.dto.CreateChatRoomRequestDto;
+import com.beet.beetmarket.domain.chatRoom.dto.CreateReservationRequestDto;
+import com.beet.beetmarket.domain.chatRoom.dto.ReservationResponseDto;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.global.response.ResponseWrapper;
 import com.beet.beetmarket.global.response.ResponseWrapperFactory;
@@ -22,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,5 +84,34 @@ public class ChatController {
     ) {
         PaginatedChatRoomListResponseDto response = chatService.getChatRoomsForUser(currentUser, pageable);
         return ResponseWrapperFactory.setResponse(HttpStatus.OK, null, response);
+    }
+
+    @PatchMapping("/{roomId}/reserve")
+    public ResponseEntity<ResponseWrapper<ReservationResponseDto>> createOrUpdateReservation(
+        @AuthenticationPrincipal User user,
+        @PathVariable String roomId,
+        @Valid @RequestBody CreateReservationRequestDto requestDto
+    ) {
+        ReservationResponseDto response = chatService.createOrUpdateReservation(
+            roomId,
+            user,
+            requestDto.schedule(),
+            requestDto.location()
+        );
+        return ResponseWrapperFactory.setResponse(HttpStatus.OK, null, response);
+    }
+
+    @GetMapping("/{roomId}/schedule-suggestion")
+    public ResponseEntity<ResponseWrapper<SuggestedScheduleResponseDto>> getScheduleSuggestionFromChat(
+        @AuthenticationPrincipal User user,
+        @PathVariable String roomId
+    ) {
+        SuggestedScheduleResponseDto suggestion = chatService.suggestScheduleFromChat(roomId, user);
+
+        return ResponseWrapperFactory.setResponse(
+            HttpStatus.OK,
+            null,
+            suggestion
+        );
     }
 }
