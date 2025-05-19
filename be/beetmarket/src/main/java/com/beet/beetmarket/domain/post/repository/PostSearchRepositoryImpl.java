@@ -162,4 +162,27 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
 
         ops.update(updateQuery, INDEX);
     }
+
+    @Override
+    public List<PostDocument> findByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+
+        Query query = Query.of(q -> q
+                .ids(i -> i
+                        .values(ids.stream().map(String::valueOf).toList())
+                )
+        );
+
+        NativeQuery nativeQuery = NativeQuery.builder()
+                .withQuery(query)
+                .build();
+
+        SearchHits<PostDocument> hits = ops.search(nativeQuery, PostDocument.class);
+        return hits.stream()
+                .map(SearchHit::getContent)
+                .toList();
+    }
+
 }

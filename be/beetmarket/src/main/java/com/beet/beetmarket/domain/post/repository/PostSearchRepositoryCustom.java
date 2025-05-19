@@ -5,6 +5,8 @@ import com.beet.beetmarket.domain.post.entity.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface PostSearchRepositoryCustom {
     Page<PostDocument> search(
             String keyword,
@@ -17,4 +19,5 @@ public interface PostSearchRepositoryCustom {
     void updateViewInEs(Long postId, Long newView);
     void changeFavoriteCount(Long postId, int delta);
     void updateStatusAndBuyerInEs(Long postId, Status status, Long buyerId);
+    List<PostDocument> findByIds(List<Long> ids);
 }

@@ -4,6 +4,7 @@ import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
 import com.beet.beetmarket.domain.favorite.entity.Favorite;
 import com.beet.beetmarket.domain.post.entity.Post;
 import com.beet.beetmarket.domain.user.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -38,4 +39,9 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     long countByPostId(Long postId);
 
     int deleteByPostAndUser(Post post, User user);
+
+    @Query("SELECT f.post.id FROM Favorite f WHERE f.user.id = :userId")
+    List<Long> findPostIdsByUserId(Long userId, Pageable pageable);
+
+    long countByUserId(Long userId);
 }

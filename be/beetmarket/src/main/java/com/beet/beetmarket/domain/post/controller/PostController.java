@@ -110,6 +110,18 @@ public class PostController {
         );
     }
 
+    @GetMapping("/my/favorite")
+    public ResponseEntity<ResponseWrapper<Page<PostListDto>>> getMyFavoritePosts(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null,
+                postService.getFavoritePosts(user.getId(), pageable)
+        );
+    }
+
     @GetMapping("/my/buy")
     public ResponseEntity<ResponseWrapper<Page<PostListDto>>> getMyBuyingPosts(
             @AuthenticationPrincipal User user,

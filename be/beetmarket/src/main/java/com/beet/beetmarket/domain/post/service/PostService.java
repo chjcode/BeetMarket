@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -243,5 +244,28 @@ public class PostService {
         searchRepository.updateStatusAndBuyerInEs(postId, request.status(), buyerId);
 
 
+    }
+
+    public Page<PostListDto> getFavoritePosts(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        List<Long> postIds = favoriteRepository.findPostIdsByUserId(userId, pageable);
+
+        List<PostDocument> documents = searchRepository.findByIds(postIds);
+
+        Map<Long, PostDocument> docMap = documents.stream()
+                .collect(Collectors.toMap(PostDocument::getId, d -> d));
+
+        List<PostListDto> dtoList = postIds.stream()
+                .map(id -> {
+                    PostDocument doc = docMap.get(id);
+                    return doc != null ? PostListDto.from(doc, true) : null;
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        long total = favoriteRepository.countByUserId(userId); // count 쿼리 따로
+
+        return new PageImpl<>(dtoList, pageable, total);
     }
 }
