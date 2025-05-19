@@ -28,20 +28,24 @@ const ChatRoomPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
 
-  // 1) 과거 채팅 기록 조회
+  // 1. 채팅 내역 불러오기
   useEffect(() => {
     if (!roomId) return;
 
     const fetchChatHistory = async () => {
       try {
         const res = await axiosInstance.get<{
-          content: ChatMessageResponse[];
+          content: {
+            messages: {
+              content: ChatMessageResponse[];
+            };
+          };
         }>(`/api/chat/rooms/${roomId}/messages`, {
           params: { page: 0, size: 20, sortOrder: "desc" },
         });
 
-        const sorted = res.data.content.reverse();
-        setMessages(sorted);
+        const history = res.data.content.messages.content;
+        setMessages([...history].reverse());
       } catch (error) {
         console.error("채팅 기록 조회 실패:", error);
       }
@@ -50,7 +54,7 @@ const ChatRoomPage = () => {
     fetchChatHistory();
   }, [roomId]);
 
-  // 2) WebSocket(STOMP) 연결 및 실시간 처리
+  // 2. WebSocket 연결
   useEffect(() => {
     if (!roomId || !accessToken) return;
 
@@ -64,22 +68,22 @@ const ChatRoomPage = () => {
       onConnect: () => {
         console.log("STOMP connected");
 
-        // 메시지 수신 구독
+        // 2-1. 메시지 수신 구독
         client.subscribe(
-          `/user/${myNickname}/sub/chat/room/${roomId}`,
+          `/user/sub/chat/room/${roomId}`,
           (message: IMessage) => {
             const body: ChatMessageResponse = JSON.parse(message.body);
             setMessages((prev) => [...prev, body]);
 
-            if (body.senderNickname === counterpartNickname) {
+            if (body.senderNickname !== myNickname) {
               sendReadAck(body.id);
             }
           }
         );
 
-        // 읽음 확인 구독
+        // 2-2. 읽음 확인 구독
         client.subscribe(
-          `/user/${myNickname}/sub/chat/read/${roomId}`,
+          `/user/sub/chat/read/${roomId}`,
           (message: IMessage) => {
             const ack = JSON.parse(message.body);
             console.log("읽음 확인 수신:", ack);
@@ -97,15 +101,14 @@ const ChatRoomPage = () => {
     return () => {
       client.deactivate();
     };
-    // counterpartNickname은 sendReadAck 안에서만 쓰이므로 deps에 생략 가능
   }, [accessToken, roomId, myNickname]);
 
-  // 자동 스크롤
+  // 3. 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 메시지 전송
+  // 4. 메시지 전송
   const sendMessage = () => {
     if (!input.trim() || !clientRef.current?.connected) return;
 
@@ -124,7 +127,7 @@ const ChatRoomPage = () => {
     setInput("");
   };
 
-  // 읽음 ACK 전송
+  // 5. 읽음 확인 전송
   const sendReadAck = (messageId: string) => {
     if (!clientRef.current?.connected) return;
 
