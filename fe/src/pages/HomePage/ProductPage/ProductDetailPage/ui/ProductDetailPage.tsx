@@ -55,6 +55,7 @@ const ProductDetailPage = () => {
   const [availableProducts, setAvailableProducts] = useState<RelatedProduct[]>([]);
   const [completedProducts, setCompletedProducts] = useState<RelatedProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chatLoading, setChatLoading] = useState(false);
 
   // 상품 상세
   useEffect(() => {
@@ -200,6 +201,8 @@ const ProductDetailPage = () => {
       <ProductDetailBottomBar
         price={product.price}
         onChatClick={async () => {
+          if (chatLoading) return; // 중복 방지
+          setChatLoading(true);
           try {
             const res = await fetch(
               "https://k12a307.p.ssafy.io/api/chatrooms",
@@ -228,6 +231,8 @@ const ProductDetailPage = () => {
           } catch (err) {
             console.error("채팅방 생성 오류:", err);
             alert("채팅방을 생성하지 못했습니다.");
+          } finally {
+            setChatLoading(false);
           }
         }}
         isLiked={product.isLiked}

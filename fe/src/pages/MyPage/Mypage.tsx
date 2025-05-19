@@ -5,6 +5,7 @@ import { FaRegListAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 // import { HiOutlineIdentification } from "react-icons/hi2";
 import axiosInstance from "@/shared/api/axiosInstance";
+import { useEffect } from "react";
 
 export const MyPage = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export const MyPage = () => {
 
     fetchUserData();
   }, []);
-  
+
   return (
     <div className="flex flex-col items-center bg-white pt-6">
       {/* 프로필 영역 */}
