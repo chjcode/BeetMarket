@@ -19,7 +19,7 @@ interface ProductDetailResponse {
   region: string;
   location: string;
   createdAt: string;
-  images: { imageUrl: string }[];
+  images: string[];
   model3D: string;
   view: number;
   like: number;
@@ -106,7 +106,9 @@ const ProductDetailPage = () => {
       {/* 상품 이미지 */}
       <div className="w-full">
         <ProductImageCarousel
-          imageUrls={product.images.map((img) => img.imageUrl)}
+          imageUrls={(product.images as (string | { imageUrl: string })[]).map((img) =>
+            typeof img === "string" ? img : img.imageUrl
+          )}
         />
       </div>
 
