@@ -36,7 +36,7 @@ const MapPage = () => {
 
   return (
     <div className="h-[calc(100dvh-110px)]"> {/* 뷰포트 전체 고정 */}
-      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+      <LoadScript googleMapsApiKey="AIzaSyBUIRKuDhxD_Q0JaJmH_msG5_iOzb9AL_Y">
         <GoogleMap
           mapContainerStyle={{ width: "100%", height: "100%" }}
           center={center}

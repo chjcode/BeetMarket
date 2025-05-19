@@ -16,7 +16,7 @@ const PlacePickerModal = ({ onClose, onSelect, initialLatLng }: PlacePickerModal
   const mapRef = useRef<google.maps.Map | null>(null);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY!,
+    googleMapsApiKey: "AIzaSyBUIRKuDhxD_Q0JaJmH_msG5_iOzb9AL_Y",
     libraries: ["places"],
   });
 
