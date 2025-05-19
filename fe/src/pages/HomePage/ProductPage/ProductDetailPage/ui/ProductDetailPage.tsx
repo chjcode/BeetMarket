@@ -105,29 +105,47 @@ const ProductDetailPage = () => {
       </div>
       {/* 상품 이미지 */}
       <div className="w-full">
-        <ProductImageCarousel imageUrls={product.images.map((img) => img.imageUrl)} />
+        <ProductImageCarousel
+          imageUrls={product.images.map((img) => img.imageUrl)}
+        />
       </div>
-      
+
       <div className="px-4 mt-[-48px] pt-[48px]">
         {/* 판매자 정보 */}
         <div className="flex justify-between items-center mb-[18.px]">
           <div className="flex items-center gap-2">
-            <img src={product.sellerProfileImage} alt="프로필" className="w-8 h-8 rounded-full" />
-            <div className="text-sm">{product.sellerNickname} · {product.location}</div>
+            <img
+              src={product.sellerProfileImage}
+              alt="프로필"
+              className="w-8 h-8 rounded-full"
+            />
+            <div className="text-sm">
+              {product.sellerNickname} · {product.location}
+            </div>
           </div>
-          <button 
+          <button
             className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full"
-            onClick={() => navigate(`/product/${id}/3d`, { state: { model3D: product.model3D } })}
-          >3D 보기</button>
+            onClick={() =>
+              navigate(`/product/${id}/3d`, {
+                state: { model3D: product.model3D },
+              })
+            }
+          >
+            3D 보기
+          </button>
         </div>
 
         <div className="border-t border-gray-200 my-[12px]" />
-  
+
         {/* 제목 + 설명 */}
         <div className="mb-[14px]">
           <div className="text-lg font-bold">{product.title}</div>
-          <div className="text-sm text-gray-400 mt-[6px]">{product.category}</div>
-          <div className="text-sm text-gray-600 mt-[10px] whitespace-pre-line break-words">{product.content}</div>
+          <div className="text-sm text-gray-400 mt-[6px]">
+            {product.category}
+          </div>
+          <div className="text-sm text-gray-600 mt-[10px] whitespace-pre-line break-words">
+            {product.content}
+          </div>
         </div>
 
         {/* 찜/조회 수 */}
@@ -137,11 +155,14 @@ const ProductDetailPage = () => {
 
         {/* 구분선 */}
         <div className="border-t border-gray-200 my-[14px]" />
-  
+
         {/* 동일 카테고리 다른 물건 */}
         <div className="mb-[14px]">
           <div className="font-bold mb-[8px]">동일 카테고리 다른 물건</div>
-          <div ref={sameProductScrollRef} className="flex overflow-x-auto gap-2 no-scrollbar select-none">
+          <div
+            ref={sameProductScrollRef}
+            className="flex overflow-x-auto gap-2 no-scrollbar select-none"
+          >
             {availableProducts.map((item) => (
               <DetailProductCard
                 key={item.id}
@@ -155,11 +176,14 @@ const ProductDetailPage = () => {
 
         {/* 구분선 */}
         <div className="border-t border-gray-200 my-[14px]" />
-  
+
         {/* 동일 카테고리 거래 내역 */}
         <div className="mb-4">
           <div className="font-bold mb-[8px]">동일 카테고리 거래 내역</div>
-          <div ref={soldHistoryScrollRef} className="flex overflow-x-auto gap-2 no-scrollbar select-none">
+          <div
+            ref={soldHistoryScrollRef}
+            className="flex overflow-x-auto gap-2 no-scrollbar select-none"
+          >
             {completedProducts.map((item) => (
               <DetailProductCard
                 key={item.id}
@@ -174,9 +198,40 @@ const ProductDetailPage = () => {
       </div>
 
       {/* 바텀바 */}
-      <ProductDetailBottomBar 
-        price={product.price} 
-        onChatClick={() => navigate("/chatting")}
+      <ProductDetailBottomBar
+        price={product.price}
+        onChatClick={async () => {
+          try {
+            const formData = new FormData();
+            formData.append("postId", id!);
+            // formData.append("sellerId", product.sellerNickname);
+
+            const res = await fetch(
+              "https://k12a307.p.ssafy.io/api/chatrooms",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${
+                    localStorage.getItem("accessToken") ?? ""
+                  }`,
+                },
+                body: formData,
+              }
+            );
+
+            const data = await res.json();
+            const chatRoomId = data.content.id;
+
+            if (chatRoomId) {
+              navigate(`/chats/${chatRoomId}`);
+            } else {
+              alert("채팅방 생성에 실패했습니다.");
+            }
+          } catch (err) {
+            console.error("채팅방 생성 오류:", err);
+            alert("채팅방을 생성하지 못했습니다.");
+          }
+        }}
         isLiked={product.isLiked}
       />
     </div>
