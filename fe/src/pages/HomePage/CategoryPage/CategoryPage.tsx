@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 const categories = [
   { label: "전체보기", img: "/categoryImage/total_icon.png" },
   { label: "최근 본 상품", img: "/categoryImage/recent_icon.png" },
@@ -14,15 +16,26 @@ const categories = [
 ];
 
 const CategoryPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="max-w-xs mx-auto py-4 px-1">
       <div className="text-lg font-bold mb-7">
-        <span className="border-b-2 border-[#F44336] pb-1 text-[#F44336]">카테고리</span>
+        <span className="border-b-2 border-[#F44336] pb-1 text-[#F44336]">
+          카테고리
+        </span>
       </div>
       <div className="grid grid-cols-2 gap-y-6 gap-x-10">
         {categories.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-3 py-1">
-            <img src={item.img} alt={item.label} className="w-10 h-10 object-contain" />
+          <div
+            key={idx}
+            className="flex items-center gap-3 py-1 cursor-pointer"
+            onClick={() => navigate(`/category/${item.label}`)}
+          >
+            <img
+              src={item.img}
+              alt={item.label}
+              className="w-10 h-10 object-contain"
+            />
             <span className="text-base font-medium">{item.label}</span>
           </div>
         ))}

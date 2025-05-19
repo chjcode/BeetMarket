@@ -12,10 +12,12 @@ export const AuthRedirectPage = () => {
         const res = await axiosInstance.get("/api/auth/issue");
         const accessToken = res.headers["authorization"]?.replace("Bearer ", "");
         const hasNickname = res.data?.content;
+        // const nickName = res.data?.nickName;
         if (!accessToken) {
           throw new Error("accessToken 누락");
         }
         localStorage.setItem("accessToken", accessToken);
+        // localStorage.setItem("nickName", nickName);
         if (!hasNickname) {
           navigate("/signup");
         } else {
