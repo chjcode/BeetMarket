@@ -6,6 +6,7 @@ import com.beet.beetmarket.domain.post.dto.request.UpdatePostStatusRequestDto;
 import com.beet.beetmarket.domain.post.dto.response.PostDto;
 import com.beet.beetmarket.domain.post.dto.response.PostListDto;
 import com.beet.beetmarket.domain.post.entity.Status;
+import com.beet.beetmarket.domain.post.exception.PostImageMissingException;
 import com.beet.beetmarket.domain.post.service.PostService;
 import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.global.response.ResponseWrapper;
@@ -71,6 +72,7 @@ public class PostController {
     public ResponseEntity<ResponseWrapper<Void>> createPost(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CreatePostRequestDto request) {
+        if(request.images().isEmpty()) throw new PostImageMissingException();
 
         postService.createPost(user.getId(), request);
 
@@ -86,6 +88,8 @@ public class PostController {
             @PathVariable Long postId,
             @Valid @RequestBody UpdatePostRequestDto request
     ) {
+        if(request.images().isEmpty()) throw new PostImageMissingException();
+
         postService.updatePost(user.getId(), postId, request);
 
         return ResponseWrapperFactory.setResponse(

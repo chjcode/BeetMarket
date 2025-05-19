@@ -28,6 +28,7 @@ public record CreatePostRequestDto(
 
     String location,
 
+    @NotNull(message = "이미지는 필수입니다.")
     List<String> images,
 
     String video,
