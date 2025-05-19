@@ -3,6 +3,7 @@ package com.beet.beetmarket.domain.chat.controller;
 import com.beet.beetmarket.domain.chat.dto.ChatMessageResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatMessagesResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatRoomListResponseDto;
+import com.beet.beetmarket.domain.chat.dto.SuggestedScheduleResponseDto;
 import com.beet.beetmarket.domain.chat.service.ChatService;
 import com.beet.beetmarket.domain.chatRoom.dto.ChatRoomResponseDto;
 import com.beet.beetmarket.domain.chatRoom.dto.ChatRoomSummaryDto;
@@ -98,5 +99,19 @@ public class ChatController {
             requestDto.location()
         );
         return ResponseWrapperFactory.setResponse(HttpStatus.OK, null, response);
+    }
+
+    @GetMapping("/{roomId}/schedule-suggestion")
+    public ResponseEntity<ResponseWrapper<SuggestedScheduleResponseDto>> getScheduleSuggestionFromChat(
+        @AuthenticationPrincipal User user,
+        @PathVariable String roomId
+    ) {
+        SuggestedScheduleResponseDto suggestion = chatService.suggestScheduleFromChat(roomId, user);
+
+        return ResponseWrapperFactory.setResponse(
+            HttpStatus.OK,
+            null,
+            suggestion
+        );
     }
 }

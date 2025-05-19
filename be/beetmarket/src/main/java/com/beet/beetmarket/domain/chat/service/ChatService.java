@@ -3,9 +3,11 @@ package com.beet.beetmarket.domain.chat.service;
 import com.beet.beetmarket.domain.chat.dto.ChatMessageResponseDto;
 import com.beet.beetmarket.domain.chat.dto.ChatRoomInfoItem;
 import com.beet.beetmarket.domain.chat.dto.ChatRoomWithFirstImageDto;
+import com.beet.beetmarket.domain.chat.dto.GptExtractedScheduleDto;
 import com.beet.beetmarket.domain.chat.dto.LastReadInfoResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatMessagesResponseDto;
 import com.beet.beetmarket.domain.chat.dto.PaginatedChatRoomListResponseDto;
+import com.beet.beetmarket.domain.chat.dto.SuggestedScheduleResponseDto;
 import com.beet.beetmarket.domain.chat.entity.ChatMessage;
 import com.beet.beetmarket.domain.chat.entity.ChatRoomRead;
 import com.beet.beetmarket.domain.chat.exception.ChatRoomNotFoundException;
@@ -26,6 +28,8 @@ import com.beet.beetmarket.domain.post.exception.PostAlreadyCompletedException;
 import com.beet.beetmarket.domain.post.exception.PostNotFountException;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
 import com.beet.beetmarket.domain.user.entity.User; // User 엔티티
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +59,8 @@ public class ChatService {
     private final ChatRoomReadRepository chatRoomReadRepository; // MongoDB
     private final ChatRoomRepository chatRoomRepository; // JPA
     private final PostRepository postRepository;
+    private final ChatGptService chatGptService;
+    private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
     public PaginatedChatMessagesResponseDto getChatMessagesByRoomId(
@@ -286,5 +293,85 @@ public class ChatService {
         // TODO: 예약 설정 알림 메시지를 채팅방에 시스템 메시지로 추가하는 로직
 
         return ReservationResponseDto.success(chatRoom.getId(), chatRoom.getSchedule(), chatRoom.getLocation());
+    }
+
+    @Transactional(readOnly = true)
+    public SuggestedScheduleResponseDto suggestScheduleFromChat(String roomIdStr, User currentUser) {
+        System.out.println(currentUser.getId());
+        Long chatRoomId;
+        try {
+            chatRoomId = Long.parseLong(roomIdStr);
+        } catch (NumberFormatException e) {
+            log.error("Invalid roomId format: {}", roomIdStr, e);
+            throw new InvalidRoomIdFormatException();
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findByIdWithParticipants(chatRoomId)
+            .orElseThrow(ChatRoomNotFoundException::new);
+
+        boolean isParticipant = chatRoom.getSeller().getId().equals(currentUser.getId()) ||
+            chatRoom.getBuyer().getId().equals(currentUser.getId());
+        if (!isParticipant) {
+            throw new UserNotParticipantInChatRoomException();
+        }
+
+        List<ChatMessage> messages = chatMessageRepository.findByRoomIdOrderByTimestampAsc(roomIdStr);
+        if (messages.isEmpty()) {
+            log.info("No messages found in chat room {} to suggest schedule.", roomIdStr);
+            return new SuggestedScheduleResponseDto("채팅 내역이 없어 분석할 수 없습니다.");
+        }
+
+        String conversationForGpt = messages.stream()
+            .map(msg -> msg.getSenderNickname() + ": " + msg.getContent())
+            .collect(Collectors.joining("\n"));
+
+        String gptJsonResponse = chatGptService.extractScheduleAndLocation(conversationForGpt);
+
+        LocalDateTime suggestedSchedule = null;
+        String suggestedLocation = null;
+        String errorMessage = null;
+
+        try {
+            GptExtractedScheduleDto extractedData = objectMapper.readValue(gptJsonResponse, GptExtractedScheduleDto.class);
+
+            // gptJsonResponse 자체에 error 키가 있는지 확인 (RealChatGptServiceImpl에서 오류 발생 시 반환)
+            Map<String, Object> rawMap = objectMapper.readValue(gptJsonResponse, Map.class);
+            if (rawMap.containsKey("error")) {
+                errorMessage = "GPT API 오류: " + rawMap.get("error").toString();
+                log.warn("GPT service returned an error: {}", errorMessage);
+                return new SuggestedScheduleResponseDto(null, null, gptJsonResponse, errorMessage);
+            }
+
+            if (extractedData.getScheduleString() != null && !extractedData.getScheduleString().isBlank()) {
+                try {
+                    suggestedSchedule = LocalDateTime.parse(extractedData.getScheduleString());
+                    // 추출된 시간이 과거인지 확인
+                    if (suggestedSchedule.isBefore(LocalDateTime.now())) {
+                        log.warn("GPT suggested a past schedule: {}. Invalidating.", suggestedSchedule);
+                        errorMessage = (errorMessage == null ? "" : errorMessage + " ") + "제안된 시간이 과거입니다.";
+                         suggestedSchedule = null; // 과거 시간이면 제안에서 제외
+                    }
+                } catch (DateTimeParseException e) {
+                    log.warn("Failed to parse schedule string from GPT: '{}'. Raw: {}", extractedData.getScheduleString(), gptJsonResponse, e);
+                    errorMessage = (errorMessage == null ? "" : errorMessage + " ") + "시간 형식 파싱 실패.";
+                }
+            }
+            suggestedLocation = extractedData.getLocation();
+
+            if (suggestedSchedule == null && suggestedLocation == null && errorMessage == null) {
+                errorMessage = "채팅에서 약속 정보를 찾을 수 없거나, 추출된 정보가 없습니다.";
+            }
+
+
+        } catch (JsonProcessingException e) {
+            log.error("Failed to parse JSON response from GPT service: {}. Raw response: {}", e.getMessage(), gptJsonResponse);
+            errorMessage = "GPT 응답 처리 중 내부 오류 발생.";
+            // GPT 서비스가 유효하지 않은 JSON을 반환했을 가능성이 높음 (예: "error" 키 없이 단순 문자열 오류)
+            // 이 경우 rawGptResponse만 클라이언트에게 전달할 수 있음
+            return new SuggestedScheduleResponseDto(null, null, gptJsonResponse, errorMessage);
+        }
+
+
+        return new SuggestedScheduleResponseDto(suggestedSchedule, suggestedLocation, gptJsonResponse, errorMessage);
     }
 }

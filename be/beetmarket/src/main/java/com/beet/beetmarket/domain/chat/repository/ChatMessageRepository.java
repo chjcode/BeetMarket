@@ -1,6 +1,7 @@
 package com.beet.beetmarket.domain.chat.repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import com.beet.beetmarket.domain.chat.entity.ChatMessage;
@@ -37,4 +38,6 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
 
     // 해당 채팅방의 가장 최근 메시지 조회
     Optional<ChatMessage> findTopByRoomIdOrderByTimestampDesc(String roomId);
+
+    List<ChatMessage> findByRoomIdOrderByTimestampAsc(String roomId);
 }
