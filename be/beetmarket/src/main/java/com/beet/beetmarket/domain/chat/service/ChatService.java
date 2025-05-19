@@ -27,6 +27,7 @@ import com.beet.beetmarket.domain.post.entity.Status;
 import com.beet.beetmarket.domain.post.exception.PostAlreadyCompletedException;
 import com.beet.beetmarket.domain.post.exception.PostNotFountException;
 import com.beet.beetmarket.domain.post.repository.PostRepository;
+import com.beet.beetmarket.domain.post.repository.PostSearchRepository;
 import com.beet.beetmarket.domain.user.entity.User; // User 엔티티
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +62,7 @@ public class ChatService {
     private final PostRepository postRepository;
     private final ChatGptService chatGptService;
     private final ObjectMapper objectMapper;
+    private final PostSearchRepository postSearchRepository;
 
     @Transactional(readOnly = true)
     public PaginatedChatMessagesResponseDto getChatMessagesByRoomId(
@@ -285,8 +287,9 @@ public class ChatService {
         chatRoom.updateLocation(location);
         chatRoomRepository.save(chatRoom);
 
-        post.reserve();
+        post.changeStatus(Status.RESERVED, null);
         postRepository.save(post);
+        postSearchRepository.updateStatusAndBuyerInEs(post.getId(), Status.RESERVED, null);
 
         log.info("ChatRoom ID {} 예약 설정 완료. 시간: {}, 장소: {}", chatRoomId, schedule, location);
 
