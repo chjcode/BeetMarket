@@ -99,11 +99,25 @@ const SchedulePage = () => {
         <StyledDate onClick={handleTodayClick}>오늘</StyledDate>
       </StyledCalendarWrapper>
 
-      {/* 일정 표시 영역 */}
       <div className="mt-4 w-full max-w-[480px] mx-auto">
-        <p className="text-sm font-semibold mb-2">
-          {format(selectedDate, "yyyy년 M월 d일")} 일정
-        </p>
+
+        {/* 일정 제목 + 범례 같이 한 줄 */}
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-semibold">
+            {format(selectedDate, "yyyy년 M월 d일")} 일정
+          </p>
+          <div className="flex gap-3 text-sm">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-red-500" />
+              <span className="text-gray-600 text-xs">판매</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-gray-600 text-xs">구매</span>
+            </div>
+          </div>
+        </div>
+
         {filteredSchedules.length > 0 ? (
           filteredSchedules.map((s) => (
             <CalendarScheduleCard key={s.id} {...s} type={s.type as "BUY" | "SELL"} />
@@ -112,6 +126,7 @@ const SchedulePage = () => {
           <p className="text-sm px-4 text-gray-400">일정이 없습니다.</p>
         )}
       </div>
+
     </>
   );
 };

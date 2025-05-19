@@ -3,7 +3,7 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "@/pages/HomePage/ProductPage/HomePage";
 import { LoginPage }  from "@/pages/login"
 import { MyPage, PurchasesPage, SalesPage, FavoritesPage } from "@/pages/MyPage";
-import PickPage from "@/pages/PickPage";
+import MapPage from "@/pages/MapPage";
 import NotFoundPage from "@/pages/UtilPage/NotFoundPage";
 import AlarmPage from "@/pages/UtilPage/AlarmPage";
 import { RequireAuth } from "@/app/providers/RequireAuth";
@@ -30,7 +30,7 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, element: <HomePage /> },
-      { path: "pick", element: <PickPage /> },
+      { path: "map", element: <MapPage /> },
       {
         path: "chats",
         children: [
