@@ -115,19 +115,19 @@ const ProductDetailPage = () => {
       <div className="px-4 mt-[-48px] pt-[48px]">
         {/* 판매자 정보 */}
         <div className="flex justify-between items-center mb-[18.px]">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-hidden">
             <img
               src={product.sellerProfileImage}
               alt="프로필"
               className="w-8 h-8 rounded-full"
             />
-            <div className="text-sm">
+            <div className="text-sm truncate overflow-hidden whitespace-nowrap">
               {product.sellerNickname} · {product.location}
             </div>
           </div>
           {product.model3D && (
             <button
-              className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full"
+              className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full flex-shrink-0 ml-2"
               onClick={() =>
                 navigate(`/product/${id}/3d`, {
                   state: { model3D: product.model3D },

@@ -15,15 +15,19 @@ export const CategoryItem = ({ label, imageName }: CategoryItemProps) => {
   const Icon = iconMap[label as keyof typeof iconMap];
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="w-full aspect-square overflow-hidden flex items-center justify-center  rounded-full shadow-md bg-[#fcf9f2]">
+    // <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-[96px]">
+      {/* <div className="w-full aspect-square overflow-hidden flex items-center justify-center  rounded-full shadow-md bg-[#fcf9f2]"> */}
+      <div className="w-[70%] h-[70%] flex items-center justify-center aspect-square overflow-hidden rounded-full shadow-md bg-[#fcf9f2]">
         {Icon ? (
-          <Icon className="w-[60%] h-[60%] m-auto object-contain" />
+          // <Icon className="w-[70%] h-[70%] m-auto object-contain" />
+          <Icon className="w-[70%] h-[70%] m-auto object-contain" />
         ) : (
           <img
             src={`/categoryImage/${imageName}`}
             alt={label}
             className="w-[80%] object-fit"
+            // className="w-full h-full object-contain"
             draggable={false}
           />
         )}

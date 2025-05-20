@@ -157,13 +157,15 @@ const AddPage = () => {
           >
             <option value="">대분류 선택</option>
             <option value="전자기기">전자기기</option>
-            <option value="가구">가구</option>
+            <option value="가구/인테리어">가구/인테리어</option>
             <option value="유아동">유아동</option>
             <option value="의류/잡화">의류/잡화</option>
             <option value="생활용품">생활용품</option>
             <option value="스포츠/레저">스포츠/레저</option>
             <option value="취미/게임/음반">취미/게임/음반</option>
+            <option value="반려동물">반려동물</option>
             <option value="뷰티/미용">뷰티/미용</option>
+            <option value="도서">도서</option>
             <option value="티켓/교환권">티켓/교환권</option>
             <option value="기타">기타</option>
           </select>

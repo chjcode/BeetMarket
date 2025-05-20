@@ -14,11 +14,11 @@ import SchedulePage from "@/pages/MyPage/SchedulePage";
 import SearchPage from "@/pages/HomePage/SearchPage/SearchPage";
 import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/SearchResultPage";
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
-import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
+import CategoryListPage from "@/pages/HomePage/CategoryPage/CategoryListPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
 import { ChatsPage, ChatRoomPage }from "@/pages/chats";
 import { SignupPage } from "@/pages/signup"
-import CategoryProductsPage from "@/pages/MyPage/CategoryProductsPage";
+import CategoryProductsPage from "@/pages/HomePage/CategoryPage/CategoryProductsPage";
 
 
 export const routes: RouteObject[] = [
@@ -43,7 +43,7 @@ export const routes: RouteObject[] = [
       {
         path: "category",
         children: [
-          { index: true, element: <CategoryPage /> },
+          { index: true, element: <CategoryListPage /> },
           { path: ":category", element: <CategoryProductsPage /> },
         ],
       },
