@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@/shared/ui/Icon";
+import { saveRecentProduct } from "@/shared/utils/localStorage";
 
 export interface ProductItemProps {
   id: number;
@@ -20,10 +21,24 @@ export const ProductItem = (product: ProductItemProps) => {
   const navigate = useNavigate();
   const isCompleted = product.status === "COMPLETED";
 
+  const handleClick = () => {
+    saveRecentProduct({
+      id: product.id,
+      title: product.title,
+      thumbnailUrl: product.thumbnailUrl,
+      price: product.price,
+      categoryName: product.categoryName,
+      viewCount: product.viewCount,
+      isLiked: product.isLiked,
+    });
+
+    navigate(`/product/${product.id}`);
+  };
+
   return (
     <div
       className="w-full h-[120px] flex cursor-pointer gap-1"
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={handleClick}
     >
       <div className="h-full aspect-square relative">
         <img
@@ -49,7 +64,7 @@ export const ProductItem = (product: ProductItemProps) => {
         <div className="">{product.createdAt}</div>
         <div className="">{product.price.toLocaleString()} 원</div>
         <div className="flex gap-4 justify-end">
-          <div className="">조회수 {product.favoriteCount}</div>
+          <div className="">조회수 {product.viewCount}</div>
           <div className="flex gap-1 items-center">
             <div className="">찜 {product.favoriteCount}</div>
             <Icon

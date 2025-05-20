@@ -3,4 +3,7 @@ export interface Product {
   title: string;
   price: number;
   thumbnailUrl: string;
+  categoryName: string;
+  viewCount: number;
+  isLiked: boolean
 }
