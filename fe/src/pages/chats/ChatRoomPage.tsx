@@ -28,7 +28,6 @@ const ChatRoomPage = () => {
   const roomId = Number(id);
 
   const [accessToken] = useState(localStorage.getItem("accessToken") ?? "");
-  const [myNick] = useState(localStorage.getItem("myNickname") ?? "");
   const [counterpartNick] = useState(
     localStorage.getItem("counterpartNickname") ?? ""
   );
