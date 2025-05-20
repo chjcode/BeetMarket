@@ -469,7 +469,7 @@ const ChatRoomPage: React.FC = () => {
     console.log("✅ 연결 사전 조건 통과, SockJS 연결 시도 예정.");
     // 테스트를 위해 accessToken을 포함하거나 제외한 URL을 선택하여 테스트 가능
     // const socketUrlForTest = `https://beet.joonprac.shop:8700/ws-chat`; // 토큰 없이 테스트
-    const socketUrlForTest = `https://beet.joonprac.shop:8700/ws-chat?access-token=${encodeURIComponent(accessToken)}`; // 토큰 포함 및 인코딩 테스트
+    const socketUrlForTest = `https://beet.joonprac.shop:8700/ws-chat`; // 토큰 포함 및 인코딩 테스트
     console.log("➡️ 생성될 SockJS 테스트 URL:", socketUrlForTest);
 
     // 이전 테스트 소켓 정리
