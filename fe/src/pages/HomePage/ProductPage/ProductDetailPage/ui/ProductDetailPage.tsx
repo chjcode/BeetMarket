@@ -106,8 +106,8 @@ const ProductDetailPage = () => {
       {/* 상품 이미지 */}
       <div className="w-full">
         <ProductImageCarousel
-          imageUrls={(product.images as (string | { imageUrl: string })[]).map((img) =>
-            typeof img === "string" ? img : img.imageUrl
+          imageUrls={(product.images as (string | { imageUrl: string })[]).map(
+            (img) => (typeof img === "string" ? img : img.imageUrl)
           )}
         />
       </div>
@@ -119,6 +119,10 @@ const ProductDetailPage = () => {
             <img
               src={product.sellerProfileImage}
               alt="프로필"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/default_profile.png";
+              }}
               className="w-8 h-8 rounded-full"
             />
             <div className="text-sm truncate overflow-hidden whitespace-nowrap">
@@ -222,7 +226,7 @@ const ProductDetailPage = () => {
             );
 
             const data = await res.json();
-            const chatRoomId = data.content?.id;
+            const chatRoomId = data.content?.roomId;
 
             if (chatRoomId) {
               navigate(`/chats/${chatRoomId}`);
