@@ -70,7 +70,7 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
     frames_dir.mkdir(parents=True, exist_ok=True)
     print(f"filename : ${filename}")
     # MinIO에서 파일 다운로드
-    minio_client.fget_object(bucket_name=MINIO_BUCKET, object_name=filename, file_path=str(video_dir / "video.mp4"))
+    minio_client.fget_object(bucket_name=MINIO_BUCKET, object_name=filename, file_path=str((video_dir / "video.mp4").as_posix()))
 
     # ffmpeg로 프레임 추출
     output_pattern = str(frames_dir / "frame_%04d.jpg")
@@ -107,7 +107,7 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
         try:
             minio_client.fput_object(
                 MODEL_BUCKET,
-                str(UPLOAD_DIR / object),
+                str((UPLOAD_DIR / object).as_posix()),
                 str(OUTPUT_DIR / object)
             )
         except S3Error as err:
@@ -116,14 +116,14 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
         try:
             minio_client.fput_object(
                 MODEL_BUCKET,
-                str(UPLOAD_DIR / png_file.name),
+                str((UPLOAD_DIR / png_file.name).as_posix()),
                 str(png_file)
             )
         except S3Error as err:
             print(f"에러 : {err}")
 
     # DB에 3D모델 파일 주소 업데이트
-    model_public_url = f"https://k12a307.p.ssafy.io:8100/{MODEL_BUCKET}" + str(UPLOAD_DIR) + "/"
+    model_public_url = f"https://k12a307.p.ssafy.io:8100/{MODEL_BUCKET}" + str(UPLOAD_DIR.as_posix()) + "/"
     cursor.execute("UPDATE post SET model3d_url = %s WHERE id = %s", (model_public_url, postId))
     conn.commit()
 
