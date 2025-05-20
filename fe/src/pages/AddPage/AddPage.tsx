@@ -129,7 +129,8 @@ const AddPage = () => {
           value={price ? `₩ ${parseInt(price, 10).toLocaleString()}` : ""}
           onChange={(e) => {
             const val = e.target.value.replace(/[^0-9]/g, "");
-            setPrice(val);
+            if (val < 1000000000)
+              setPrice(val);
           }}
         />
         <InputTextField
