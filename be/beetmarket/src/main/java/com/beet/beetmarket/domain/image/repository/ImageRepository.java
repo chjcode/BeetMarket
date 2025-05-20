@@ -1,6 +1,7 @@
 package com.beet.beetmarket.domain.image.repository;
 
 import com.beet.beetmarket.domain.image.entity.Image;
+import com.beet.beetmarket.domain.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     List<String> findImageUrlsByPostIdOrderBySequence(Long postId);
 
     Image findByImageOrigin(String imageOrigin);
+
+    void deleteByPost(Post post);
 }
