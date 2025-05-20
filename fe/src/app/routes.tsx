@@ -16,7 +16,7 @@ import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/Se
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
 import CategoryPage from "@/pages/HomePage/CategoryPage/CategoryPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
-import { ChatsPage, ChatRoomPage }from "@/pages/chats";
+import { ChatsPage, ChatRoomPage, ChatRoomPage2 }from "@/pages/chats";
 import { SignupPage } from "@/pages/signup"
 import CategoryProductsPage from "@/pages/MyPage/CategoryProductsPage";
 
@@ -38,6 +38,13 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <ChatsPage /> },
           { path: ":id", element: <ChatRoomPage /> },
+        ],
+      },
+      {
+        path: "chats2",
+        children: [
+          { index: true, element: <ChatsPage /> },
+          { path: ":id", element: <ChatRoomPage2 /> },
         ],
       },
       {
