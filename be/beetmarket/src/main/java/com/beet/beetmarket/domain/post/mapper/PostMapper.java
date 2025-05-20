@@ -6,9 +6,13 @@ import com.beet.beetmarket.domain.user.entity.User;
 
 public class PostMapper {
     public static PostDocument toDocument(Post post, long favoriteCount) {
+//        String thumbnail = post.getImageUrls().isEmpty()
+//                ? null
+//                : post.getImageUrls().get(0).getImagePreview();
         String thumbnail = post.getImageUrls().isEmpty()
                 ? null
-                : post.getImageUrls().get(0).getImagePreview();
+                : post.getImageUrls().get(0).getImageOrigin();
+
         User author = post.getUser();
         Long buyerId = post.getBuyer() == null ? null : post.getBuyer().getId();
 
