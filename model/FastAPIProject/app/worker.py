@@ -119,6 +119,9 @@ async def update_db_preview(pool, post_uuid: str, origin_url: str, preview_url: 
     """
     async with pool.acquire() as conn, conn.cursor() as cur:
         await cur.execute(sql, (preview_url, origin_url, post_uuid))
+        logging.info("post_uuid : (%s)", post_uuid)
+        logging.info("origin_url : (%s)", origin_url)
+        logging.info("preview_url : (%s)", preview_url)
         logging.info("DB update (%s) affected %s rows", preview_url, cur.rowcount)
 
 ### ─────────────────────────── 메시지 처리 ───────────────────────────
