@@ -82,6 +82,43 @@ const AddPage = () => {
     if (e) e.preventDefault();
     if (loading) return;
 
+    if (!price || isNaN(Number(price))) {
+      alert("가격을 숫자로 입력해주세요.");
+      return;
+    }
+    if (Number(price) < 0 || Number(price) > 99999999) {
+      alert("가격은 0원 이상 99,999,999원 이하로 입력해주세요.");
+      return;
+    }
+
+    if (!title) {
+      alert("제목을 입력해주세요.");
+      return;
+    }
+    if (title.length > 30) {
+      alert("제목은 최대 30자까지 입력 가능합니다.");
+      return;
+    }
+
+    if (!content) {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+    if (content.length > 200) {
+      alert("내용은 최대 200자까지 입력 가능합니다.");
+      return;
+    }
+
+    if (!category) {
+      alert("카테고리를 선택해주세요.");
+      return;
+    }
+
+    if (images.length === 0) {
+      alert("상품 이미지를 최소 1장 이상 등록해주세요.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -129,7 +166,7 @@ const AddPage = () => {
           value={price ? `₩ ${parseInt(price, 10).toLocaleString()}` : ""}
           onChange={(e) => {
             const val = e.target.value.replace(/[^0-9]/g, "");
-            // if (val < 1000000000)
+            if (val.length > 8) return;
             setPrice(val);
           }}
         />
@@ -137,7 +174,11 @@ const AddPage = () => {
           label="제목"
           placeholder="제목"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length <= 30) {
+              setTitle(e.target.value)
+            }
+          }}
         />
         <div>
           <label className="text-lg font-bold mb-2">글 내용</label>
@@ -145,7 +186,11 @@ const AddPage = () => {
             placeholder="내용을 입력해주세요"
             className="border-2 border-[#CBCBCB] focus:outline-none focus:border-2 rounded-xl px-4 py-3 placeholder-[#8B8B8B] text-[#000000] w-full min-h-[150px] resize-none"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 200) {
+                setContent(e.target.value)
+              }
+            }}
           />
         </div>
         <div>
@@ -280,7 +325,8 @@ const AddPage = () => {
         <Button
           label="등록하기"
           width="100%"
-          onClick={() => handleSubmit()}
+          // onClick={() => handleSubmit()}
+          // type="submit"
           disabled={loading}
         />
       </form>
