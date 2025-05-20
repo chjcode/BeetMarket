@@ -56,40 +56,27 @@ const ChatRoomPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!roomId) return;
-    (async () => {
-      try {
-        const res = await axiosInstance.get<{
-          content: { messages: { content: ChatMessageResponse[] } };
-        }>(`/api/chat/rooms/${roomId}/messages`, {
-          params: { page: 0, size: 20, sortOrder: "desc" },
-        });
-        const history = res.data.content.messages.content;
-        const chronological = Array.isArray(history)
-          ? [...history].reverse()
-          : [];
-        setMessages(chronological);
-        chronological.forEach((m) => fetchAndCacheNickname(m.senderNickname));
-      } catch (error) {
-        console.error("채팅 기록 조회 실패:", error);
-      }
-    })();
-  }, [roomId]);
+    if (!roomId || !accessToken) {
+      console.warn(
+        "❗ WebSocket 초기화 조건 부족 (roomId 또는 accessToken 없음)"
+      );
+      return;
+    }
 
-  useEffect(() => {
-    if (!roomId || !accessToken) return;
-
-    // const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
-    // 올바르게는
     const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
+
+    // ✅ 디버깅용 로그
+    socket.onopen = () => console.log("🟢 SockJS 연결 열림");
+    socket.onclose = (e) => console.warn("🔴 SockJS 연결 닫힘", e);
+    socket.onerror = (e) => console.error("❌ SockJS 오류 발생", e);
 
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       debug: (msg) => console.log("[STOMP]", msg),
       onConnect: () => {
-        console.log("[STOMP] 연결 성공");
+        console.log("✅ STOMP 연결 성공");
 
         client.subscribe(
           `/user/sub/chat/room/${roomId}`,
@@ -102,7 +89,7 @@ const ChatRoomPage: React.FC = () => {
                 sendReadAck(body.id);
               }
             } catch (e) {
-              console.error("메시지 처리 오류", e);
+              console.error("메시지 파싱 오류", e);
             }
           }
         );
@@ -120,7 +107,7 @@ const ChatRoomPage: React.FC = () => {
         );
       },
       onStompError: (frame) => {
-        console.error("[STOMP ERROR]", frame.headers["message"], frame.body);
+        console.error("❌ STOMP Error:", frame.headers["message"], frame.body);
       },
       onWebSocketClose: (event) => {
         console.warn("[STOMP] WebSocket closed:", event);
@@ -130,11 +117,17 @@ const ChatRoomPage: React.FC = () => {
       },
     });
 
-    client.activate();
-    clientRef.current = client;
+    try {
+      client.activate();
+      console.log("📡 STOMP client.activate() 호출됨");
+      clientRef.current = client;
+    } catch (err) {
+      console.error("🔥 STOMP activate 중 예외 발생:", err);
+    }
 
     return () => {
       client.deactivate();
+      console.log("🛑 STOMP 연결 종료");
     };
   }, [accessToken, roomId]);
 
@@ -187,8 +180,8 @@ const ChatRoomPage: React.FC = () => {
   };
 
   const handleScheduleReserve = async () => {
-    const scheduleToSend = suggestedSchedule?.schedule ?? "20250601120000"; // 테스트용 날짜
-    const locationToSend = suggestedSchedule?.location ?? "역삼 멀티캠퍼스 3층"; // 테스트용 장소
+    const scheduleToSend = suggestedSchedule?.schedule ?? "20250601120000";
+    const locationToSend = suggestedSchedule?.location ?? "역삼 멀티캠퍼스 3층";
 
     try {
       const res = await axiosInstance.patch(
@@ -203,7 +196,6 @@ const ChatRoomPage: React.FC = () => {
       console.error("❌ 일정 등록 실패", err);
     }
   };
-  
 
   return (
     <div className="flex flex-col h-full">
@@ -265,7 +257,7 @@ const ChatRoomPage: React.FC = () => {
         </button>
       </div>
 
-      {/* 하단 기능 버튼 */}
+      {/* 하단 버튼 */}
       <div className="flex justify-between bg-gray-50 px-4 py-2 text-sm border-t border-gray-300">
         <button
           onClick={handleScheduleSuggestion}
