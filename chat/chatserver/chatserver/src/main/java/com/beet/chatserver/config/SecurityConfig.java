@@ -1,5 +1,6 @@
 package com.beet.chatserver.config;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -59,7 +60,7 @@ public class SecurityConfig {
             "http://localhost:*",
             "http://127.0.0.1:*"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
+        config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
