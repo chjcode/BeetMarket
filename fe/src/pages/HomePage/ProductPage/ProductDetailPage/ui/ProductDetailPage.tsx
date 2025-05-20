@@ -119,10 +119,6 @@ const ProductDetailPage = () => {
             <img
               src={product.sellerProfileImage}
               alt="프로필"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = "/default_profile.png";
-              }}
               className="w-8 h-8 rounded-full"
             />
             <div className="text-sm truncate overflow-hidden whitespace-nowrap">
