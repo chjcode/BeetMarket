@@ -1,9 +1,7 @@
-// src/pages/chats/ChatRoomPage.tsx
-
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import SockJS from "sockjs-client";
 import { Client, IMessage } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 interface ChatMessageResponse {
   id: string;
@@ -21,8 +19,6 @@ interface ReadAckResponse {
   lastReadAt: string;
 }
 
-const WS_URL = "https://beet.joonprac.shop:8700/ws-chat";
-
 const ChatRoomPage = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
@@ -37,7 +33,6 @@ const ChatRoomPage = () => {
   const counterpartNickname = localStorage.getItem("counterpartNickname") ?? "";
   const accessToken = localStorage.getItem("accessToken") ?? "";
 
-  // 읽음 확인 전송
   const sendReadAck = (lastReadMessageId: string) => {
     const ack = {
       roomId,
@@ -52,30 +47,33 @@ const ChatRoomPage = () => {
   };
 
   useEffect(() => {
-    const socket = new SockJS(`${WS_URL}?access-token=${accessToken}`);
+    if (!accessToken) {
+      console.error("❌ accessToken 없음");
+      return;
+    }
+
+    const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
+    const sock = new SockJS(socketUrl);
+
     const client = new Client({
-      webSocketFactory: () => socket,
-      debug: (msg) => console.log("[STOMP DEBUG]", msg),
+      webSocketFactory: () => sock,
       reconnectDelay: 5000,
+      debug: (msg) => console.log("[STOMP DEBUG]", msg),
       onConnect: () => {
         console.log("[STOMP] 연결 성공");
         setConnected(true);
 
-        // 채팅 메시지 구독
         client.subscribe(
           `/user/sub/chat/room/${roomId}`,
           (message: IMessage) => {
             const msg: ChatMessageResponse = JSON.parse(message.body);
             setMessages((prev) => [...prev, msg]);
-
-            // 내가 받은 메시지에 대해 읽음 확인 전송
             if (msg.senderNickname !== myNickname) {
               sendReadAck(msg.id);
             }
           }
         );
 
-        // 읽음 확인 구독
         client.subscribe(
           `/user/sub/chat/read/${roomId}`,
           (message: IMessage) => {
@@ -84,7 +82,6 @@ const ChatRoomPage = () => {
           }
         );
 
-        // (선택) 알림 구독
         client.subscribe(
           `/user/${myNickname}/sub/notifications`,
           (message: IMessage) => {
@@ -94,7 +91,15 @@ const ChatRoomPage = () => {
         );
       },
       onStompError: (frame) => {
-        console.error("[STOMP] 에러", frame.headers["message"]);
+        console.error("[STOMP] 연결 실패", frame.headers["message"]);
+        setConnected(false);
+      },
+      onWebSocketClose: () => {
+        console.warn("[STOMP] 연결 종료됨");
+        setConnected(false);
+      },
+      onWebSocketError: (e) => {
+        console.error("[STOMP] 소켓 에러 발생", e);
         setConnected(false);
       },
     });
