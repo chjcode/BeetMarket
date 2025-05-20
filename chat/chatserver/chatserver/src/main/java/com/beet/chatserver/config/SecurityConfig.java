@@ -36,7 +36,10 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/ws-chat/**").permitAll()
+                .requestMatchers(
+                    "/ws-chat/**",
+                    "/api/chat-health"
+                ).permitAll()
                 .anyRequest().authenticated()
             );
 
@@ -47,7 +50,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedOrigins(List.of("https://k12a307.p.ssafy.io"));
+        config.setAllowedOrigins(List.of("https://k12a307.p.ssafy.io:*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
