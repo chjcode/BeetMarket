@@ -80,7 +80,8 @@ const ChatRoomPage: React.FC = () => {
     if (!roomId || !accessToken) return;
 
     // const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
-    const socketUrl = `https://beet.joonprac.shop:8700?access-token=${accessToken}`;
+    // 올바르게는
+    const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
 
     const client = new Client({
