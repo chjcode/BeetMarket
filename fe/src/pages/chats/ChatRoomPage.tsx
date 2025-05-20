@@ -113,7 +113,8 @@ const ChatRoomPage = () => {
 
     const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
-
+    console.log("최종", socketUrl);
+    console.log("dd",socket);
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
