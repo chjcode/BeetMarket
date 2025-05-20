@@ -125,16 +125,18 @@ const ProductDetailPage = () => {
               {product.sellerNickname} · {product.location}
             </div>
           </div>
-          <button
-            className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full"
-            onClick={() =>
-              navigate(`/product/${id}/3d`, {
-                state: { model3D: product.model3D },
-              })
-            }
-          >
-            3D 보기
-          </button>
+          {product.model3D && (
+            <button
+              className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full"
+              onClick={() =>
+                navigate(`/product/${id}/3d`, {
+                  state: { model3D: product.model3D },
+                })
+              }
+            >
+              3D 보기
+            </button>
+          )}
         </div>
 
         <div className="border-t border-gray-200 my-[12px]" />

@@ -74,7 +74,7 @@ const ModelViewer = ({ productId, modelPath }: ModelViewerProps) => {
   const [objBlob, setObjBlob] = useState<Blob | null>(null);
   const [mtlBlob, setMtlBlob] = useState<Blob | null>(null);
 
-  const minZoom = 1;
+  const minZoom = 0;
   const maxZoom = 5;
   const [cameraDistance, setCameraDistance] = useState(2);
 
@@ -174,7 +174,7 @@ const ModelViewer = ({ productId, modelPath }: ModelViewerProps) => {
         <directionalLight position={[0, 5, 5]} intensity={1.2} />
         <Suspense fallback={null}>
           {objBlob && mtlBlob && (
-            <Model objBlob={objBlob} mtlBlob={mtlBlob} scale={1} modelPath={modelPath} />
+            <Model objBlob={objBlob} mtlBlob={mtlBlob} scale={0.5} modelPath={modelPath} />
           )}
         </Suspense>
         <DreiOrbitControls
