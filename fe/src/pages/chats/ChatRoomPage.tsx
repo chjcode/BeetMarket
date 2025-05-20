@@ -52,9 +52,12 @@ const ChatRoomPage = () => {
       return;
     }
 
-    const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
-    const sock = new SockJS(socketUrl);
-
+    // const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
+    // const sock = new SockJS(socketUrl);
+    const sock = new SockJS(
+      `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`
+    );
+    console.log("✅ SockJS 생성됨", sock);
     const client = new Client({
       webSocketFactory: () => sock,
       reconnectDelay: 5000,
