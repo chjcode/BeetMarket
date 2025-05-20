@@ -32,8 +32,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             // handshake 성공 후 principal 생성 핸들러 설정
             .setHandshakeHandler(principalHandshakeHandler)
             // CORS, SockJS 설정
-            .setAllowedOriginPatterns("*")
-            .setAllowedOrigins("https://k12a307.p.ssafy.io")
+            .setAllowedOriginPatterns(
+                "https://k12a307.p.ssafy.io:*",
+                "https://k12a307.p.ssafy.io:443",
+                "http://127.0.0.1:[*]"
+            )
             .withSockJS();
     }
 
