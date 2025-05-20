@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
 
-@Document(indexName = "posts")
+@Document(indexName = "posts_alias")
 @Getter
 @Setter
 @Builder

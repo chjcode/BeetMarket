@@ -30,7 +30,7 @@ import java.util.Map;
 @Repository
 public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
     private final ElasticsearchOperations ops;
-    private static final IndexCoordinates INDEX = IndexCoordinates.of("posts");
+    private static final IndexCoordinates INDEX = IndexCoordinates.of("posts_alias");
 
     public PostSearchRepositoryImpl(ElasticsearchOperations ops) {
         this.ops = ops;
@@ -57,7 +57,10 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
                 if(hasKeyword) {
                     b.must(m -> m.multiMatch(mm -> mm
                             .query(keyword)
-                            .fields("title", "content")
+                            .fields(
+                                    "title","title.ngram",
+                                    "content", "content.ngram"
+                            )
                     ));
                 }
                 if(hasCategoryName) {
