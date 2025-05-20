@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import "../shared/styles/index.css";
 import App from "./App";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-// const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+import { registerSW } from "virtual:pwa-register";
+
+registerSW({ immediate: true }); // 최신 PWA 등록 방식
 
 const rootElement = document.getElementById("root")!;
 createRoot(rootElement).render(
