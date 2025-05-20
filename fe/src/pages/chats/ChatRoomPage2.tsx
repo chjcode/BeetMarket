@@ -52,19 +52,27 @@ export const ChatRoomPage2 = () => {
 
   const connectWebSocket = () => {
     console.log("WebSocket 연결 시도 중...");
+
+    // 쿼리 파라미터 유지
     const socket = new SockJS(
       `${WS_HOST}${WS_ENDPOINT}?access-token=${accessToken}`
     );
+
     const client = new Client({
       webSocketFactory: () => socket,
+      connectHeaders: {
+        Authorization: `Bearer ${accessToken}`, // ← STOMP CONNECT 프레임에 포함
+      },
       reconnectDelay: 5000,
       onConnect: () => {
         console.log("✅ Connected to STOMP");
 
+        // 메시지 구독
         client.subscribe(`/user/sub/chat/room/${roomId}`, (msg: IMessage) => {
           const body: ChatMessageResponse = JSON.parse(msg.body);
           console.log("📩 메시지 수신:", body);
           setMessages((prev) => [...prev, body]);
+
           if (body.senderNickname === counterpartNickname) {
             lastReadMessageId.current = body.id;
             if (document.hasFocus()) {
@@ -74,6 +82,7 @@ export const ChatRoomPage2 = () => {
           }
         });
 
+        // 읽음 확인 수신
         client.subscribe(`/user/sub/chat/read/${roomId}`, (msg: IMessage) => {
           const ack = JSON.parse(msg.body);
           console.log("📬 읽음 확인 수신:", ack);
@@ -90,6 +99,7 @@ export const ChatRoomPage2 = () => {
     client.activate();
     clientRef.current = client;
   };
+  
 
   const sendMessage = () => {
     if (!input.trim()) return;
