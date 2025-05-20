@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Client, IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { useParams } from "react-router-dom";
 import axiosInstance from "@/shared/api/axiosInstance";
 import { Icon } from "@/shared/ui/Icon";
-import dayjs from "dayjs";
 
 interface ChatMessageResponse {
   id: string;
@@ -15,10 +14,9 @@ interface ChatMessageResponse {
   timestamp: string;
 }
 
-const ChatRoomPage: React.FC = () => {
+const ChatRoomPage = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
-
   const myOauthName = localStorage.getItem("myNickname") ?? "";
   const counterpartOauthName =
     localStorage.getItem("counterpartNickname") ?? "";
@@ -27,14 +25,11 @@ const ChatRoomPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const [input, setInput] = useState("");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
 
-  const [suggestedSchedule, setSuggestedSchedule] = useState<{
-    schedule: string;
-    location: string;
-  } | null>(null);
-
+  /** 닉네임 캐싱 */
   const fetchAndCacheNickname = async (oauthName: string) => {
     if (!oauthName || userMap[oauthName]) return;
     try {
@@ -45,38 +40,44 @@ const ChatRoomPage: React.FC = () => {
         ...prev,
         [oauthName]: res.data.content.nickname,
       }));
-    } catch (e) {
-      console.error(`닉네임 조회 실패: ${oauthName}`, e);
+    } catch (err) {
+      console.error("닉네임 조회 실패", oauthName, err);
     }
   };
 
+  /** 과거 메시지 불러오기 */
   useEffect(() => {
-    fetchAndCacheNickname(myOauthName);
-    fetchAndCacheNickname(counterpartOauthName);
-  }, []);
+    if (!roomId) return;
+    (async () => {
+      try {
+        const res = await axiosInstance.get<{
+          content: { messages: { content: ChatMessageResponse[] } };
+        }>(`/api/chat/rooms/${roomId}/messages`, {
+          params: { page: 0, size: 20, sortOrder: "desc" },
+        });
+        const history = res.data.content.messages.content;
+        const ordered = [...history].reverse();
+        setMessages(ordered);
+        ordered.forEach((msg) => fetchAndCacheNickname(msg.senderNickname));
+      } catch (err) {
+        console.error("메시지 불러오기 실패", err);
+      }
+    })();
+  }, [roomId]);
 
+  /** WebSocket 연결 및 구독 */
   useEffect(() => {
-    if (!roomId || !accessToken) {
-      console.warn(
-        "❗ WebSocket 초기화 조건 부족 (roomId 또는 accessToken 없음)"
-      );
-      return;
-    }
+    if (!roomId || !accessToken) return;
 
-    const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
+    const socketUrl = `https://k12a307.p.ssafy.io/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
-
-    // ✅ 디버깅용 로그
-    socket.onopen = () => console.log("🟢 SockJS 연결 열림");
-    socket.onclose = (e) => console.warn("🔴 SockJS 연결 닫힘", e);
-    socket.onerror = (e) => console.error("❌ SockJS 오류 발생", e);
 
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       debug: (msg) => console.log("[STOMP]", msg),
       onConnect: () => {
-        console.log("✅ STOMP 연결 성공");
+        console.log("[STOMP] 연결 성공");
 
         client.subscribe(
           `/user/sub/chat/room/${roomId}`,
@@ -89,7 +90,7 @@ const ChatRoomPage: React.FC = () => {
                 sendReadAck(body.id);
               }
             } catch (e) {
-              console.error("메시지 파싱 오류", e);
+              console.error("메시지 처리 실패", e);
             }
           }
         );
@@ -101,40 +102,37 @@ const ChatRoomPage: React.FC = () => {
               const ack = JSON.parse(message.body);
               console.log("읽음 확인 수신:", ack);
             } catch (e) {
-              console.error("ACK 파싱 오류", e);
+              console.error("ACK 파싱 실패", e);
             }
           }
         );
       },
       onStompError: (frame) => {
-        console.error("❌ STOMP Error:", frame.headers["message"], frame.body);
-      },
-      onWebSocketClose: (event) => {
-        console.warn("[STOMP] WebSocket closed:", event);
+        console.error("[STOMP ERROR]", frame.headers["message"], frame.body);
       },
       onWebSocketError: (event) => {
-        console.error("[STOMP] WebSocket error:", event);
+        console.error("[WebSocket ERROR]", event);
+      },
+      onWebSocketClose: (event) => {
+        console.warn("[WebSocket CLOSED]", event);
       },
     });
 
-    try {
-      client.activate();
-      console.log("📡 STOMP client.activate() 호출됨");
-      clientRef.current = client;
-    } catch (err) {
-      console.error("🔥 STOMP activate 중 예외 발생:", err);
-    }
+    client.activate();
+    clientRef.current = client;
 
     return () => {
       client.deactivate();
-      console.log("🛑 STOMP 연결 종료");
+      console.log("[STOMP] 연결 해제");
     };
-  }, [accessToken, roomId]);
+  }, [roomId, accessToken]);
 
+  /** 자동 스크롤 */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /** 메시지 전송 */
   const sendMessage = () => {
     if (!input.trim() || !clientRef.current?.connected) return;
     clientRef.current.publish({
@@ -149,6 +147,7 @@ const ChatRoomPage: React.FC = () => {
     setInput("");
   };
 
+  /** 읽음 ACK */
   const sendReadAck = (messageId: string) => {
     if (!clientRef.current?.connected) return;
     clientRef.current.publish({
@@ -161,45 +160,9 @@ const ChatRoomPage: React.FC = () => {
     });
   };
 
-  const handleScheduleSuggestion = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/chat/rooms/${roomId}/schedule-suggestion`
-      );
-      const { suggestedSchedule, suggestedLocation } = res.data.content;
-      const formatted = dayjs(suggestedSchedule).format("YYYYMMDDHHmmss");
-      const payload = {
-        schedule: formatted,
-        location: suggestedLocation,
-      };
-      setSuggestedSchedule(payload);
-      console.log("✅ 추천 일정 저장됨:", payload);
-    } catch (err) {
-      console.error("❌ 일정 추천 실패", err);
-    }
-  };
-
-  const handleScheduleReserve = async () => {
-    const scheduleToSend = suggestedSchedule?.schedule ?? "20250601120000";
-    const locationToSend = suggestedSchedule?.location ?? "역삼 멀티캠퍼스 3층";
-
-    try {
-      const res = await axiosInstance.patch(
-        `/api/chat/rooms/${roomId}/reserve`,
-        {
-          schedule: scheduleToSend,
-          location: locationToSend,
-        }
-      );
-      console.log("✅ 일정 등록 성공:", res.data);
-    } catch (err) {
-      console.error("❌ 일정 등록 실패", err);
-    }
-  };
-
   return (
     <div className="flex flex-col h-full">
-      {/* 메시지 리스트 */}
+      {/* 메시지 목록 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messages.map((msg) => (
           <div
@@ -225,8 +188,8 @@ const ChatRoomPage: React.FC = () => {
               <div>{msg.content}</div>
               <div className="text-xs text-gray-500 mt-1">
                 {new Date(msg.timestamp).toLocaleTimeString("ko-KR", {
-                  hour: "numeric",
-                  minute: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </div>
             </div>
@@ -236,7 +199,7 @@ const ChatRoomPage: React.FC = () => {
       </div>
 
       {/* 입력창 */}
-      <div className="py-2 bg-white flex items-center gap-2 px-4 border-t border-gray-300">
+      <div className="py-2 bg-white flex items-center gap-2 px-4 border-t">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -254,22 +217,6 @@ const ChatRoomPage: React.FC = () => {
           className="bg-[#A349A4] text-white p-2 rounded-full w-10 h-10 flex justify-center items-center"
         >
           <Icon name="send" className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* 하단 버튼 */}
-      <div className="flex justify-between bg-gray-50 px-4 py-2 text-sm border-t border-gray-300">
-        <button
-          onClick={handleScheduleSuggestion}
-          className="text-purple-600 font-medium hover:underline"
-        >
-          🧠 AI 일정 추천
-        </button>
-        <button
-          onClick={handleScheduleReserve}
-          className="text-blue-600 font-medium hover:underline"
-        >
-          📅 일정 등록
         </button>
       </div>
     </div>
