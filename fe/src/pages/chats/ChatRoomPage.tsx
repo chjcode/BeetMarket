@@ -50,7 +50,7 @@ const ChatRoomPage = () => {
     if (!roomId || !accessToken) return;
 
     const client = new Client({
-      brokerURL: "wss://beet.joonprac.shop:8700/ws-chat", // wss (secure WebSocket)
+      brokerURL: `wss://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`,
       connectHeaders: {
         Authorization: `Bearer ${accessToken}`, // 헤더 방식
       },
