@@ -37,9 +37,15 @@ const PlacePickerModal = ({ onClose, onSelect, initialLatLng }: PlacePickerModal
 
     const raw = res.results[0]?.formatted_address || "";
 
-    // "대한민국 "으로 시작하면 잘라냄
     return raw.startsWith("대한민국 ") ? raw.replace("대한민국 ", "") : raw;
   };
+
+  const isWithinKorea = (lat: number, lng: number) => {
+    return (
+      lat >= 33.0 && lat <= 38.4 &&
+      lng >= 124.1 && lng <= 131.6
+    )
+  }
 
   const handleConfirm = async () => {
     const center = mapRef.current?.getCenter();
@@ -49,6 +55,12 @@ const PlacePickerModal = ({ onClose, onSelect, initialLatLng }: PlacePickerModal
     }
 
     const { lat, lng } = center.toJSON();
+
+    if (!isWithinKorea(lat, lng)) {
+      alert("대한민국 내 위치만 선택할 수 있습니다.");
+      return;
+    }
+
     try {
         const address = await getAddress(lat, lng);
         onSelect({ lat, lng, address });
@@ -71,6 +83,15 @@ const PlacePickerModal = ({ onClose, onSelect, initialLatLng }: PlacePickerModal
           onLoad={(map) => {mapRef.current = map}}
           options={{
             disableDefaultUI: true,
+            restriction: {
+              latLngBounds: {
+                north: 38.3447,
+                south: 33.0642,
+                west: 124.1050,
+                east: 131.5223,
+              },
+              strictBounds: true,
+            },
           }}
         />
         {/* 고정된 중앙 마커 */}
