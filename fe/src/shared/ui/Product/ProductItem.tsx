@@ -28,6 +28,8 @@ export const ProductItem = (product: ProductItemProps) => {
       thumbnailUrl: product.thumbnailUrl,
       price: product.price,
       categoryName: product.categoryName,
+      viewCount: product.viewCount,
+      isLiked: product.isLiked,
     });
 
     navigate(`/product/${product.id}`);
@@ -62,7 +64,7 @@ export const ProductItem = (product: ProductItemProps) => {
         <div className="">{product.createdAt}</div>
         <div className="">{product.price.toLocaleString()} 원</div>
         <div className="flex gap-4 justify-end">
-          <div className="">조회수 {product.favoriteCount}</div>
+          <div className="">조회수 {product.viewCount}</div>
           <div className="flex gap-1 items-center">
             <div className="">찜 {product.favoriteCount}</div>
             <Icon

@@ -6,6 +6,8 @@ export interface RecentProduct {
   thumbnailUrl: string;
   price: number;
   categoryName: string;
+  viewCount: number;
+  isLiked: boolean;
 }
 
 export const saveRecentProduct = (product: RecentProduct) => {

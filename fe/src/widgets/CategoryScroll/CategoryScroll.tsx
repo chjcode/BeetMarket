@@ -4,14 +4,14 @@ import { CategoryItem } from "./CategoryItem";
 import { useNavigate } from "react-router-dom";
 
 const categories = [
-  { label: "전체 보기", image: "" },
+  { label: "전체 보기", image: "total_icon.png" },
   { label: "전자기기", image: "electronics.png" },
   { label: "가구/인테리어", image: "furniture.png" },
   { label: "유아동", image: "kids.png" },
   { label: "의류/잡화", image: "clothing.png" },
   { label: "생활용품", image: "living_goods.png" },
   { label: "스포츠/레져", image: "sports_leisure.png" },
-  { label: "최근 본 상품", image: "sdfs" },
+  { label: "최근 본 상품", image: "recent_icon.png" },
   { label: "취미/게임/음반", image: "hobby_game_music.png" },
   { label: "뷰티/미용", image: "beauty.png" },
   { label: "반려동물", image: "pet.png" },
@@ -51,7 +51,7 @@ const CategoryScroll = () => {
               </div>
               {row2[i] && (
                 <div onClick={() => navigate(getPath(row2[i].label))}>
-                  <CategoryItem
+                 <CategoryItem
                     label={row2[i].label}
                     imageName={row2[i].image}
                   />

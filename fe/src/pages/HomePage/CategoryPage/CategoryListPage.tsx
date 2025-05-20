@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 const categories = [
   // { label: "전체보기", img: "/categoryImage/total_icon.png" },
   // { label: "최근 본 상품", img: "/categoryImage/recent_icon.png" },
-  { label: "전자기기", img: "/categoryImage/electronics.png", navname:"electronics" },
-  { label: "가구/인테리어", img: "/categoryImage/furniture.png", navname:"furniture" },
-  { label: "유아동", img: "/categoryImage/kids.png", navname:"kids" },
-  { label: "의류/잡화", img: "/categoryImage/clothing.png", navname:"clothing" },
-  { label: "생활용품", img: "/categoryImage/living_goods.png", navname:"living_goods" },
-  { label: "스포츠/레져", img: "/categoryImage/sports_leisure.png", navname:"sports_leisure" },
-  { label: "취미/게임/음반", img: "/categoryImage/hobby_game_music.png", navname:"hobby_game_music" },
-  { label: "뷰티/미용", img: "/categoryImage/beauty.png", navname:"beauty" },
-  { label: "티켓/교환권", img: "/categoryImage/ticket.png", navname:"ticket" },
-  { label: "기타", img: "/categoryImage/etc.png", navname:"etc" },
+  { label: "전자기기", img: "/categoryImage/electronics.png" },
+  { label: "가구/인테리어", img: "/categoryImage/furniture.png" },
+  { label: "유아동", img: "/categoryImage/kids.png" },
+  { label: "의류/잡화", img: "/categoryImage/clothing.png" },
+  { label: "생활용품", img: "/categoryImage/living_goods.png" },
+  { label: "스포츠/레져", img: "/categoryImage/sports_leisure.png" },
+  { label: "취미/게임/음반", img: "/categoryImage/hobby_game_music.png" },
+  { label: "뷰티/미용", img: "/categoryImage/beauty.png" },
+  { label: "티켓/교환권", img: "/categoryImage/ticket.png" },
+  { label: "기타", img: "/categoryImage/etc.png" },
 ];
 
 const CategoryListPage = () => {
@@ -29,7 +29,7 @@ const CategoryListPage = () => {
           <div
             key={idx}
             className="flex items-center gap-3 py-1 cursor-pointer"
-            onClick={() => navigate(`/category/${item.navname}`)}
+            onClick={() => navigate(`/category/${item.label}`)}
           >
             <img
               src={item.img}

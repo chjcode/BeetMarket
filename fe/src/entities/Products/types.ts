@@ -4,4 +4,6 @@ export interface Product {
   price: number;
   thumbnailUrl: string;
   categoryName: string;
+  viewCount: number;
+  isLiked: boolean
 }

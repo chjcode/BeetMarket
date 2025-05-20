@@ -19,6 +19,7 @@ import MyPageEdit from "@/pages/MyPage/MyPageEdit";
 import { ChatsPage, ChatRoomPage, ChatRoomPage2 }from "@/pages/chats";
 import { SignupPage } from "@/pages/signup"
 import CategoryProductsPage from "@/pages/HomePage/CategoryPage/CategoryProductsPage";
+import RecentPage from "@/pages/HomePage/CategoryPage/RecentPage";
 
 
 export const routes: RouteObject[] = [
@@ -81,6 +82,7 @@ export const routes: RouteObject[] = [
       },
       { path: "alarm", element: <AlarmPage /> },
       { path: "add", element: <AddPage /> },
+      { path: "recent", element: <RecentPage />}
     ],
   },
   { path: "login", element: <LoginPage /> },
