@@ -11,7 +11,7 @@ const categories = [
   { label: "의류/잡화", image: "clothing.png" },
   { label: "생활용품", image: "living_goods.png" },
   { label: "스포츠/레져", image: "sports_leisure.png" },
-  { label: "최근 본 상품", image: "" },
+  { label: "최근 본 상품", image: "sdfs" },
   { label: "취미/게임/음반", image: "hobby_game_music.png" },
   { label: "뷰티/미용", image: "beauty.png" },
   { label: "반려동물", image: "pet.png" },
@@ -50,7 +50,7 @@ const CategoryScroll = () => {
                 <CategoryItem label={category.label} imageName={category.image} />
               </div>
               {row2[i] && (
-                <div onClick={() => navigate(getPath(category.label))}>
+                <div onClick={() => navigate(getPath(row2[i].label))}>
                   <CategoryItem
                     label={row2[i].label}
                     imageName={row2[i].image}
