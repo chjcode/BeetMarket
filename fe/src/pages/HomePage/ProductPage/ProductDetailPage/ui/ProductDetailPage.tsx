@@ -117,13 +117,9 @@ const ProductDetailPage = () => {
         <div className="flex justify-between items-center mb-[18.px]">
           <div className="flex items-center gap-2 overflow-hidden">
             <img
-              src={product.sellerProfileImage}
+              src={product.sellerProfileImage ?? "/default_profile.png"}
               alt="프로필"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = "/default_profile.png";
-              }}
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 rounded-full object-cover"
             />
             <div className="text-sm truncate overflow-hidden whitespace-nowrap">
               {product.sellerNickname} · {product.location}
