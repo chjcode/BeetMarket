@@ -44,4 +44,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Long> findPostIdsByUserId(Long userId, Pageable pageable);
 
     long countByUserId(Long userId);
+
+    void deleteByPost(Post post);
 }

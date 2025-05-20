@@ -161,4 +161,18 @@ public class PostController {
                 null
         );
     }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<ResponseWrapper<Void>> deletePost(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long postId
+    ) {
+        postService.deletePost(user.getId(), postId);
+
+        return ResponseWrapperFactory.setResponse(
+                HttpStatus.OK,
+                null,
+                null
+        );
+    }
 }

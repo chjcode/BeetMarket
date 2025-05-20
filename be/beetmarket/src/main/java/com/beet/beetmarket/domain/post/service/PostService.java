@@ -271,4 +271,19 @@ public class PostService {
 
         return new PageImpl<>(dtoList, pageable, total);
     }
+
+    public void deletePost(Long id, Long postId) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFountException::new);
+
+        if(!post.getUser().getId().equals(user.getId())) {
+            throw new PostAccessDeniedException();
+        }
+
+        favoriteRepository.deleteByPost(post);
+        imageRepository.deleteByPost(post);
+
+        searchRepository.deleteById(postId);
+        postRepository.delete(post);
+    }
 }
