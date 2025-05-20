@@ -51,20 +51,12 @@ const ChatRoomPage = () => {
   }, [messages]);
 
   const connect = () => {
-    if (!accessToken || !myNick || !counterpartNick || !roomId) {
-      alert("토큰, 닉네임, 채팅방 ID가 필요합니다.");
-      return;
-    }
-
     const socket = new SockJS(
       `${WS_HOST}${WS_ENDPOINT}?access-token=${encodeURIComponent(accessToken)}`
     );
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 3000,
-      connectHeaders: {
-        Authorization: `Bearer ${accessToken}`,
-      },
       onConnect: () => {
         setStatus("connected");
         addLog("✅ STOMP 연결 성공");
@@ -105,6 +97,7 @@ const ChatRoomPage = () => {
     client.activate();
     stompClientRef.current = client;
   };
+  
 
   const disconnect = () => {
     stompClientRef.current?.deactivate();
