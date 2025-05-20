@@ -1,266 +1,229 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Client, IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import axiosInstance from "@/shared/api/axiosInstance";
-import { Icon } from "@/shared/ui/Icon";
+import { Client, IMessage } from "@stomp/stompjs";
 
 interface ChatMessageResponse {
-  id: string;
+  messageId: string;
   roomId: number;
   senderNickname: string;
+  receiverNickname: string;
   type: "TEXT" | "IMAGE";
   content: string;
   timestamp: string;
 }
 
+interface ReadAckResponse {
+  roomId: number;
+  readerNickname: string;
+  lastReadMessageId: string;
+  lastReadAt: string;
+}
+
+const WS_HOST = "https://beet.joonprac.shop:8700";
+const WS_ENDPOINT = "/ws-chat";
+
 const ChatRoomPage = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
-  const myOauthName = localStorage.getItem("myNickname") ?? "";
-  const counterpartOauthName =
-    localStorage.getItem("counterpartNickname") ?? "";
-  const accessToken = localStorage.getItem("accessToken") ?? "";
+
+  const [accessToken] = useState(localStorage.getItem("accessToken") ?? "");
+  const [myNick] = useState(localStorage.getItem("myNickname") ?? "");
+  const [counterpartNick] = useState(
+    localStorage.getItem("counterpartNickname") ?? ""
+  );
 
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
-  const [userMap, setUserMap] = useState<Record<string, string>>({});
   const [input, setInput] = useState("");
+  const [type, setType] = useState<"TEXT" | "IMAGE">("TEXT");
+  const [status, setStatus] = useState<"connected" | "disconnected" | "error">(
+    "disconnected"
+  );
+  const [logs, setLogs] = useState<string[]>([]);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const clientRef = useRef<Client | null>(null);
+  const stompClientRef = useRef<Client | null>(null);
+  const lastSeenMessageIdRef = useRef<string | null>(null);
+  const ackTimer = useRef<NodeJS.Timeout | null>(null);
+  const messageEndRef = useRef<HTMLDivElement>(null);
 
-  /** 닉네임 캐싱 */
-  const fetchAndCacheNickname = async (oauthName: string) => {
-    if (!oauthName || userMap[oauthName]) return;
-    try {
-      const res = await axiosInstance.get<{ content: { nickname: string } }>(
-        `/api/users/oauth/${oauthName}`
-      );
-      setUserMap((prev) => ({
-        ...prev,
-        [oauthName]: res.data.content.nickname,
-      }));
-    } catch (err) {
-      console.error("닉네임 조회 실패", oauthName, err);
-    }
-  };
-
-  /** 과거 메시지 불러오기 */
   useEffect(() => {
-    if (!roomId || !accessToken) return;
-
-    const client = new Client({
-      brokerURL: `wss://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`,
-      connectHeaders: {
-        Authorization: `Bearer ${accessToken}`, // 헤더 방식
-      },
-      reconnectDelay: 5000,
-      debug: (msg) => console.log("[STOMP]", msg),
-      onConnect: () => {
-        console.log("[STOMP] 연결 성공");
-
-        client.subscribe(
-          `/user/sub/chat/room/${roomId}`,
-          (message: IMessage) => {
-            try {
-              const body: ChatMessageResponse = JSON.parse(message.body);
-              setMessages((prev) => [...prev, body]);
-              fetchAndCacheNickname(body.senderNickname);
-              if (body.senderNickname !== myOauthName) {
-                sendReadAck(body.id);
-              }
-            } catch (e) {
-              console.error("메시지 처리 실패", e);
-            }
-          }
-        );
-
-        client.subscribe(
-          `/user/sub/chat/read/${roomId}`,
-          (message: IMessage) => {
-            try {
-              const ack = JSON.parse(message.body);
-              console.log("읽음 확인 수신:", ack);
-            } catch (e) {
-              console.error("ACK 파싱 실패", e);
-            }
-          }
-        );
-      },
-      onStompError: (frame) => {
-        console.error("[STOMP ERROR]", frame.headers["message"], frame.body);
-      },
-      onWebSocketError: (event) => {
-        console.error("[WebSocket ERROR]", event);
-      },
-      onWebSocketClose: (event) => {
-        console.warn("[WebSocket CLOSED]", event);
-      },
-    });
-
-    client.activate();
-    clientRef.current = client;
-
-    return () => {
-      client.deactivate();
-      console.log("[STOMP] 연결 해제");
-    };
-  }, [roomId, accessToken]);
-
-  /** WebSocket 연결 및 구독 */
-  useEffect(() => {
-    if (!roomId || !accessToken) return;
-
-    const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
-    const socket = new SockJS(socketUrl);
-    console.log("최종", socketUrl);
-    console.log("dd",socket);
-    const client = new Client({
-      webSocketFactory: () => socket,
-      reconnectDelay: 5000,
-      debug: (msg) => console.log("[STOMP]", msg),
-      onConnect: () => {
-        console.log("[STOMP] 연결 성공");
-
-        client.subscribe(
-          `/user/sub/chat/room/${roomId}`,
-          (message: IMessage) => {
-            try {
-              const body: ChatMessageResponse = JSON.parse(message.body);
-              setMessages((prev) => [...prev, body]);
-              fetchAndCacheNickname(body.senderNickname);
-              if (body.senderNickname !== myOauthName) {
-                sendReadAck(body.id);
-              }
-            } catch (e) {
-              console.error("메시지 처리 실패", e);
-            }
-          }
-        );
-
-        client.subscribe(
-          `/user/sub/chat/read/${roomId}`,
-          (message: IMessage) => {
-            try {
-              const ack = JSON.parse(message.body);
-              console.log("읽음 확인 수신:", ack);
-            } catch (e) {
-              console.error("ACK 파싱 실패", e);
-            }
-          }
-        );
-      },
-      onStompError: (frame) => {
-        console.error("[STOMP ERROR]", frame.headers["message"], frame.body);
-      },
-      onWebSocketError: (event) => {
-        console.error("[WebSocket ERROR]", event);
-      },
-      onWebSocketClose: (event) => {
-        console.warn("[WebSocket CLOSED]", event);
-      },
-    });
-
-    client.activate();
-    clientRef.current = client;
-
-    return () => {
-      client.deactivate();
-      console.log("[STOMP] 연결 해제");
-    };
-  }, [roomId, accessToken]);
-
-  /** 자동 스크롤 */
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /** 메시지 전송 */
-  const sendMessage = () => {
-    if (!input.trim() || !clientRef.current?.connected) return;
-    clientRef.current.publish({
-      destination: "/pub/chat/message",
-      body: JSON.stringify({
-        roomId,
-        receiverNickname: counterpartOauthName,
-        type: "TEXT",
-        content: input.trim(),
-      }),
+  const connect = () => {
+    if (!accessToken || !myNick || !counterpartNick || !roomId) {
+      alert("토큰, 닉네임, 채팅방 ID가 필요합니다.");
+      return;
+    }
+
+    const socket = new SockJS(
+      `${WS_HOST}${WS_ENDPOINT}?access-token=${encodeURIComponent(accessToken)}`
+    );
+    const client = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 3000,
+      connectHeaders: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      onConnect: () => {
+        setStatus("connected");
+        addLog("✅ STOMP 연결 성공");
+
+        client.subscribe(
+          `/user/sub/chat/room/${roomId}`,
+          (message: IMessage) => {
+            const data: ChatMessageResponse = JSON.parse(message.body);
+            setMessages((prev) => [...prev, data]);
+
+            if (data.senderNickname === counterpartNick) {
+              lastSeenMessageIdRef.current = data.messageId;
+              debounceSendReadAck();
+            }
+          }
+        );
+
+        client.subscribe(
+          `/user/sub/chat/read/${roomId}`,
+          (message: IMessage) => {
+            const ack: ReadAckResponse = JSON.parse(message.body);
+            addLog(
+              `📩 ${ack.readerNickname}가 메시지 ${ack.lastReadMessageId}까지 읽음`
+            );
+          }
+        );
+      },
+      onDisconnect: () => {
+        setStatus("disconnected");
+        addLog("❎ 연결이 끊겼습니다.");
+      },
+      onStompError: (error) => {
+        setStatus("error");
+        addLog(`❌ STOMP 에러: ${error.headers?.message}`);
+      },
     });
+
+    client.activate();
+    stompClientRef.current = client;
+  };
+
+  const disconnect = () => {
+    stompClientRef.current?.deactivate();
+    stompClientRef.current = null;
+    setStatus("disconnected");
+    addLog("🔌 연결 해제됨");
+  };
+
+  const sendMessage = () => {
+    if (!input.trim() || !stompClientRef.current?.connected) return;
+
+    const payload = {
+      roomId,
+      receiverNickname: counterpartNick,
+      type,
+      content: input.trim(),
+    };
+
+    stompClientRef.current.publish({
+      destination: "/pub/chat/message",
+      body: JSON.stringify(payload),
+    });
+
     setInput("");
   };
 
-  /** 읽음 ACK */
-  const sendReadAck = (messageId: string) => {
-    if (!clientRef.current?.connected) return;
-    clientRef.current.publish({
-      destination: "/pub/chat/read",
-      body: JSON.stringify({
-        roomId,
-        counterpartNickname: counterpartOauthName,
-        lastReadMessageId: messageId,
-      }),
-    });
+  const debounceSendReadAck = () => {
+    if (ackTimer.current) clearTimeout(ackTimer.current);
+    ackTimer.current = setTimeout(() => {
+      const lastId = lastSeenMessageIdRef.current;
+      if (lastId && stompClientRef.current?.connected) {
+        stompClientRef.current.publish({
+          destination: "/pub/chat/read",
+          body: JSON.stringify({
+            roomId,
+            counterpartNickname: counterpartNick,
+            lastReadMessageId: lastId,
+          }),
+        });
+        addLog(`🟢 읽음처리 전송 (ID: ${lastId})`);
+      }
+    }, 500);
+  };
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (stompClientRef.current?.connected) debounceSendReadAck();
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, []);
+
+  const addLog = (msg: string) => {
+    setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* 메시지 목록 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${
-              msg.senderNickname === myOauthName
-                ? "justify-end"
-                : "justify-start"
-            }`}
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-xl font-bold mb-4">🧪 채팅 테스트 (STOMP)</h2>
+
+      <div className="mb-4">
+        <div className="mb-2 text-sm text-gray-600">상태: {status}</div>
+        <div className="flex gap-2 mb-2">
+          <button
+            onClick={connect}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
           >
-            <div
-              className={`p-2 rounded-xl max-w-[70%] text-sm ${
-                msg.senderNickname === myOauthName
-                  ? "bg-purple-200 text-right"
-                  : "bg-gray-200 text-left"
-              }`}
-            >
-              {msg.senderNickname !== myOauthName && (
-                <div className="text-xs text-gray-500 mb-1">
-                  {userMap[msg.senderNickname] ?? msg.senderNickname}
-                </div>
-              )}
-              <div>{msg.content}</div>
-              <div className="text-xs text-gray-500 mt-1">
-                {new Date(msg.timestamp).toLocaleTimeString("ko-KR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </div>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+            연결
+          </button>
+          <button
+            onClick={disconnect}
+            className="px-4 py-2 bg-gray-500 text-white rounded"
+          >
+            끊기
+          </button>
+        </div>
       </div>
 
-      {/* 입력창 */}
-      <div className="py-2 bg-white flex items-center gap-2 px-4 border-t">
+      <div className="mb-4 h-64 overflow-y-auto border rounded p-2 bg-gray-50 text-sm">
+        {messages.map((msg, idx) => (
+          <div key={idx} className="mb-1">
+            <span className="font-bold text-indigo-600">
+              {msg.senderNickname}
+            </span>
+            : {msg.content}
+          </div>
+        ))}
+        <div ref={messageEndRef} />
+      </div>
+
+      <div className="mb-4 flex items-center gap-2">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as "TEXT" | "IMAGE")}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="TEXT">TEXT</option>
+          <option value="IMAGE">IMAGE</option>
+        </select>
         <input
+          type="text"
+          className="flex-1 border px-3 py-1 rounded"
+          placeholder="메시지 입력"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage();
-            }
-          }}
-          className="flex-1 border border-gray-400 rounded-full py-2 px-4"
-          placeholder="메시지를 입력하세요"
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
         <button
           onClick={sendMessage}
-          className="bg-[#A349A4] text-white p-2 rounded-full w-10 h-10 flex justify-center items-center"
+          className="px-3 py-1 bg-green-500 text-white rounded"
         >
-          <Icon name="send" className="w-4 h-4" />
+          전송
         </button>
+      </div>
+
+      <div className="text-xs text-gray-400 h-28 overflow-y-auto border rounded p-2 bg-gray-50">
+        {logs.map((log, idx) => (
+          <div key={idx}>{log}</div>
+        ))}
       </div>
     </div>
   );
