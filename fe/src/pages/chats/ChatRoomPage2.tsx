@@ -4,6 +4,7 @@ import { Client, IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
+import axios from "axios";
 
 interface ChatMessageResponse {
   id: string;
@@ -35,7 +36,22 @@ export const ChatRoomPage2 = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const fetchInitialMessages = async () => {
+    try {
+      const res = await axios.get(
+        `https://k12a307.p.ssafy.io/api/chat/rooms/${roomId}/messages`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      console.log("🗃️ 초기 메시지 목록:", res.data);
+    } catch (err) {
+      console.error("❌ 초기 메시지 불러오기 실패:", err);
+    }
+  };
+
   const connectWebSocket = () => {
+    console.log("WebSocket 연결 시도 중...");
     const socket = new SockJS(
       `${WS_HOST}${WS_ENDPOINT}?access-token=${accessToken}`
     );
@@ -43,10 +59,11 @@ export const ChatRoomPage2 = () => {
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       onConnect: () => {
-        console.log("Connected to STOMP");
+        console.log("✅ Connected to STOMP");
 
         client.subscribe(`/user/sub/chat/room/${roomId}`, (msg: IMessage) => {
           const body: ChatMessageResponse = JSON.parse(msg.body);
+          console.log("📩 메시지 수신:", body);
           setMessages((prev) => [...prev, body]);
           if (body.senderNickname === counterpartNickname) {
             lastReadMessageId.current = body.id;
@@ -59,11 +76,14 @@ export const ChatRoomPage2 = () => {
 
         client.subscribe(`/user/sub/chat/read/${roomId}`, (msg: IMessage) => {
           const ack = JSON.parse(msg.body);
-          console.log("Read Ack Received:", ack);
+          console.log("📬 읽음 확인 수신:", ack);
         });
       },
       onStompError: (frame) => {
-        console.error("Broker error:", frame);
+        console.error("❌ STOMP 브로커 오류:", frame);
+      },
+      onWebSocketError: (event) => {
+        console.error("❌ WebSocket 연결 오류:", event);
       },
     });
 
@@ -79,6 +99,8 @@ export const ChatRoomPage2 = () => {
       type: "TEXT",
       content: input.trim(),
     };
+    console.log("📤 메시지 전송:", payload);
+    console.log("📡 연결 상태:", clientRef.current?.connected);
     clientRef.current?.publish({
       destination: "/pub/chat/message",
       body: JSON.stringify(payload),
@@ -93,6 +115,7 @@ export const ChatRoomPage2 = () => {
       counterpartNickname,
       lastReadMessageId: lastReadMessageId.current,
     };
+    console.log("✅ 읽음 확인 전송:", payload);
     clientRef.current?.publish({
       destination: "/pub/chat/read",
       body: JSON.stringify(payload),
@@ -100,6 +123,7 @@ export const ChatRoomPage2 = () => {
   };
 
   useEffect(() => {
+    fetchInitialMessages();
     connectWebSocket();
     return () => {
       if (ackTimer.current) clearTimeout(ackTimer.current);
