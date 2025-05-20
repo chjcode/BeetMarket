@@ -32,10 +32,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
             .sessionManagement(sm -> sm
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .formLogin(AbstractHttpConfigurer::disable)
+
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .requestMatchers(
@@ -64,11 +65,9 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // WebSocket 핸드셰이크 엔드포인트에만 적용하려면 "/ws-chat/**"
-//        source.registerCorsConfiguration("/ws-chat/**", config);
+        source.registerCorsConfiguration("/ws-chat/**", config);
         // 필요하다면 REST API에도 전역 적용
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-
 }
