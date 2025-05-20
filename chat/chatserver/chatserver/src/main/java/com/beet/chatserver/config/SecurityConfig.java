@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,6 +37,7 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .requestMatchers(
                     "/ws-chat/**",
                     "/api/chat-health"
@@ -56,7 +58,7 @@ public class SecurityConfig {
             "http://localhost:*",
             "http://127.0.0.1:*"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
