@@ -60,7 +60,7 @@ const ChatRoomPage: React.FC = () => {
     console.log("[디버깅] accessToken:", accessToken);
     if (!roomId || !accessToken) return;
 
-    const socketUrl = `wss://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
+    const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
 
     socket.onopen = () => console.log("🟢 SockJS 연결 시도");
