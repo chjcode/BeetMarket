@@ -35,6 +35,16 @@ const ChatRoomPage: React.FC = () => {
     location: string;
   } | null>(null);
 
+  const handleChatHealthCheck = async () => {
+    try {
+      const res = await axiosInstance.get(
+        "https://beet.joonprac.shop:8700/api/chat-health"
+      );
+      console.log("✅ 서버 상태 응답:", res.data);
+    } catch (err) {
+      console.error("❌ 서버 상태 확인 실패:", err);
+    }
+  };
   const fetchAndCacheNickname = async (oauthName: string) => {
     if (!oauthName || userMap[oauthName]) return;
     try {
@@ -263,6 +273,12 @@ const ChatRoomPage: React.FC = () => {
           className="text-blue-600 font-medium hover:underline"
         >
           📅 일정 등록
+        </button>
+        <button
+          onClick={handleChatHealthCheck}
+          className="text-green-600 font-medium hover:underline"
+        >
+          🩺 서버 상태 확인
         </button>
       </div>
     </div>
