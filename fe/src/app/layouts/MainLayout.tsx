@@ -20,7 +20,7 @@ const Layout = () => {
 
   return (
     <div className="fixed inset-0 flex justify-center bg-gray-100">
-      <div className="relative w-full min-w-[360px] max-w-[480px] bg-white flex flex-col ">
+      <div className="relative w-full min-w-[360px] max-w-[480px] bg-white flex flex-col">
         {showHeader && !pathname.startsWith("/product/") && (
           <div className="fixed top-0 w-full max-w-[480px] z-10 bg-white">
             <TopBar />
@@ -30,7 +30,7 @@ const Layout = () => {
         <div
           className={`${
             isChatRoom ? "mt-[54px]" : "my-[54px]"
-          } px-4 overflow-auto flex-1 no-scrollbar`}
+          } px-4 overflow-auto flex-1`}
         >
           <Outlet />
         </div>
