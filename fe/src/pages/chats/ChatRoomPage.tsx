@@ -47,23 +47,65 @@ const ChatRoomPage = () => {
 
   /** 과거 메시지 불러오기 */
   useEffect(() => {
-    if (!roomId) return;
-    (async () => {
-      try {
-        const res = await axiosInstance.get<{
-          content: { messages: { content: ChatMessageResponse[] } };
-        }>(`/api/chat/rooms/${roomId}/messages`, {
-          params: { page: 0, size: 20, sortOrder: "desc" },
-        });
-        const history = res.data.content.messages.content;
-        const ordered = [...history].reverse();
-        setMessages(ordered);
-        ordered.forEach((msg) => fetchAndCacheNickname(msg.senderNickname));
-      } catch (err) {
-        console.error("메시지 불러오기 실패", err);
-      }
-    })();
-  }, [roomId]);
+    if (!roomId || !accessToken) return;
+
+    const client = new Client({
+      brokerURL: "wss://beet.joonprac.shop:8700/ws-chat", // wss (secure WebSocket)
+      connectHeaders: {
+        Authorization: `Bearer ${accessToken}`, // 헤더 방식
+      },
+      reconnectDelay: 5000,
+      debug: (msg) => console.log("[STOMP]", msg),
+      onConnect: () => {
+        console.log("[STOMP] 연결 성공");
+
+        client.subscribe(
+          `/user/sub/chat/room/${roomId}`,
+          (message: IMessage) => {
+            try {
+              const body: ChatMessageResponse = JSON.parse(message.body);
+              setMessages((prev) => [...prev, body]);
+              fetchAndCacheNickname(body.senderNickname);
+              if (body.senderNickname !== myOauthName) {
+                sendReadAck(body.id);
+              }
+            } catch (e) {
+              console.error("메시지 처리 실패", e);
+            }
+          }
+        );
+
+        client.subscribe(
+          `/user/sub/chat/read/${roomId}`,
+          (message: IMessage) => {
+            try {
+              const ack = JSON.parse(message.body);
+              console.log("읽음 확인 수신:", ack);
+            } catch (e) {
+              console.error("ACK 파싱 실패", e);
+            }
+          }
+        );
+      },
+      onStompError: (frame) => {
+        console.error("[STOMP ERROR]", frame.headers["message"], frame.body);
+      },
+      onWebSocketError: (event) => {
+        console.error("[WebSocket ERROR]", event);
+      },
+      onWebSocketClose: (event) => {
+        console.warn("[WebSocket CLOSED]", event);
+      },
+    });
+
+    client.activate();
+    clientRef.current = client;
+
+    return () => {
+      client.deactivate();
+      console.log("[STOMP] 연결 해제");
+    };
+  }, [roomId, accessToken]);
 
   /** WebSocket 연결 및 구독 */
   useEffect(() => {
