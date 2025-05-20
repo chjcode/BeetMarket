@@ -16,7 +16,7 @@ import SearchResultPage from "@/pages/HomePage/SearchPage/SearchResultPage/ui/Se
 import { AuthRedirectPage } from "@/pages/auth/AuthRedirectPage";
 import CategoryListPage from "@/pages/HomePage/CategoryPage/CategoryListPage";
 import MyPageEdit from "@/pages/MyPage/MyPageEdit";
-import { ChatsPage, ChatRoomPage, ChatRoomPage2 }from "@/pages/chats";
+import { ChatsPage, ChatRoomPage, ChatRoomPage2, ChatRoomPage3 }from "@/pages/chats";
 import { SignupPage } from "@/pages/signup"
 import CategoryProductsPage from "@/pages/HomePage/CategoryPage/CategoryProductsPage";
 import RecentPage from "@/pages/HomePage/CategoryPage/RecentPage";
@@ -38,7 +38,7 @@ export const routes: RouteObject[] = [
         path: "chats",
         children: [
           { index: true, element: <ChatsPage /> },
-          { path: ":id", element: <ChatRoomPage /> },
+          { path: ":id", element: <ChatRoomPage3 /> },
         ],
       },
       {
@@ -46,6 +46,13 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <ChatsPage /> },
           { path: ":id", element: <ChatRoomPage2 /> },
+        ],
+      },
+      {
+        path: "chats3",
+        children: [
+          { index: true, element: <ChatsPage /> },
+          { path: ":id", element: <ChatRoomPage /> },
         ],
       },
       {
@@ -82,7 +89,7 @@ export const routes: RouteObject[] = [
       },
       { path: "alarm", element: <AlarmPage /> },
       { path: "add", element: <AddPage /> },
-      { path: "recent", element: <RecentPage />}
+      { path: "recent", element: <RecentPage /> },
     ],
   },
   { path: "login", element: <LoginPage /> },
