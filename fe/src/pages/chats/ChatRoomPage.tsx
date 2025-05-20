@@ -56,25 +56,24 @@ const ChatRoomPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!roomId || !accessToken) {
-      console.warn(
-        "❗ WebSocket 초기화 조건 부족 (roomId 또는 accessToken 없음)"
-      );
-      return;
-    }
+    console.log("[디버깅] roomId:", roomId);
+    console.log("[디버깅] accessToken:", accessToken);
+    if (!roomId || !accessToken) return;
 
     const socketUrl = `https://beet.joonprac.shop:8700/ws-chat?access-token=${accessToken}`;
     const socket = new SockJS(socketUrl);
 
-    // ✅ 디버깅용 로그
-    socket.onopen = () => console.log("🟢 SockJS 연결 열림");
-    socket.onclose = (e) => console.warn("🔴 SockJS 연결 닫힘", e);
-    socket.onerror = (e) => console.error("❌ SockJS 오류 발생", e);
+    socket.onopen = () => console.log("🟢 SockJS 연결 시도");
+    socket.onclose = (e) => console.warn("🔴 SockJS 연결 종료", e);
+    socket.onerror = (e) => console.error("❌ SockJS 연결 오류", e);
 
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       debug: (msg) => console.log("[STOMP]", msg),
+      connectHeaders: {}, // 헤더는 비워둠 (토큰은 URL에 포함)
+      forceBinaryWSFrames: false,
+      appendMissingNULLonIncoming: true,
       onConnect: () => {
         console.log("✅ STOMP 연결 성공");
 
@@ -117,18 +116,15 @@ const ChatRoomPage: React.FC = () => {
       },
     });
 
-    try {
-      client.activate();
-      console.log("📡 STOMP client.activate() 호출됨");
-      clientRef.current = client;
-    } catch (err) {
-      console.error("🔥 STOMP activate 중 예외 발생:", err);
-    }
+    client.activate();
+    console.log("📡 STOMP client.activate() 호출됨");
+    clientRef.current = client;
 
     return () => {
-      client.deactivate();
-      console.log("🛑 STOMP 연결 종료");
-    };
+      client.deactivate()
+      console.log("🛑 STOMP 연결 종료 완료");
+     };
+    
   }, [accessToken, roomId]);
 
   useEffect(() => {
@@ -199,7 +195,6 @@ const ChatRoomPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* 메시지 리스트 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messages.map((msg) => (
           <div
@@ -235,7 +230,6 @@ const ChatRoomPage: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 입력창 */}
       <div className="py-2 bg-white flex items-center gap-2 px-4 border-t border-gray-300">
         <input
           value={input}
@@ -257,7 +251,6 @@ const ChatRoomPage: React.FC = () => {
         </button>
       </div>
 
-      {/* 하단 버튼 */}
       <div className="flex justify-between bg-gray-50 px-4 py-2 text-sm border-t border-gray-300">
         <button
           onClick={handleScheduleSuggestion}
