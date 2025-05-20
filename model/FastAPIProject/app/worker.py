@@ -131,7 +131,10 @@ async def handle_message(msg_id: str, fields: dict):
     Redis Stream으로부터 받은 메시지 1건 처리
     - 이미지 URL 목록 순회하며 미리보기 생성, 업로드 및 DB 갱신
     """
-    post_uuid = fields.get("postId") or fields.get("tempUuid") or "no-id"
+    post_uuid = fields.get("postUuid")
+    if not post_uuid:
+        logging.error("Missing required field: postUuid in message %s", fields)
+        return 
     urls = fields.get("imageUrls", "").split(",")
 
     for origin in urls:
