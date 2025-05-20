@@ -26,5 +26,7 @@ server:
 
 logging:
   level:
-    # 특정 패키지(예: com.beet.chatserver) 및 그 하위 패키지 전체에 대해 DEBUG 레벨 로그 활성화
     com.beet.chatserver: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.web.cors.DefaultCorsProcessor: TRACE
