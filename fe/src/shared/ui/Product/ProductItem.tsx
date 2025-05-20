@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@/shared/ui/Icon";
+import { saveRecentProduct } from "@/shared/utils/localStorage";
 
 export interface ProductItemProps {
   id: number;
@@ -20,10 +21,22 @@ export const ProductItem = (product: ProductItemProps) => {
   const navigate = useNavigate();
   const isCompleted = product.status === "COMPLETED";
 
+  const handleClick = () => {
+    saveRecentProduct({
+      id: product.id,
+      title: product.title,
+      thumbnailUrl: product.thumbnailUrl,
+      price: product.price,
+      categoryName: product.categoryName,
+    });
+
+    navigate(`/product/${product.id}`);
+  };
+
   return (
     <div
       className="w-full h-[120px] flex cursor-pointer gap-1"
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={handleClick}
     >
       <div className="h-full aspect-square relative">
         <img

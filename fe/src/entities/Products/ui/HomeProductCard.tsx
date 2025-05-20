@@ -1,11 +1,17 @@
 import type { Product } from "@/entities/Products/types";
 import { useNavigate } from "react-router-dom";
+import { saveRecentProduct } from "@/shared/utils/localStorage";
 
-const HomeProductCard = ({ id, title, price, thumbnailUrl }: Product) => {
+const HomeProductCard = ({ id, title, price, thumbnailUrl, categoryName }: Product) => {
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    saveRecentProduct({ id, title, price, thumbnailUrl, categoryName });
+    navigate(`/product/${id}`);
+  };
+
   return (
-    <div onClick={() => navigate(`/product/${id}`)} className="flex flex-col cursor-pointer mb-1">
+    <div onClick={handleClick} className="flex flex-col cursor-pointer mb-1">
       <div className="w-full aspect-square relative overflow-hidden rounded-2xl shadow-md">
         <img
           loading="lazy"
