@@ -158,6 +158,7 @@ public class PostService {
                 .region(request.region())
                 .location(request.location())
                 .imageUrls(images)
+                .videoUrl(request.video())
                 .uuid(request.uuid())
                 .latitude(request.latitude())
                 .longitude(request.longitude())
