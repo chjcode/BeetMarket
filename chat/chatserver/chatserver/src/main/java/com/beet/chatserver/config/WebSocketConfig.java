@@ -37,9 +37,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 "wss://k12a307.p.ssafy.io:*",
                 "https://k12a307.p.ssafy.io",
                 "https://k12a307.p.ssafy.io:*",
-                "http://127.0.0.1:*"
+                "http://127.0.0.1:*",
+                "http://localhost:*"
             )
-            .withSockJS();
+//            .withSockJS()
+        ;
     }
 
     @Override
