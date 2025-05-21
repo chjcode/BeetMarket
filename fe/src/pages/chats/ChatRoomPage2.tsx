@@ -16,6 +16,7 @@ interface LocationState {
   roomId: number;
   opponentUserNickname: string | null;
   opponentUserProfileImageUrl: string | null;
+  opponentOauthName: string | null;
 }
 
 export const ChatRoomPage2 = () => {
@@ -27,18 +28,17 @@ export const ChatRoomPage2 = () => {
   const roomId = state?.roomId ?? Number(paramId);
   const opponentUserNickname = state?.opponentUserNickname ?? "";
   const opponentUserProfileImageUrl = state?.opponentUserProfileImageUrl;
+  const opponentOauthName = state?.opponentOauthName ?? "";
 
   const token = localStorage.getItem("accessToken") ?? "";
-  const myNickname = localStorage.getItem("myNickname") ?? "";
+  // const myNickname = localStorage.getItem("myNickname") ?? "";
 
   const [status, setStatus] = useState<
     "연결전" | "연결중" | "연결됨" | "연결끊김" | "에러"
   >("연결전");
   const [inputMessage, setInputMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessageResponse[]>([]);
-  const [opponentLastReadMessageId, setOpponentLastReadMessageId] = useState<
-    string | null
-  >(null);
+  const [opponentLastReadMessageId, setOpponentLastReadMessageId] = useState<string | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -82,7 +82,9 @@ export const ChatRoomPage2 = () => {
 
     ws.onopen = () => {
       setStatus("연결됨");
-      ws.send(`CONNECT\naccept-version:1.2\nheart-beat:10000,10000\n\n\u0000`);
+      ws.send(
+        `CONNECT\naccept-version:1.2\nheart-beat:10000,10000\n\n\u0000`
+      );
     };
 
     ws.onmessage = (event) => {
@@ -172,7 +174,7 @@ export const ChatRoomPage2 = () => {
       {/* 메시지 리스트 */}
       <div className="flex-1 overflow-auto p-4 space-y-2 bg-gray-50">
         {chatMessages.map((msg, idx) => {
-          const isMine = msg.senderNickname === myNickname;
+          const isMine = msg.senderNickname === opponentOauthName;
           const showUnread =
             isMine &&
             opponentLastReadMessageId &&
@@ -217,10 +219,9 @@ export const ChatRoomPage2 = () => {
                   </div>
                 )}
               </div>
-              <div
-                className={`text-gray-500 text-xs mt-1 ${
-                  isMine ? "text-right" : "text-left"
-                }`}
+              <div className={`text-gray-500 text-xs mt-1 ${
+                isMine ? "text-right" : "text-left"
+              }`}
               >
                 {dayjs(msg.timestamp).format("HH:mm")}
               </div>
