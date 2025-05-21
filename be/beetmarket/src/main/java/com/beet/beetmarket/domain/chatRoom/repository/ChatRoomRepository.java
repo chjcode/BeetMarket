@@ -36,7 +36,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
         AND c.schedule BETWEEN :start AND :end
         ORDER BY c.schedule
     """)
-    List<ScheduleResponseDto> findAllMySchedule(User user, LocalDateTime start, LocalDateTime end);
+    List<ScheduleResponseDto> findAllMySchedule(Long userId, LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT cr FROM ChatRoom cr LEFT JOIN FETCH cr.seller LEFT JOIN FETCH cr.buyer WHERE cr.id = :id")
     Optional<ChatRoom> findByIdWithParticipants(@Param("id") Long id);
