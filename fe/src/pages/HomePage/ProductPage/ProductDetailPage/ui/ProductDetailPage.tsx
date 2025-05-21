@@ -225,7 +225,9 @@ const ProductDetailPage = () => {
             const chatRoomId = data.content?.roomId;
 
             if (chatRoomId) {
-              navigate(`/chats/${chatRoomId}`);
+              navigate(`/chats/${chatRoomId}`, {
+                
+              });
             } else {
               alert("채팅방 생성에 실패했습니다.");
             }
