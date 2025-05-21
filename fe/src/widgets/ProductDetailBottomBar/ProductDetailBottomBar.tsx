@@ -5,10 +5,16 @@ interface ProductDetailBottomBarProps {
   price: number;
   isLiked: boolean;
   onChatClick: () => void;
+  onToggleLike: (liked: boolean) => void;
 }
 
-const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, isLiked, onChatClick }) => {
+const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, isLiked, onChatClick, onToggleLike }) => {
   const [liked, setLiked] = useState(isLiked);
+
+  const handleLikeClick = () => {
+    onToggleLike(liked);
+    setLiked(!liked);
+  }
 
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-white border-t border-gray-200 z-50 w-full max-w-[480px] min-w-[360px] px-4">
@@ -17,7 +23,7 @@ const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, 
         {/* 하트 + 가격 */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setLiked((prev) => !prev)}
+            onClick={handleLikeClick}
             className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
           >
             {liked ? (
