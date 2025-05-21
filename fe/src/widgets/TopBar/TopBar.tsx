@@ -6,7 +6,7 @@ import { TopBarSearch } from "./TopBarSearch";
 export const TopBar = () => {
   const { pathname } = useLocation();
 
-  const mainRoutes = ["/", "/chats", "/mypage"];
+  const mainRoutes = ["/", "/chats", "/mypage", "/map"];
   const searchRoutes = ["/search", "/search/result"]
 
   if (searchRoutes.includes(pathname)) {
