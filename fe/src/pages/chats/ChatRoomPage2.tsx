@@ -151,7 +151,7 @@ export const ChatRoomPage2 = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#f3d6f7]">
+    <div className="flex flex-col h-screen">
       <div className="h-[54px] flex items-center justify-between px-4">
         <div
           className="flex w-[36px] h-[36px] justify-start items-center cursor-pointer"
@@ -212,14 +212,14 @@ export const ChatRoomPage2 = () => {
                   <img
                     src={opponentUserProfileImageUrl ?? "/default-profile.png"}
                     alt="프로필"
-                    className="w-6 h-6 rounded-full mr-2"
+                    className="w-10 h-10 rounded-full mr-2"
                   />
                 )}
                 <div
-                  className={`px-3 py-2 rounded-lg max-w-[60%] ${
+                  className={`px-3 py-2 rounded-xl ${
                     isMine
-                      ? "bg-blue-500 text-white rounded-br-none"
-                      : "bg-white text-gray-800 rounded-bl-none"
+                      ? "bg-[#f3d6f7] rounded-br-none"
+                      : "bg-white rounded-bl-none"
                   }`}
                 >
                   {msg.content}
@@ -232,7 +232,7 @@ export const ChatRoomPage2 = () => {
               </div>
               <div
                 className={`text-xs mt-1 ${
-                  isMine ? "text-right" : "text-left"
+                  isMine ? "text-left" : "text-right"
                 }`}
               >
                 {dayjs(msg.timestamp).format("HH:mm")}
@@ -245,7 +245,7 @@ export const ChatRoomPage2 = () => {
 
       <div className="h-[54px] flex flex-col gap-2 bg-white justify-center">
         <div className="flex w-full h-[80%] px-2 items-center justify-between">
-          <textarea
+          <input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => {
@@ -255,7 +255,7 @@ export const ChatRoomPage2 = () => {
               }
             }}
             className="w-[90%] px-3 py-2 bg-gray-100 border border-gray-400 rounded-full focus:outline-none"
-            placeholder="메시지를 입력하세요"
+            placeholder="메시지 입력하기"
           />
           <button
             onClick={sendMessage}

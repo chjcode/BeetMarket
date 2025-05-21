@@ -31,8 +31,8 @@ const HomeProductCard = ({ id, title, price, thumbnailUrl, categoryName, viewCou
       </div>
 
         <div className="flex flex-col justify-between mt-1">
-          <div className="pl-2 mt-1 text-xs font-medium">{title}</div>
-          <div className="pl-2 text-sm font-semibold">{price.toLocaleString()}원</div>
+          <div className="pl-2 mt-1 text-sm ">{title}</div>
+          <div className="pl-2 text-base font-semibold">{price.toLocaleString()}원</div>
         </div>
       
     </div>
