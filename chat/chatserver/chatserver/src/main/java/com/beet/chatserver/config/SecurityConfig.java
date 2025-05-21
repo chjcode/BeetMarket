@@ -57,6 +57,8 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
             "https://k12a307.p.ssafy.io",       // 프론트엔드가 표준 HTTPS 포트(443)를 사용할 경우
             "https://k12a307.p.ssafy.io:*",    // 프론트엔드가 k12a307.p.ssafy.io 호스트의 특정 비표준 포트(예: :80)를 포함한 모든 포트를 사용할 경우
+            "wss://k12a307.p.ssafy.io",
+            "wss://k12a307.p.ssafy.io:*",
             "http://localhost:*",
             "http://127.0.0.1:*"
         ));
