@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -20,8 +20,8 @@ const ChatRoomPage2 = () => {
   >("연결전");
   const [logs, setLogs] = useState<string[]>([]);
   const [token, setToken] = useState<string>("");
-  const [myNickname, setMyNickname] = useState<string>("me");
-  const [receiverNickname, setReceiverNickname] = useState<string>("you");
+  const [myNickname, setMyNickname] = useState<string>("");
+  const [receiverNickname, setReceiverNickname] = useState<string>("");
 
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [input, setInput] = useState("");
@@ -88,7 +88,7 @@ const ChatRoomPage2 = () => {
   };
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !receiverNickname) return;
     const payload = {
       roomId,
       receiverNickname,
@@ -100,49 +100,33 @@ const ChatRoomPage2 = () => {
     setInput("");
   };
 
+  // ✅ 컴포넌트 마운트 시 자동 연결 및 정보 세팅
+  useEffect(() => {
+    const savedToken = localStorage.getItem("accessToken");
+    const savedNickname = localStorage.getItem("myNickname");
+    const savedReceiver = localStorage.getItem("counterpartNickname");
+
+    if (savedToken) {
+      setToken(savedToken);
+      addLog("accessToken 로컬스토리지에서 불러옴");
+    }
+
+    if (savedNickname) {
+      setMyNickname(savedNickname);
+    }
+    if (savedReceiver) {
+      setReceiverNickname(savedReceiver);
+    }
+
+    if (savedToken) {
+      connect();
+    }
+  }, []);
+
   return (
     <div className="p-4 max-w-xl mx-auto space-y-4">
-      <div className="space-y-2">
-        <label>Access Token:</label>
-        <input
-          type="text"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-          className="w-full px-2 py-1 border rounded"
-        />
-        <label>내 닉네임:</label>
-        <input
-          type="text"
-          value={myNickname}
-          onChange={(e) => setMyNickname(e.target.value)}
-          className="w-full px-2 py-1 border rounded"
-        />
-        <label>상대 닉네임:</label>
-        <input
-          type="text"
-          value={receiverNickname}
-          onChange={(e) => setReceiverNickname(e.target.value)}
-          className="w-full px-2 py-1 border rounded"
-        />
-      </div>
-
       <div className="font-bold">
         상태: <span className="text-blue-600">{status}</span>
-      </div>
-
-      <div className="flex space-x-2">
-        <button
-          onClick={connect}
-          className="px-4 py-1 bg-green-500 text-white rounded"
-        >
-          연결
-        </button>
-        <button
-          onClick={disconnect}
-          className="px-4 py-1 bg-red-500 text-white rounded"
-        >
-          연결끊기
-        </button>
       </div>
 
       <div className="border p-2 h-64 overflow-y-auto bg-gray-100 rounded">
@@ -184,6 +168,12 @@ const ChatRoomPage2 = () => {
           <div key={idx}>{log}</div>
         ))}
       </div>
+      <button
+        onClick={disconnect}
+        className="px-4 py-1 bg-red-500 text-white rounded"
+      >
+        연결끊기
+      </button>
     </div>
   );
 };
