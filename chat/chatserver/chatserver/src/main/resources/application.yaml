@@ -26,7 +26,4 @@ server:
 
 logging:
   level:
-    com.beet.chatserver: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web.servlet.DispatcherServlet: DEBUG
-    org.springframework.web.cors.DefaultCorsProcessor: TRACE
+    com.beet.chatserver: INFO
