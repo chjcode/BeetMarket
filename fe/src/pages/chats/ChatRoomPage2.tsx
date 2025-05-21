@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 import axiosInstance from "@/shared/api/axiosInstance";
 
 interface ChatMessageResponse {
@@ -25,30 +26,36 @@ export const ChatRoomPage2 = () => {
 
   const roomId = state?.roomId ?? Number(paramId);
   const opponentUserNickname = state?.opponentUserNickname ?? "";
-  const opponentUserProfileImageUrl =
-    state?.opponentUserProfileImageUrl ?? null;
+  const opponentUserProfileImageUrl = state?.opponentUserProfileImageUrl;
 
   const token = localStorage.getItem("accessToken") ?? "";
-  const receiverNickname = opponentUserNickname;
+  const myNickname = localStorage.getItem("myNickname") ?? "";
 
   const [status, setStatus] = useState<
     "연결전" | "연결중" | "연결됨" | "연결끊김" | "에러"
   >("연결전");
   const [inputMessage, setInputMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessageResponse[]>([]);
+  const [opponentLastReadMessageId, setOpponentLastReadMessageId] = useState<
+    string | null
+  >(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // 초기 메시지 불러오기
+  // 초기 메시지 + 읽음 정보 불러오기
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const res = await axiosInstance.get(
           `/api/chat/rooms/${roomId}/messages`
         );
-        const data: ChatMessageResponse[] = res.data.content.messages.content;
+        const content = res.data.content;
+        const data: ChatMessageResponse[] = content.messages.content;
         setChatMessages(data);
+        setOpponentLastReadMessageId(
+          content.opponentLastReadInfo?.lastReadMessageId ?? null
+        );
       } catch (err) {
         console.error("메시지 불러오기 실패", err);
       }
@@ -80,7 +87,6 @@ export const ChatRoomPage2 = () => {
 
     ws.onmessage = (event) => {
       const data = event.data as string;
-
       if (data.startsWith("CONNECTED")) {
         ws.send(
           `SUBSCRIBE\nid:sub-0\ndestination:/user/sub/chat/room/${roomId}\n\n\u0000`
@@ -117,22 +123,19 @@ export const ChatRoomPage2 = () => {
   const sendMessage = () => {
     if (!inputMessage.trim() || !wsRef.current || status !== "연결됨") return;
 
-    const message = {
+    const frameBody = JSON.stringify({
       roomId,
-      receiverNickname,
+      receiverNickname: opponentUserNickname,
       type: "TEXT",
       content: inputMessage,
-    };
-    const body = JSON.stringify(message);
-    const encoder = new TextEncoder();
-    const byteLength = encoder.encode(body).length;
-
+    });
+    const byteLength = new TextEncoder().encode(frameBody).length;
     const frame =
       `SEND\n` +
       `destination:/pub/chat/message\n` +
       `content-type:application/json\n` +
       `content-length:${byteLength}\n\n` +
-      `${body}\u0000`;
+      `${frameBody}\u0000`;
 
     wsRef.current.send(frame);
     setInputMessage("");
@@ -169,41 +172,58 @@ export const ChatRoomPage2 = () => {
       {/* 메시지 리스트 */}
       <div className="flex-1 overflow-auto p-4 space-y-2 bg-gray-50">
         {chatMessages.map((msg, idx) => {
-          const isMine =
-            msg.senderNickname === localStorage.getItem("myNickname");
+          const isMine = msg.senderNickname === myNickname;
+          const showUnread =
+            isMine &&
+            opponentLastReadMessageId &&
+            Number(msg.id) > Number(opponentLastReadMessageId);
           return (
             <div
               key={idx}
-              className={`flex items-end ${
-                isMine ? "justify-end" : "justify-start"
+              className={`flex flex-col ${
+                isMine ? "items-end" : "items-start"
               }`}
             >
-              {!isMine && (
-                <img
-                  src={opponentUserProfileImageUrl ?? "/default-profile.png"}
-                  alt="프로필"
-                  className="w-6 h-6 rounded-full mr-2"
-                />
-              )}
+              <div className="flex items-end">
+                {!isMine && (
+                  <img
+                    src={opponentUserProfileImageUrl ?? "/default-profile.png"}
+                    alt="프로필"
+                    className="w-6 h-6 rounded-full mr-2"
+                  />
+                )}
+                <div
+                  className={`px-3 py-2 rounded-lg max-w-[60%] whitespace-pre-wrap ${
+                    isMine
+                      ? "bg-blue-500 text-white rounded-br-none"
+                      : "bg-white text-gray-800 rounded-bl-none"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+                {isMine && (
+                  <img
+                    src={
+                      localStorage.getItem("myProfileImageUrl") ||
+                      "/default-profile.png"
+                    }
+                    alt="내 프로필"
+                    className="w-6 h-6 rounded-full ml-2"
+                  />
+                )}
+                {showUnread && (
+                  <div className="text-xs bg-red-500 text-white px-1 rounded-full ml-1">
+                    1
+                  </div>
+                )}
+              </div>
               <div
-                className={`px-3 py-2 rounded-lg max-w-[60%] whitespace-pre-wrap ${
-                  isMine
-                    ? "bg-blue-500 text-white rounded-br-none"
-                    : "bg-white text-gray-800 rounded-bl-none"
+                className={`text-gray-500 text-xs mt-1 ${
+                  isMine ? "text-right" : "text-left"
                 }`}
               >
-                {msg.content}
+                {dayjs(msg.timestamp).format("HH:mm")}
               </div>
-              {isMine && (
-                <img
-                  src={
-                    localStorage.getItem("myProfileImageUrl") ||
-                    "/default-profile.png"
-                  }
-                  alt="내 프로필"
-                  className="w-6 h-6 rounded-full ml-2"
-                />
-              )}
             </div>
           );
         })}
