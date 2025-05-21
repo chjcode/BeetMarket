@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.beet.beetmarket.domain.user.entity.RefreshTokenEntity;
 import com.beet.beetmarket.domain.user.entity.User;
@@ -22,17 +23,25 @@ public class AuthService {
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
+	private final UserService userService;
 
 	@Autowired
-	public AuthService(JwtUtil jwtUtil, UserRepository userRepository, RefreshTokenRepository refreshTokenRepository) {
+	public AuthService(
+		JwtUtil jwtUtil,
+		UserRepository userRepository,
+		RefreshTokenRepository refreshTokenRepository,
+		UserService userService
+	) {
 		this.jwtUtil = jwtUtil;
 		this.userRepository = userRepository;
 		this.refreshTokenRepository = refreshTokenRepository;
+		this.userService = userService;
 	}
 
 	// refreshToken이 유효한지 확인하고 헤더에 "Authorization"이라는 키로 accessToken을 발급함.
 	// refreshToken이 유효한지 확인하고 db에 있는 토큰인지 확인하고
 	// "Authorization"이라는 키로 accessToken과 refreshToken을 발급함.
+	@Transactional
 	public HttpHeaders setAccessToken(String token) {
 		String oauthName = jwtUtil.getKey(token, "id");	// jwt 토큰에서 user의 아이디 가져옴
 
@@ -49,6 +58,9 @@ public class AuthService {
 		if (user == null) {	//user 없으면 exception
 			throw new UserNotFoundException();
 		}
+
+		// redis에 사용자 정보 캐시
+		userService.cacheUserProfile(user);
 
 		// access token , refresh token 갱신
 		String accessToken = jwtUtil.generateToken(user, 24 * 60 * 60 * 1000L);
