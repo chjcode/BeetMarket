@@ -40,18 +40,21 @@ const CategoryScroll = () => {
         ref={scrollRef}
         className="overflow-x-auto no-scrollbar pb-4 w-full select-none"
       >
-        <div className="flex w-max gap-3 px-1">
+        <div className="flex w-max gap-x-[4px] px-3">
           {row1.map((category, i) => (
             <div
               key={i}
-              className="shrink-0 w-[20vw] max-w-[96px] flex flex-col gap-3 items-center"
+              className="shrink-0 w-[18vw] max-w-[96px] flex flex-col gap-3 items-center"
             >
               <div onClick={() => navigate(getPath(category.label))}>
-                <CategoryItem label={category.label} imageName={category.image} />
+                <CategoryItem
+                  label={category.label}
+                  imageName={category.image}
+                />
               </div>
               {row2[i] && (
                 <div onClick={() => navigate(getPath(row2[i].label))}>
-                 <CategoryItem
+                  <CategoryItem
                     label={row2[i].label}
                     imageName={row2[i].image}
                   />
@@ -61,12 +64,12 @@ const CategoryScroll = () => {
           ))}
         </div>
       </div>
-
+      
       {/* 인디케이터 */}
       <div className="absolute bottom-0 left-0 w-full h-[2px] flex justify-center">
         <div className="relative w-[100px] h-full bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="absolute top-0 left-0 h-full w-[40px] bg-[#9C7A7A] rounded-full transition-all duration-300"
+            className="absolute top-0 left-0 h-full w-[40px] bg-[#A349A4] rounded-full transition-all duration-300"
             style={{
               transform: `translateX(${scrollPercent * 60}px)`,
             }}

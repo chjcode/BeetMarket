@@ -16,12 +16,12 @@ export const CategoryItem = ({ label, imageName }: CategoryItemProps) => {
 
   return (
     // <div className="flex flex-col items-center w-full">
-    <div className="flex flex-col items-center w-[96px]">
+    <div className="flex flex-col items-center w-[60px]">
       {/* <div className="w-full aspect-square overflow-hidden flex items-center justify-center  rounded-full shadow-md bg-[#fcf9f2]"> */}
-      <div className="w-[70%] h-[70%] flex items-center justify-center aspect-square overflow-hidden rounded-full shadow-md bg-[#fcf9f2]">
+      <div className="w-full h-[70%] flex items-center justify-center aspect-square overflow-hidden rounded-2xl shadow-md bg-[#fcf9f2]">
         {Icon ? (
           // <Icon className="w-[70%] h-[70%] m-auto object-contain" />
-          <Icon className="w-[70%] h-[70%] m-auto object-contain" />
+          <Icon className="w-[50%] h-[50%] m-auto object-contain" />
         ) : (
           <img
             src={`/categoryImage/${imageName}`}

@@ -7,8 +7,8 @@ export const TopBarMain = () => {
   if (pathname === "/chats") {
     return (
       <div className="h-[54px] flex items-center justify-between px-4 shadow-[0_-4px_8px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-3">
-          {/* <img src="/beet.png" className="h-[36px]" />   */}
+        <div className="flex items-center gap-2">
+          {/* <img src="/beet.png" className="h-[28px]" /> */}
           <div className="text-2xl font-bold font-moneygraphy pt-1">채팅</div>
         </div>
         <NavLink
@@ -24,8 +24,8 @@ export const TopBarMain = () => {
   if (pathname === "/mypage") {
     return (
       <div className="h-[54px] flex items-center justify-between px-4 shadow-[0_-4px_8px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-3">
-          {/* <img src="/beet.png" className="h-[36px]" />   */}
+        <div className="flex items-center gap-2">
+          {/* <img src="/beet.png" className="h-[28px]" /> */}
           <div className="text-2xl font-bold font-moneygraphy pt-1">
             마이페이지
           </div>
@@ -42,11 +42,9 @@ export const TopBarMain = () => {
   if (pathname === "/map") {
     return (
       <div className="h-[54px] flex items-center justify-between px-4 shadow-[0_-4px_8px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-3">
-          {/* <img src="/beet.png" className="h-[36px]" />   */}
-          <div className="text-2xl font-bold font-moneygraphy pt-1">
-            지도
-          </div>
+        <div className="flex items-center gap-2">
+          {/* <img src="/beet.png" className="h-[28px]" /> */}
+          <div className="text-2xl font-bold font-moneygraphy pt-1">지도</div>
         </div>
         <NavLink
           to="/alarm"
@@ -60,8 +58,8 @@ export const TopBarMain = () => {
 
   return (
     <div className="h-[54px] flex items-center justify-between px-4 shadow-[0_-4px_8px_rgba(0,0,0,0.1)]">
-      <div className="flex items-center gap-3">
-        {/* <img src="/beet.png" className="h-[36px]" />   */}
+      <div className="flex items-center gap-2">
+        <img src="/beet.png" className="h-[28px]" />  
         <div className="text-2xl font-bold font-moneygraphy pt-1">비트마켓</div>
       </div>
       <div className="flex h-[36px] justify-end items-center gap-1">
