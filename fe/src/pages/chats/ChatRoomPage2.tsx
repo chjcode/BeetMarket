@@ -63,54 +63,53 @@ export const ChatRoomPage2 = () => {
 
   // 웹소켓 연결
   useEffect(() => {
-    if (!token || status === "연결됨") return;
+    if (!token || !roomId || status !== "연결전") return;
 
-    const connect = () => {
-      setStatus("연결중");
-      const ws = new WebSocket(
-        `wss://beet.joonprac.shop:8700/ws-chat?access-token=${encodeURIComponent(
-          token
-        )}`
-      );
-      wsRef.current = ws;
+    const ws = new WebSocket(
+      `wss://beet.joonprac.shop:8700/ws-chat?access-token=${encodeURIComponent(
+        token
+      )}`
+    );
+    wsRef.current = ws;
+    setStatus("연결중");
 
-      ws.onopen = () => {
-        setStatus("연결됨");
-        ws.send(
-          `CONNECT\naccept-version:1.2\nheart-beat:10000,10000\n\n\u0000`
-        );
-      };
-
-      ws.onmessage = (event) => {
-        const data = event.data as string;
-        if (data.startsWith("CONNECTED")) {
-          ws.send(
-            `SUBSCRIBE\nid:sub-0\ndestination:/user/sub/chat/room/${roomId}\n\n\u0000`
-          );
-        } else if (data.startsWith("MESSAGE")) {
-          const body = data.split("\n\n")[1].split("\u0000")[0];
-          try {
-            const parsed: ChatMessageResponse = JSON.parse(body);
-            setChatMessages((prev) => [...prev, parsed]);
-          } catch (e) {
-            console.error("메시지 파싱 실패", e);
-          }
-        }
-      };
-
-      ws.onerror = () => {
-        setStatus("에러");
-      };
-
-      ws.onclose = () => {
-        setStatus("연결끊김");
-      };
+    ws.onopen = () => {
+      setStatus("연결됨");
+      ws.send(`CONNECT\naccept-version:1.2\nheart-beat:10000,10000\n\n\u0000`);
     };
 
-    connect();
+    ws.onmessage = (event) => {
+      const data = event.data as string;
+
+      if (data.startsWith("CONNECTED")) {
+        ws.send(
+          `SUBSCRIBE\nid:sub-0\ndestination:/user/sub/chat/room/${roomId}\n\n\u0000`
+        );
+      } else if (data.startsWith("MESSAGE")) {
+        const body = data.split("\n\n")[1].split("\u0000")[0];
+        try {
+          const parsed: ChatMessageResponse = JSON.parse(body);
+          setChatMessages((prev) => [...prev, parsed]);
+        } catch (e) {
+          console.error("메시지 파싱 실패", e);
+        }
+      }
+    };
+
+    ws.onerror = (err) => {
+      console.error("WebSocket 오류", err);
+      setStatus("에러");
+    };
+
+    ws.onclose = (event) => {
+      console.warn("WebSocket 종료", event.code, event.reason);
+      setStatus("연결끊김");
+    };
 
     return () => {
-      wsRef.current?.close();
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.close();
+      }
     };
   }, [roomId, token, status]);
 
