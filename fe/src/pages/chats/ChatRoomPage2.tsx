@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -14,22 +14,24 @@ interface ChatMessageResponse {
 const ChatRoomPage2 = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
-
   const [status, setStatus] = useState<
     "연결전" | "연결중" | "연결됨" | "연결끊김" | "에러"
   >("연결전");
   const [logs, setLogs] = useState<string[]>([]);
-  const [token, setToken] = useState<string>("");
-  const [myNickname, setMyNickname] = useState<string>("");
-  const [receiverNickname, setReceiverNickname] = useState<string>("");
-
-  const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
-  const [input, setInput] = useState("");
+  const [token, setToken] = useState("");
+  const [receiverNickname, setReceiverNickname] = useState("");
+  const [inputMessage, setInputMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState<ChatMessageResponse[]>([]);
 
   const wsRef = useRef<WebSocket | null>(null);
 
   const addLog = (msg: string) => {
     setLogs((prev) => [...prev, `${dayjs().format("HH:mm:ss")} - ${msg}`]);
+  };
+
+  const sendRaw = (msg: string) => {
+    wsRef.current?.send(msg);
+    addLog(`[SEND] ${msg}`);
   };
 
   const connect = () => {
@@ -43,9 +45,6 @@ const ChatRoomPage2 = () => {
     }
 
     setStatus("연결중");
-    addLog(
-      `WebSocket 접속 시도: wss://beet.joonprac.shop:8700/ws-chat?access-token=${token}`
-    );
     const ws = new WebSocket(
       `wss://beet.joonprac.shop:8700/ws-chat?access-token=${encodeURIComponent(
         token
@@ -56,27 +55,40 @@ const ChatRoomPage2 = () => {
     ws.onopen = () => {
       setStatus("연결됨");
       addLog("WebSocket 연결 성공");
-    };
 
-    ws.onerror = (err) => {
-      setStatus("에러");
-      addLog("WebSocket 에러 발생");
-      console.error(err);
-    };
-
-    ws.onclose = (evt) => {
-      setStatus("연결끊김");
-      addLog(`WebSocket 연결 종료 (code=${evt.code})`);
+      // STOMP CONNECT
+      sendRaw(`CONNECT\naccept-version:1.2\nheart-beat:10000,10000\n\n\u0000`);
     };
 
     ws.onmessage = (event) => {
-      try {
-        const data: ChatMessageResponse = JSON.parse(event.data);
-        setMessages((prev) => [...prev, data]);
-        addLog(`메시지 수신: ${data.content}`);
-      } catch (e) {
-        addLog("수신 데이터 파싱 실패");
+      const data = event.data;
+      addLog(`[RECV] ${data}`);
+
+      if (data.startsWith("CONNECTED")) {
+        // STOMP SUBSCRIBE
+        sendRaw(
+          `SUBSCRIBE\nid:sub-0\ndestination:/user/sub/chat/room/${roomId}\n\n\u0000`
+        );
+      } else if (data.startsWith("MESSAGE")) {
+        const body = data.split("\n\n")[1].split("\u0000")[0];
+        try {
+          const parsed: ChatMessageResponse = JSON.parse(body);
+          setChatMessages((prev) => [...prev, parsed]);
+        } catch (e) {
+          console.error("메시지 파싱 실패", e);
+        }
       }
+    };
+
+    ws.onerror = (e) => {
+      setStatus("에러");
+      addLog("WebSocket 에러 발생");
+      console.error(e);
+    };
+
+    ws.onclose = (e) => {
+      setStatus("연결끊김");
+      addLog(`WebSocket 연결 종료 (code=${e.code})`);
     };
   };
 
@@ -88,72 +100,64 @@ const ChatRoomPage2 = () => {
   };
 
   const sendMessage = () => {
-    if (!input.trim() || !receiverNickname) return;
-    const payload = {
+    if (!inputMessage.trim()) return;
+
+    const message = {
       roomId,
       receiverNickname,
       type: "TEXT",
-      content: input,
+      content: inputMessage,
     };
-    wsRef.current?.send(JSON.stringify(payload));
-    addLog(`메시지 전송: ${input}`);
-    setInput("");
+    const body = JSON.stringify(message);
+    const frame = `SEND\ndestination:/pub/chat/message\ncontent-type:application/json\ncontent-length:${body.length}\n\n${body}\u0000`;
+    sendRaw(frame);
+    setInputMessage("");
   };
 
-  // ✅ 컴포넌트 마운트 시 자동 연결 및 정보 세팅
-  useEffect(() => {
-    const savedToken = localStorage.getItem("accessToken");
-    const savedNickname = localStorage.getItem("myNickname");
-    const savedReceiver = localStorage.getItem("counterpartNickname");
-
-    if (savedToken) {
-      setToken(savedToken);
-      addLog("accessToken 로컬스토리지에서 불러옴");
-    }
-
-    if (savedNickname) {
-      setMyNickname(savedNickname);
-    }
-    if (savedReceiver) {
-      setReceiverNickname(savedReceiver);
-    }
-
-    if (savedToken) {
-      connect();
-    }
-  }, []);
-
   return (
-    <div className="p-4 max-w-xl mx-auto space-y-4">
-      <div className="font-bold">
-        상태: <span className="text-blue-600">{status}</span>
-      </div>
-
-      <div className="border p-2 h-64 overflow-y-auto bg-gray-100 rounded">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={
-              msg.senderNickname === myNickname ? "text-right" : "text-left"
-            }
-          >
-            <span className="block text-sm">
-              <strong>{msg.senderNickname}</strong>: {msg.content}
-            </span>
-            <span className="text-[10px] text-gray-500">
-              {dayjs(msg.timestamp).format("HH:mm:ss")}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex space-x-2">
+    <div className="p-4">
+      <div className="mb-2">
+        <label>Access Token:</label>
         <input
-          type="text"
-          placeholder="메시지를 입력하세요"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 px-2 py-1 border rounded"
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          className="ml-2 px-2 py-1 border rounded w-64"
+        />
+      </div>
+      <div className="mb-2">
+        <label>상대 닉네임:</label>
+        <input
+          value={receiverNickname}
+          onChange={(e) => setReceiverNickname(e.target.value)}
+          className="ml-2 px-2 py-1 border rounded w-64"
+        />
+      </div>
+      <div className="mb-4">
+        <span className="font-bold">상태:</span>{" "}
+        <span className="ml-2">{status}</span>
+      </div>
+
+      <div className="mb-2 space-x-2">
+        <button
+          onClick={connect}
+          className="px-4 py-1 bg-green-500 text-white rounded"
+        >
+          연결
+        </button>
+        <button
+          onClick={disconnect}
+          className="px-4 py-1 bg-red-500 text-white rounded"
+        >
+          연결끊기
+        </button>
+      </div>
+
+      <div className="mb-2">
+        <input
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          className="w-64 px-2 py-1 border rounded mr-2"
+          placeholder="메시지 입력"
         />
         <button
           onClick={sendMessage}
@@ -163,17 +167,24 @@ const ChatRoomPage2 = () => {
         </button>
       </div>
 
-      <div className="border p-2 h-40 overflow-y-auto bg-gray-50 text-xs rounded">
+      <div className="h-40 overflow-y-auto bg-gray-100 p-2 text-xs mb-4">
         {logs.map((log, idx) => (
           <div key={idx}>{log}</div>
         ))}
       </div>
-      <button
-        onClick={disconnect}
-        className="px-4 py-1 bg-red-500 text-white rounded"
-      >
-        연결끊기
-      </button>
+
+      <div className="h-64 overflow-y-auto bg-white p-2 border">
+        {chatMessages.map((msg, idx) => (
+          <div key={idx} className="mb-2">
+            <div>
+              <b>{msg.senderNickname}</b>: {msg.content}
+            </div>
+            <div className="text-gray-400 text-xs">
+              {dayjs(msg.timestamp).format("HH:mm:ss")}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
