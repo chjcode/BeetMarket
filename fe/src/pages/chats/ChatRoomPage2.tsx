@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import axiosInstance from "@/shared/api/axiosInstance";
+import { Icon } from "@/shared/ui/Icon";
 
 interface ChatMessageResponse {
   id: string;
@@ -34,7 +35,7 @@ export const ChatRoomPage2 = () => {
 
   const [status, setStatus] = useState<
     "연결전" | "연결중" | "연결됨" | "연결끊김" | "에러"
-  >("연결전");
+>("연결전");
   const [inputMessage, setInputMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessageResponse[]>([]);
   const [opponentLastReadMessageId, setOpponentLastReadMessageId] = useState<
@@ -59,7 +60,9 @@ export const ChatRoomPage2 = () => {
         );
         const content = res.data.content;
         const data: ChatMessageResponse[] = content.messages.content;
-        setChatMessages(data);
+  
+        setChatMessages([...data].reverse());
+  
         setOpponentLastReadMessageId(
           content.opponentLastReadInfo?.lastReadMessageId ?? null
         );
@@ -67,6 +70,7 @@ export const ChatRoomPage2 = () => {
         console.error("메시지 불러오기 실패", err);
       }
     };
+  
     if (roomId) fetchMessages();
   }, [roomId]);
 
@@ -131,8 +135,9 @@ export const ChatRoomPage2 = () => {
       roomId,
       receiverNickname: opponentUserNickname,
       type: "TEXT",
-      content: inputMessage,
+      content: inputMessage.trim(),
     });
+    
     const byteLength = new TextEncoder().encode(frameBody).length;
     const frame =
       `SEND\n` +
@@ -145,73 +150,50 @@ export const ChatRoomPage2 = () => {
     setInputMessage("");
   };
 
-  const fetchScheduleSuggestion = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/chat/rooms/${roomId}/schedule-suggestion`
-      );
-      const content = res.data.content;
-      setSuggestedSchedule(content.suggestedSchedule);
-      setSuggestedLocation(content.suggestedLocation);
-      alert(
-        `추천 일정: ${content.suggestedSchedule}\n장소: ${content.suggestedLocation}`
-      );
-    } catch (err) {
-      console.error("일정 추천 실패", err);
-      alert("일정 추천 요청에 실패했습니다.");
-    }
-  };
-
-  const reserveSchedule = async () => {
-    if (!suggestedSchedule || !suggestedLocation) {
-      alert("먼저 일정 추천을 받아주세요.");
-      return;
-    }
-
-    try {
-      // const formattedDate = suggestedSchedule
-      //   .replace(/[-:T]/g, "")
-      //   .slice(0, 12); // "2025-05-22T14:00:00" → "202505221400"
-      const data = {
-        schedule: suggestedSchedule,
-        location: suggestedLocation,
-      };
-      await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, data);
-      alert("일정이 성공적으로 추가되었습니다.");
-    } catch (err) {
-      console.error("일정 추가 실패", err);
-      alert("일정 추가 요청에 실패했습니다.");
-    }
-  };
-
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex items-center p-4 border-b">
-        <button onClick={() => navigate(-1)} className="mr-4 text-xl">
-          ‹
-        </button>
-        <img
-          src={opponentUserProfileImageUrl ?? "/default-profile.png"}
-          alt="프로필"
-          className="w-8 h-8 rounded-full mr-2"
-        />
-        <span className="font-semibold">
-          {opponentUserNickname || "알 수 없음"}
-        </span>
-        <span className="ml-auto text-xs text-gray-500">
-          {status}
-          {status === "연결끊김" && (
-            <button
-              onClick={() => setStatus("연결전")}
-              className="ml-2 underline text-blue-500 text-xs"
-            >
-              다시 연결
-            </button>
-          )}
-        </span>
+    <div className="flex flex-col h-screen bg-[#f3d6f7]">
+      <div className="h-[54px] flex items-center justify-between px-4">
+        <div
+          className="flex w-[36px] h-[36px] justify-start items-center cursor-pointer"
+          onClick={() => navigate(-1)}
+        >
+          <Icon name="back" className="w-6 h-6 stroke-[0.5]" />
+        </div>
+        <div className="font-semibold pt-1">{opponentUserNickname}</div>
+        <div
+          className="cursor-pointer"
+          onClick={async () => {
+            try {
+              const res = await axiosInstance.get(
+                `/api/chat/rooms/${roomId}/schedule-suggestion`
+              );
+              const content = res.data.content;
+              setSuggestedSchedule(content.suggestedSchedule);
+              setSuggestedLocation(content.suggestedLocation);
+
+              // 추천 일정 받았으면 바로 예약까지
+              if (suggestedSchedule && suggestedLocation) {
+                await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, {
+                  schedule: suggestedSchedule,
+                  location: suggestedLocation,
+                });
+                alert(
+                  `일정이 성공적으로 추가되었습니다!\n\n일정: ${content.suggestedSchedule}\n장소: ${content.suggestedLocation}`
+                );
+              } else {
+                alert("추천 일정을 받을 수 없습니다.");
+              }
+            } catch (err) {
+              console.error("일정 추천 및 추가 실패", err);
+              alert("일정 추천 또는 추가 요청에 실패했습니다.");
+            }
+          }}
+        >
+          <Icon name="calendar" className="w-5 h-5" />
+        </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-4 space-y-2 bg-gray-50">
+      <div className="flex-1 overflow-auto p-4 space-y-2">
         {chatMessages.map((msg, idx) => {
           const isMine = msg.senderNickname !== opponentOauthName;
           const showUnread =
@@ -234,7 +216,7 @@ export const ChatRoomPage2 = () => {
                   />
                 )}
                 <div
-                  className={`px-3 py-2 rounded-lg max-w-[60%] whitespace-pre-wrap ${
+                  className={`px-3 py-2 rounded-lg max-w-[60%] ${
                     isMine
                       ? "bg-blue-500 text-white rounded-br-none"
                       : "bg-white text-gray-800 rounded-bl-none"
@@ -249,7 +231,7 @@ export const ChatRoomPage2 = () => {
                 )}
               </div>
               <div
-                className={`text-gray-500 text-xs mt-1 ${
+                className={`text-xs mt-1 ${
                   isMine ? "text-right" : "text-left"
                 }`}
               >
@@ -261,9 +243,9 @@ export const ChatRoomPage2 = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t flex flex-col gap-2">
-        <div className="flex">
-          <input
+      <div className="h-[54px] flex flex-col gap-2 bg-white justify-center">
+        <div className="flex w-full h-[80%] px-2 items-center justify-between">
+          <textarea
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => {
@@ -272,29 +254,14 @@ export const ChatRoomPage2 = () => {
                 sendMessage();
               }
             }}
-            className="flex-1 px-3 py-2 border rounded-l-lg focus:outline-none"
+            className="w-[90%] px-3 py-2 bg-gray-100 border border-gray-400 rounded-full focus:outline-none"
             placeholder="메시지를 입력하세요"
           />
           <button
             onClick={sendMessage}
-            className="px-4 bg-blue-500 text-white rounded-r-lg"
+            className="w-[40px] h-[40px] bg-purple-400 text-white rounded-full flex items-center justify-center ml-2"
           >
-            전송
-          </button>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={fetchScheduleSuggestion}
-            className="flex-1 px-3 py-2 bg-green-500 text-white rounded"
-          >
-            일정 추천
-          </button>
-          <button
-            onClick={reserveSchedule}
-            className="flex-1 px-3 py-2 bg-purple-500 text-white rounded"
-          >
-            일정 추가
+            <Icon name="send" className="w-5 h-5 stroke-[0.5]" />
           </button>
         </div>
       </div>
