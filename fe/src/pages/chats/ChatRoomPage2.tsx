@@ -219,7 +219,7 @@ export const ChatRoomPage2 = () => {
                   className={`px-3 py-2 rounded-xl ${
                     isMine
                       ? "bg-[#f3d6f7] rounded-br-none"
-                      : "bg-white rounded-bl-none"
+                      : "bg-white rounded-bl-none border border-gray-700"
                   }`}
                 >
                   {msg.content}
