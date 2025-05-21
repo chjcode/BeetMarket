@@ -35,7 +35,7 @@ export const ChatRoomPage2 = () => {
 
   const [status, setStatus] = useState<
     "연결전" | "연결중" | "연결됨" | "연결끊김" | "에러"
->("연결전");
+  >("연결전");
   const [inputMessage, setInputMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessageResponse[]>([]);
   const [opponentLastReadMessageId, setOpponentLastReadMessageId] = useState<
@@ -60,9 +60,9 @@ export const ChatRoomPage2 = () => {
         );
         const content = res.data.content;
         const data: ChatMessageResponse[] = content.messages.content;
-  
+
         setChatMessages([...data].reverse());
-  
+
         setOpponentLastReadMessageId(
           content.opponentLastReadInfo?.lastReadMessageId ?? null
         );
@@ -70,7 +70,7 @@ export const ChatRoomPage2 = () => {
         console.error("메시지 불러오기 실패", err);
       }
     };
-  
+
     if (roomId) fetchMessages();
   }, [roomId]);
 
@@ -137,7 +137,7 @@ export const ChatRoomPage2 = () => {
       type: "TEXT",
       content: inputMessage.trim(),
     });
-    
+
     const byteLength = new TextEncoder().encode(frameBody).length;
     const frame =
       `SEND\n` +
