@@ -24,6 +24,7 @@ interface ProductDetailResponse {
   view: number;
   like: number;
   isLiked: boolean;
+  sellerOauthName: string;
 }
 
 interface RelatedProduct {
@@ -226,7 +227,12 @@ const ProductDetailPage = () => {
 
             if (chatRoomId) {
               navigate(`/chats/${chatRoomId}`, {
-                
+                state: {
+                  roomId: chatRoomId,
+                  opponentUserNickname: product.sellerNickname,
+                  opponentUserProfileImageUrl: product.sellerProfileImage,
+                  opponentOauthName: product.sellerOauthName,
+                },
               });
             } else {
               alert("채팅방 생성에 실패했습니다.");

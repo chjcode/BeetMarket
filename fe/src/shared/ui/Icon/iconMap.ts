@@ -10,6 +10,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 import { LuMap } from "react-icons/lu";
 import { IoEllipsisVerticalSharp } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
+import { FaRegCalendarPlus } from "react-icons/fa";
 
 export const iconMap = {
   home: HiHome,
@@ -28,7 +29,7 @@ export const iconMap = {
   map: LuMap,
   dots: IoEllipsisVerticalSharp,
   send: IoSend,
-  
+  calendar: FaRegCalendarPlus,
 };
 
 export type IconName = keyof typeof iconMap;
