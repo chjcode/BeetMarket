@@ -5,6 +5,7 @@ import SockJS from "sockjs-client";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from "axios";
+import axiosInstance from "@/shared/api/axiosInstance";
 
 interface ChatMessageResponse {
   id: string;
@@ -100,7 +101,31 @@ export const ChatRoomPage2 = () => {
     clientRef.current = client;
   };
   
+  const handleScheduleSuggestion = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/chat/rooms/${roomId}/schedule-suggestion`
+      );
+      console.log("🧠 일정 추천 결과:", res.data);
+      alert("AI 일정 추천 완료:\n" + JSON.stringify(res.data, null, 2));
+    } catch (err) {
+      console.error("❌ 일정 추천 실패:", err);
+      alert("AI 일정 추천 요청 실패");
+    }
+  };
 
+  const handleReserveSchedule = async () => {
+    try {
+      const res = await axiosInstance.patch(
+        `/api/chat/rooms/${roomId}/reserve`
+      );
+      console.log("📌 일정 추가 완료:", res.data);
+      alert("일정이 성공적으로 추가되었습니다!");
+    } catch (err) {
+      console.error("❌ 일정 추가 실패:", err);
+      alert("일정 추가 요청 실패");
+    }
+  };
   const sendMessage = () => {
     if (!input.trim()) return;
     const payload = {
@@ -185,6 +210,20 @@ export const ChatRoomPage2 = () => {
           className="px-4 py-2 rounded bg-purple-500 text-white font-semibold"
         >
           전송
+        </button>
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={handleScheduleSuggestion}
+          className="flex-1 px-4 py-2 rounded bg-blue-500 text-white font-semibold"
+        >
+          🧠 AI 일정 추천
+        </button>
+        <button
+          onClick={handleReserveSchedule}
+          className="flex-1 px-4 py-2 rounded bg-green-600 text-white font-semibold"
+        >
+          ➕ 일정 추가
         </button>
       </div>
     </div>
