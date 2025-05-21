@@ -50,13 +50,13 @@ const SalesPage = () => {
     `px-4 py-2 rounded-full border text-sm font-medium transition 
      ${
        filter === type
-         ? "bg-[#A349A4] text-white border-blue-500"
+         ? "bg-[#A349A4] text-white"
          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
      }`;
 
   return (
     <div className="flex flex-col px-4 py-2">
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mt-1">
         <button className={buttonClass("all")} onClick={() => setFilter("all")}>
           전체
         </button>

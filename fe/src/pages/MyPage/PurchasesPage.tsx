@@ -64,13 +64,13 @@ const PurchasesPage = () => {
           className={buttonClass("selling")}
           onClick={() => setFilter("selling")}
         >
-          판매중
+          구매중
         </button>
         <button
           className={buttonClass("sold")}
           onClick={() => setFilter("sold")}
         >
-          판매완료
+          구매매완료
         </button>
       </div>
 
