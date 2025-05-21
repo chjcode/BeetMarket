@@ -29,33 +29,6 @@ const SchedulePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const dummySchedules: ScheduleResponse[] = [
-    {
-      schedule: "2025-05-21T14:00:00",
-      location: "서울 강남구 역삼1동 멀티캠퍼스 1층층",
-      tradeType: "SELL",
-      opposite: "홍길동",
-      postThumbnail: "/beet.png",
-      postTitle: "아이폰 13 미개봉",
-    },
-    {
-      schedule: "2025-05-21T19:30:00",
-      location: "서울 종로구 종로역 우리집",
-      tradeType: "BUY",
-      opposite: "김철수",
-      postThumbnail: "/beet.png",
-      postTitle: "게이밍 노트북",
-    },
-    {
-      schedule: "2025-05-25T10:00:00",
-      location: "서울 마포구",
-      tradeType: "SELL",
-      opposite: "이영희",
-      postThumbnail: "/beet.png",
-      postTitle: "의자 팝니다",
-    },
-  ];
-
   // API 호출
   useEffect(() => {
     const fetchData = async () => {
@@ -65,8 +38,8 @@ const SchedulePage = () => {
       setIsError(false);
 
       try {
-        // const data = await fetchMySchedule(start, end);
-        const data = dummySchedules;
+        const data = await fetchMySchedule(start, end);
+        // const data = dummySchedules;
         setSchedules(data);
       } catch (error) {
         console.error("일정 조회 실패", error);
