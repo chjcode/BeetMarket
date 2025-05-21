@@ -23,7 +23,7 @@ const CalendarScheduleCard = ({
         <span className={`font-bold ${isBuy ? "text-blue-500" : "text-red-500"}`}>
           {time}
         </span>
-        <span className="text-[12px] text-gray-500 mt-1">{place}</span>
+        <span className="text-[12px] text-gray-500 line-clamp-2 break-words mt-1">{place}</span>
       </div>
       <div className="w-[2px] h-[48px] bg-purple-400 rounded-full" />
       <div className="flex-1">
