@@ -130,7 +130,7 @@ const ProductDetailPage = () => {
               className="text-sm text-white bg-purple-600 px-3 py-1 rounded-full flex-shrink-0 ml-2"
               onClick={() =>
                 navigate(`/product/${id}/3d`, {
-                  state: { model3D: product.model3D },
+                  state: { model3D: product.model3D, title: product.title },
                 })
               }
             >
