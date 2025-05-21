@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -100,7 +99,7 @@ public class UserService {
 
     public List<ScheduleResponseDto> getUserSchedule(Long id, LocalDateTime start, LocalDateTime end) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        return chatRoomRepository.findAllMySchedule(user, start, end);
+        return chatRoomRepository.findAllMySchedule(user.getId(), start, end);
     }
 
     @Transactional(readOnly = true)
