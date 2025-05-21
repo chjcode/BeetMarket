@@ -153,27 +153,25 @@ export const ChatRoomPage2 = () => {
       const content = res.data.content;
       setSuggestedSchedule(content.suggestedSchedule);
       setSuggestedLocation(content.suggestedLocation);
-      alert(
+      console.log(
         `추천 일정: ${content.suggestedSchedule}\n장소: ${content.suggestedLocation}`
       );
     } catch (err) {
       console.error("일정 추천 실패", err);
-      alert("일정 추천 요청에 실패했습니다.");
     }
   };
 
   const reserveSchedule = async () => {
     if (!suggestedSchedule || !suggestedLocation) {
-      alert("먼저 일정 추천을 받아주세요.");
       return;
     }
 
     try {
-      const formattedDate = suggestedSchedule
-        .replace(/[-:T]/g, "")
-        .slice(0, 12); // "2025-05-22T14:00:00" → "202505221400"
+      // const formattedDate = suggestedSchedule
+      //   .replace(/[-:T]/g, "")
+      //   .slice(0, 12); // "2025-05-22T14:00:00" → "202505221400"
       const data = {
-        schedule: formattedDate,
+        schedule: suggestedSchedule,
         location: suggestedLocation,
       };
       await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, data);

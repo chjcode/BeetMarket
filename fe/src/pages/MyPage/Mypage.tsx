@@ -7,6 +7,7 @@ import { FiSettings } from "react-icons/fi";
 
 export const MyPage = () => {
   const navigate = useNavigate();
+  
   return (
     <div className="flex flex-col items-center bg-white pt-6">
       {/* 프로필 영역 */}
@@ -50,7 +51,12 @@ export const MyPage = () => {
           <span className="text-xs">내 일정</span>
         </NavLink>
       </div>
-
+    <div className="cursor-pointer" onClick={()=>{
+      localStorage.removeItem("accessToken");
+      navigate("/login");
+      }}>
+      로그아웃
+    </div>
     </div>
   );
 };
