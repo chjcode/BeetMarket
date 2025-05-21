@@ -1,6 +1,8 @@
 package com.beet.beetmarket.domain.user.service;
 
 import com.beet.beetmarket.domain.chatRoom.repository.ChatRoomRepository;
+import com.beet.beetmarket.domain.post.entity.PostDocument;
+import com.beet.beetmarket.domain.post.repository.PostSearchRepository;
 import com.beet.beetmarket.domain.user.dto.CreateUserInfoRequestDto;
 import com.beet.beetmarket.domain.user.dto.ScheduleResponseDto;
 import com.beet.beetmarket.domain.user.dto.UpdateUserInfoRequestDto;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -33,14 +36,16 @@ public class UserService {
 
     private static final String USER_PROFILE_KEY_PREFIX = "user_profile:";
     private static final long USER_PROFILE_TTL_DAYS = 90; // 90일 TTL
+    private final PostSearchRepository postSearchRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, ChatRoomRepository chatRoomRepository,
-                       StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
+                       StringRedisTemplate redisTemplate, ObjectMapper objectMapper, PostSearchRepository postSearchRepository) {
         this.userRepository = userRepository;
         this.chatRoomRepository = chatRoomRepository;
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
+        this.postSearchRepository = postSearchRepository;
     }
 
     public UserResponseDto getUserById(Long id) {
@@ -72,11 +77,23 @@ public class UserService {
     public void updateUserInfo(Long userId, UpdateUserInfoRequestDto request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
+        if(request.nickname() != null) {
+            if(userRepository.findByNickname(request.nickname()).isPresent())
+                throw new NicknameAlreadyTakenException();
+
+            List<PostDocument> documents = postSearchRepository.findByAuthorNickname(user.getNickname());
+
+            for(PostDocument postDocument : documents) {
+                postDocument.setAuthorNickname(request.nickname());
+                postSearchRepository.save(postDocument);
+            }
+        }
+
         user.updateAdditionalInfo(
-                request.nickname(),
+                request.nickname() == null ? user.getNickname() : request.nickname(),
                 user.getBirthDate(),
                 user.getGender(),
-                request.region()
+                request.region() == null ? user.getRegion() : request.region()
         );
         user.updateProfileImage(request.profileImage());
     }
