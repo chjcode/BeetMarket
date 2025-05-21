@@ -169,11 +169,11 @@ export const ChatRoomPage2 = () => {
     }
 
     try {
-      const formattedDate = suggestedSchedule
-        .replace(/[-:T]/g, "")
-        .slice(0, 12); // "2025-05-22T14:00:00" → "202505221400"
+      // const formattedDate = suggestedSchedule
+      //   .replace(/[-:T]/g, "")
+      //   .slice(0, 12); // "2025-05-22T14:00:00" → "202505221400"
       const data = {
-        schedule: formattedDate,
+        schedule: suggestedSchedule,
         location: suggestedLocation,
       };
       await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, data);
