@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@/shared/ui/Icon";
 import { saveRecentProduct } from "@/shared/utils/localStorage";
+import dayjs from "dayjs";
 
 export interface ProductItemProps {
   id: number;
@@ -37,7 +38,7 @@ export const ProductItem = (product: ProductItemProps) => {
 
   return (
     <div
-      className="w-full h-[120px] flex cursor-pointer gap-1"
+      className="w-full h-[112px] flex cursor-pointer gap-1"
       onClick={handleClick}
     >
       <div className="h-full aspect-square relative">
@@ -59,18 +60,18 @@ export const ProductItem = (product: ProductItemProps) => {
           isCompleted ? "text-gray-400" : "text-black"
         }`}
       >
-        <div className="font-semibold">{product.title}</div>
-        <div className="">{product.region}</div>
-        <div className="">{product.createdAt}</div>
-        <div className="">{product.price.toLocaleString()} 원</div>
-        <div className="flex gap-4 justify-end">
-          <div className="">조회수 {product.viewCount}</div>
+        <div className="font-semibold text">{product.title}</div>
+        <div className="text-sm">{product.region?.split(" ").slice(0, 2).join(" ") ?? ""}</div>
+        <div className="text-sm">{dayjs(product.createdAt).format("YYYY.MM.DD HH:mm")}</div> {/* ✅ 포맷팅 */}
+        <div className="text-sm">{product.price.toLocaleString()} 원</div>
+        <div className="flex gap-2 justify-end items-center">
+          <div className="text-xs">조회수 {product.viewCount}</div>
           <div className="flex gap-1 items-center">
-            <div className="">찜 {product.favoriteCount}</div>
+            <div className="text-xs">찜 {product.favoriteCount}</div>
             <Icon
-              name={product.isLiked ? "heart" : "heartfill"}
-              className={`w-6 h-6 rounded-full shadow-md bg-gray-100 p-1 text-red-400
-                    ${product.isLiked ? "stroke-[2]" : ""}
+              name={product.isLiked ? "heartfill" : "heart"}
+              className={`w-5 h-5 rounded-full shadow-md bg-gray-100 p-1 text-red-400
+                ${product.isLiked ? "" : "stroke-[1.5]"}
               `}
             />
           </div>
