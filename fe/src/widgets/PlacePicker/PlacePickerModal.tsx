@@ -74,7 +74,7 @@ const PlacePickerModal = ({ onClose, onSelect, initialLatLng }: PlacePickerModal
   if (!isLoaded) return <div className="p-4">지도를 불러오는 중입니다...</div>;
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+    <div className="absolute inset-0 bg-white z-50 flex flex-col">
       <div className="flex-1 relative">
         <GoogleMap
           center={center}

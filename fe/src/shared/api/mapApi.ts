@@ -12,5 +12,6 @@ export const getNearbyProducts = async (
       page: 0,
     },
   });
+  console.log("전체 응답:", res.data)
   return res.data.content.content;
 };

@@ -130,6 +130,7 @@ const AddPage = () => {
         content,
         category,
         price: Number(price),
+        region: place,
         location: place,
         images: imageUrls,
         video: videoUrl,
@@ -157,7 +158,7 @@ const AddPage = () => {
   return (
     <>
       <form
-        className="max-w-md mx-auto px-4 pt-6 pb-18 flex flex-col gap-6"
+        className="relative max-w-md mx-auto px-4 pt-6 pb-18 flex flex-col gap-6"
         onSubmit={handleSubmit}
       >
         <InputTextField
