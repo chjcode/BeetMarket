@@ -95,6 +95,33 @@ const ProductDetailPage = () => {
     fetchRelated("COMPLETED", setCompletedProducts);
   }, [product?.category]);
 
+  
+  const toggleLike = async (liked: boolean) => {
+    if (!id) return;
+    const method = liked ? "DELETE" : "POST";
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const res = await fetch(`https://k12a307.p.ssafy.io/api/posts/${id}/like`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token ?? ""}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("서버 오류");
+
+      // 성공 시 상태 갱신
+      setProduct((prev) =>
+        prev ? { ...prev, isLiked: !liked, like: liked ? prev.like - 1 : prev.like + 1 } : prev
+      );
+    } catch (err) {
+      console.error("좋아요 처리 실패", err);
+      alert("좋아요 처리에 실패했습니다.");
+    }
+  };
+
   if (loading) return <div className="p-4 text-center text-gray-500">로딩 중...</div>;
   if (!product) return <div className="p-4 text-center text-red-600">상품을 찾을 수 없습니다.</div>
 
@@ -203,6 +230,7 @@ const ProductDetailPage = () => {
 
       <ProductDetailBottomBar
         price={product.price}
+        isLiked={product.isLiked}
         onChatClick={async () => {
           try {
             const res = await fetch(
@@ -236,7 +264,7 @@ const ProductDetailPage = () => {
             alert("채팅방을 생성하지 못했습니다.");
           }
         }}
-        isLiked={product.isLiked}
+        onToggleLike={toggleLike}
       />
     </div>
   );
