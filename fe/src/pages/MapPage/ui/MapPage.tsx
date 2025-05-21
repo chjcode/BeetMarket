@@ -87,11 +87,11 @@ const MapPage = () => {
         setMyLocation({ lat, lng });
 
         const region = await getRegionFromLatLng(lat, lng);
-        // console.log("추출된 region 값:", region);
+        console.log("추출된 region 값:", region);
 
         if (region) {
           const data = await getNearbyProducts(region);
-          // console.log("서버 응답 데이터:", data);
+          console.log("서버 응답 데이터:", data);
           setProducts(data);
         } else {
           setProducts([]); // fallback
