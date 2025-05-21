@@ -88,6 +88,7 @@ def process_video(userId: int, uuid: str, filename: str, postId: int):
 
     # photogrammetry 파이프라인 수행
     OUTPUT_DIR = Path(LOCAL_MODELS_DIR) / uuid
+    print("OUTPUT_DIR : "  + str(OUTPUT_DIR))
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     INPUT_DIR = str(frames_dir)
     cmd = [

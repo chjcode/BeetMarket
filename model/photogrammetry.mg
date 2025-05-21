@@ -5,18 +5,18 @@
         "fileVersion": "1.1",
         "template": false,
         "nodesVersions": {
-            "Publish": "1.3",
-            "DepthMap": "5.0",
-            "Meshing": "7.0",
             "Texturing": "6.0",
-            "ImageMatching": "2.0",
             "CameraInit": "9.0",
-            "FeatureMatching": "2.0",
-            "StructureFromMotion": "3.3",
             "MeshFiltering": "3.0",
-            "PrepareDenseScene": "3.1",
+            "FeatureMatching": "2.0",
             "FeatureExtraction": "1.3",
-            "DepthMapFilter": "4.0"
+            "PrepareDenseScene": "3.1",
+            "Publish": "1.3",
+            "StructureFromMotion": "3.3",
+            "DepthMapFilter": "4.0",
+            "ImageMatching": "2.0",
+            "DepthMap": "5.0",
+            "Meshing": "7.0"
         }
     },
     "graph": {
@@ -32,7 +32,7 @@
                 "split": 1
             },
             "uids": {
-                "0": "5ac0f9b990da581246554835ac8101bc965f5956"
+                "0": "97ea24450e86638ac09f17bc1c0bc26e9c7b31f6"
             },
             "internalFolder": "{cache}/{nodeType}/{uid0}/",
             "inputs": {
@@ -574,7 +574,7 @@
                 "split": 1
             },
             "uids": {
-                "0": "0575713df91795412c310b48b0c2eee503991d92"
+                "0": "72050f429a109823ff251457e180cb40bd5aa86f"
             },
             "internalFolder": "{cache}/{nodeType}/{uid0}/",
             "inputs": {
@@ -583,7 +583,7 @@
                 "keepLargestMeshOnly": false,
                 "smoothingSubset": "all",
                 "smoothingBoundariesNeighbours": 0,
-                "smoothingIterations": 50,
+                "smoothingIterations": 25,
                 "smoothingLambda": 1.0,
                 "filteringSubset": "all",
                 "filteringIterations": 1,
@@ -650,8 +650,8 @@
         "Publish_1": {
             "nodeType": "Publish",
             "position": [
-                2234,
-                8
+                2243,
+                16
             ],
             "parallelization": {
                 "blockSize": 0,
@@ -659,7 +659,7 @@
                 "split": 1
             },
             "uids": {
-                "0": "ec17a02808f573f6c7d69d1b1179936a7682cdfc"
+                "0": "2fe9cb4a1c1b6fbf2ae1c7efb949b23461d10c37"
             },
             "internalFolder": "{cache}/{nodeType}/{uid0}/",
             "inputs": {
@@ -668,7 +668,7 @@
                     "{Texturing_1.outputMaterial}",
                     "{Texturing_1.outputTextures}"
                 ],
-                "output": "",
+                "output": "C:/beet/models",
                 "verboseLevel": "info"
             },
             "internalInputs": {
