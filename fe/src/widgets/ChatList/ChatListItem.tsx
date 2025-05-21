@@ -17,6 +17,7 @@ const ChatListItem = ({ chat }: Props) => {
             roomId: chat.roomId,
             opponentUserNickname: chat.opponentUserNickname,
             opponentUserProfileImageUrl: chat.opponentUserProfileImageUrl,
+            opponentOauthName: chat.opponentOauthName,
           },
         })
       }
