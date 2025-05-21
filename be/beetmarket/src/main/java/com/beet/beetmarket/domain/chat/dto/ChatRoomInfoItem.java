@@ -7,6 +7,7 @@ public record ChatRoomInfoItem(
     long unreadMessageCount,
     String opponentUserProfileImageUrl,
     String opponentUserNickname,
+    String opponentOauthName,
     String postFirstImageUrl,
     String lastMessageContent,
     Instant lastMessageTimestamp,

@@ -231,6 +231,7 @@ public class ChatService {
                 unreadCount,
                 opponentUser.getProfileImage(),
                 opponentUser.getNickname(),
+                opponentUser.getOauthName(),
                 firstImageUrl,
                 lastMessageContent,
                 lastMessageTimestampForDisplay,
