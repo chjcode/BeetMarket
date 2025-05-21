@@ -20,17 +20,21 @@ const HomeProductCard = ({ id, title, price, thumbnailUrl, categoryName, viewCou
 
   return (
     <div onClick={handleClick} className="flex flex-col cursor-pointer mb-1">
-      <div className="w-full aspect-square relative overflow-hidden rounded-2xl shadow-md">
+      <div className="w-full aspect-square relative overflow-hidden rounded-xl shadow-md">
         <img
           loading="lazy"
           src={thumbnailUrl}
           alt={title}
-          className="absolute top-0 left-0 w-full h-full object-cover"
+          className="absolute top-0 left-0 w-full h-full object-cover shadow-md rounded-2xl"
           draggable={false}
         />
       </div>
-      <div className="pl-2 mt-1 text-base ">{title}</div>
-      <div className="pl-2 text-base font-semibold">{price.toLocaleString()}원</div>
+
+        <div className="flex flex-col justify-between mt-1">
+          <div className="pl-2 mt-1 text-xs font-medium">{title}</div>
+          <div className="pl-2 text-sm font-semibold">{price.toLocaleString()}원</div>
+        </div>
+      
     </div>
   );
 };

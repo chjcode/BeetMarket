@@ -6,7 +6,7 @@ interface ProductListProps {
 
 export const ProductList = ({ products }: ProductListProps) => {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3 pt-3 px-3">
       {products.map((item) => (
         <div key={item.id} className="flex flex-col gap-2">
           <ProductItem {...item} />
