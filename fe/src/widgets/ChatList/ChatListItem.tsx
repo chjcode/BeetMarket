@@ -11,7 +11,15 @@ const ChatListItem = ({ chat }: Props) => {
   return (
     <div
       className="w-full h-[80px] flex items-center gap-4 hover:bg-gray-50 cursor-pointer"
-      onClick={() => navigate(`/chats/${chat.roomId}`)}
+      onClick={() =>
+        navigate(`/chats/${chat.roomId}`, {
+          state: {
+            roomId: chat.roomId,
+            opponentUserNickname: chat.opponentUserNickname,
+            opponentUserProfileImageUrl: chat.opponentUserProfileImageUrl,
+          },
+        })
+      }
     >
       <img
         src={chat.opponentUserProfileImageUrl ?? "/default-profile.png"}

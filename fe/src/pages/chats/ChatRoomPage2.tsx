@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useRef, useState,useEffect } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
+import axiosInstance from "@/shared/api/axiosInstance";
 
 interface ChatMessageResponse {
   id: string;
@@ -10,7 +11,6 @@ interface ChatMessageResponse {
   content: string;
   timestamp: string;
 }
-
 const ChatRoomPage2 = () => {
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
@@ -24,6 +24,24 @@ const ChatRoomPage2 = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessageResponse[]>([]);
 
   const wsRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/api/chat/rooms/${roomId}/messages`
+        );
+        console.log(response.data); // 실제 데이터
+        setChatMessages(response.data); // 초기 메시지 설정
+      } catch (err) {
+        console.error("메시지 불러오기 실패", err);
+      }
+    };
+
+    if (roomId) {
+      fetchMessages();
+    }
+  }, [roomId]);
 
   const addLog = (msg: string) => {
     setLogs((prev) => [...prev, `${dayjs().format("HH:mm:ss")} - ${msg}`]);
@@ -55,8 +73,6 @@ const ChatRoomPage2 = () => {
     ws.onopen = () => {
       setStatus("연결됨");
       addLog("WebSocket 연결 성공");
-
-      // STOMP CONNECT
       sendRaw(`CONNECT\naccept-version:1.2\nheart-beat:10000,10000\n\n\u0000`);
     };
 
@@ -65,7 +81,6 @@ const ChatRoomPage2 = () => {
       addLog(`[RECV] ${data}`);
 
       if (data.startsWith("CONNECTED")) {
-        // STOMP SUBSCRIBE
         sendRaw(
           `SUBSCRIBE\nid:sub-0\ndestination:/user/sub/chat/room/${roomId}\n\n\u0000`
         );

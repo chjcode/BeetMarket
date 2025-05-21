@@ -35,14 +35,14 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: "map", element: <MapPage /> },
       {
-        path: "chats",
+        path: "chats2",
         children: [
           { index: true, element: <ChatsPage /> },
           { path: ":id", element: <ChatRoomPage3 /> },
         ],
       },
       {
-        path: "chats2",
+        path: "chats",
         children: [
           { index: true, element: <ChatsPage /> },
           { path: ":id", element: <ChatRoomPage2 /> },
