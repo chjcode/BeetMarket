@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-// import dayjs from "dayjs";
 import axiosInstance from "@/shared/api/axiosInstance";
 
 interface ChatMessageResponse {
@@ -64,7 +63,8 @@ export const ChatRoomPage2 = () => {
 
   // 웹소켓 연결
   useEffect(() => {
-    if (!token) return;
+    if (!token || status === "연결됨") return;
+
     const connect = () => {
       setStatus("연결중");
       const ws = new WebSocket(
@@ -107,17 +107,17 @@ export const ChatRoomPage2 = () => {
       };
     };
 
-    const disconnect = () => {
+    connect();
+
+    return () => {
       wsRef.current?.close();
     };
-
-    connect();
-    return () => disconnect();
-  }, [roomId, token]);
+  }, [roomId, token, status]);
 
   // 메시지 전송
   const sendMessage = () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || !wsRef.current || status !== "연결됨") return;
+
     const message = {
       roomId,
       receiverNickname,
@@ -125,8 +125,17 @@ export const ChatRoomPage2 = () => {
       content: inputMessage,
     };
     const body = JSON.stringify(message);
-    const frame = `SEND\ndestination:/pub/chat/message\ncontent-type:application/json\ncontent-length:${body.length}\n\n${body}\u0000`;
-    wsRef.current?.send(frame);
+    const encoder = new TextEncoder();
+    const byteLength = encoder.encode(body).length;
+
+    const frame =
+      `SEND\n` +
+      `destination:/pub/chat/message\n` +
+      `content-type:application/json\n` +
+      `content-length:${byteLength}\n\n` +
+      `${body}\u0000`;
+
+    wsRef.current.send(frame);
     setInputMessage("");
   };
 
@@ -145,7 +154,17 @@ export const ChatRoomPage2 = () => {
         <span className="font-semibold">
           {opponentUserNickname || "알 수 없음"}
         </span>
-        <span className="ml-auto text-xs text-gray-500">{status}</span>
+        <span className="ml-auto text-xs text-gray-500">
+          {status}
+          {status === "연결끊김" && (
+            <button
+              onClick={() => setStatus("연결전")}
+              className="ml-2 underline text-blue-500 text-xs"
+            >
+              다시 연결
+            </button>
+          )}
+        </span>
       </div>
 
       {/* 메시지 리스트 */}
