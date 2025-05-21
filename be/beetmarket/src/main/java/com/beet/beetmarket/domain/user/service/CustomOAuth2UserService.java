@@ -1,6 +1,7 @@
 package com.beet.beetmarket.domain.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -18,6 +19,9 @@ import com.beet.beetmarket.domain.user.repository.UserRepository;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	private final UserRepository userRepository;
+
+	@Value("${spring.minio.url}")
+	private String MINIO_URL;
 
 	@Autowired
 	public CustomOAuth2UserService(UserRepository userRepository) {
@@ -52,6 +56,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 				.email(oAuth2Response.getEmail())
 				.oauthProvider(oAuth2Response.getProvider())
 				.build();
+
+			user.updateProfileImage(MINIO_URL + "/uploads/default_profile.png");
 
 			existUser = user;
 
