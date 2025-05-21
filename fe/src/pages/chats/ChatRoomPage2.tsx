@@ -174,7 +174,7 @@ export const ChatRoomPage2 = () => {
       {/* 메시지 리스트 */}
       <div className="flex-1 overflow-auto p-4 space-y-2 bg-gray-50">
         {chatMessages.map((msg, idx) => {
-          const isMine = msg.senderNickname === opponentOauthName;
+          const isMine = msg.senderNickname !== opponentOauthName;
           const showUnread =
             isMine &&
             opponentLastReadMessageId &&
@@ -203,25 +203,16 @@ export const ChatRoomPage2 = () => {
                 >
                   {msg.content}
                 </div>
-                {isMine && (
-                  <img
-                    src={
-                      localStorage.getItem("myProfileImageUrl") ||
-                      "/default-profile.png"
-                    }
-                    alt="내 프로필"
-                    className="w-6 h-6 rounded-full ml-2"
-                  />
-                )}
                 {showUnread && (
                   <div className="text-xs bg-red-500 text-white px-1 rounded-full ml-1">
                     1
                   </div>
                 )}
               </div>
-              <div className={`text-gray-500 text-xs mt-1 ${
-                isMine ? "text-right" : "text-left"
-              }`}
+              <div
+                className={`text-gray-500 text-xs mt-1 ${
+                  isMine ? "text-right" : "text-left"
+                }`}
               >
                 {dayjs(msg.timestamp).format("HH:mm")}
               </div>
@@ -236,6 +227,12 @@ export const ChatRoomPage2 = () => {
         <input
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault(); // 줄바꿈 방지
+              sendMessage();
+            }
+          }}
           className="flex-1 px-3 py-2 border rounded-l-lg focus:outline-none"
           placeholder="메시지를 입력하세요"
         />
