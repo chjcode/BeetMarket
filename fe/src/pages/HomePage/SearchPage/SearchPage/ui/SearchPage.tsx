@@ -15,13 +15,19 @@ const SearchPage = () => {
     setOnSearch((q: string) => {
       const query = q.trim();
       if (!query) return;
+
       addKeyword(query);
-      navigate(`/search/result?query=${encodeURIComponent(query)}`);
+
+      navigate("/", { replace: true });
+
+      setTimeout(() => {
+        navigate(`/search/result?query=${encodeURIComponent(query)}`);
+      }, 0);
     });
   }, [setOnSearch, setPlaceholder, addKeyword, navigate]);
 
   return (
-    <div className="">
+    <div className="py-4">
       <SearchRecentList />
     </div>
   );

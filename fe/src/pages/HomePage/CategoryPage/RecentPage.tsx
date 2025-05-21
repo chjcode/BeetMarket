@@ -11,8 +11,8 @@ const RecentPage = () => {
   }, []);
 
   return (
-    <div className="p4">
-      <h2 className="text-xl font-bold mb-2">최근 본 상품</h2>
+    <div className="py-4">
+      {/* <h2 className="text-xl font-bold mb-2">최근 본 상품</h2> */}
       <ProductList products={products} />
     </div>
   );

@@ -1,12 +1,67 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   GoogleMap,
-  LoadScript,
+  useJsApiLoader,
   OverlayView,
   Marker,
 } from "@react-google-maps/api";
 import { ProductItemProps } from "@/shared/types/product";
 import { dummyProducts } from "@/shared/dummy/products";
+import { getNearbyProducts } from "@/shared/api/mapApi";
+import { useNavigate } from "react-router-dom";
+
+const getRegionFromLatLng = async (lat: number, lng: number): Promise<string | null> => {
+  const geocoder = new window.google.maps.Geocoder();
+
+  return new Promise((resolve) => {
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status !== "OK" || !results || results.length === 0) {
+        resolve(null);
+        return;
+      }
+
+      // console.log("results:", results)
+      // console.log("Reverse Geocode 결과:", results[0]);
+      // console.log("주소 컴포넌트:", results[0].address_components.map(c => ({
+      //   long_name: c.long_name,
+      //   types: c.types
+      // })));
+
+      const address = results[5].address_components;
+
+      const regionName = address.find((comp: google.maps.GeocoderAddressComponent) =>
+        comp.types.includes("administrative_area_level_1")
+      )?.long_name;
+
+      if (!regionName) {
+        resolve(null);
+        return;
+      }
+
+      const regionMap: Record<string, string> = {
+        "서울특별시": "서울",
+        "부산광역시": "부산",
+        "대구광역시": "대구",
+        "인천광역시": "인천",
+        "광주광역시": "광주",
+        "대전광역시": "대전",
+        "울산광역시": "울산",
+        "세종특별자치시": "세종",
+        "경기도": "경기",
+        "강원도": "강원",
+        "충청북도": "충북",
+        "충청남도": "충남",
+        "전라북도": "전북",
+        "전라남도": "전남",
+        "경상북도": "경북",
+        "경상남도": "경남",
+        "제주특별자치도": "제주",
+      };
+
+      resolve(regionMap[regionName] || null);
+    });
+  });
+};
 
 const MapPage = () => {
   const [products, setProducts] = useState<ProductItemProps[]>([]);
@@ -14,37 +69,68 @@ const MapPage = () => {
   const [center, setCenter] = useState({ lat: 37.5665, lng: 126.978 });
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  const navigate = useNavigate();
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyBUIRKuDhxD_Q0JaJmH_msG5_iOzb9AL_Y",
+  });
+
   useEffect(() => {
+    if (!isLoaded) return;
+
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+
         setCenter({ lat, lng });
         setMyLocation({ lat, lng });
-        setProducts(dummyProducts);
+
+        const region = await getRegionFromLatLng(lat, lng);
+        // console.log("추출된 region 값:", region);
+
+        if (region) {
+          const data = await getNearbyProducts(region);
+          // console.log("서버 응답 데이터:", data);
+          setProducts(data);
+        } else {
+          setProducts([]); // fallback
+        }
       },
       () => {
         setCenter({ lat: 37.5665, lng: 126.978 });
         setProducts(dummyProducts);
       }
     );
-  }, []);
+  }, [isLoaded]);
 
   const handleMapClick = useCallback(() => {
     setSelected(null);
   }, []);
 
+  if (!isLoaded) return <div>지도를 불러오는 중...</div>;
+
   return (
     <div className="h-[calc(100dvh-110px)]"> {/* 뷰포트 전체 고정 */}
-      <LoadScript googleMapsApiKey="AIzaSyBUIRKuDhxD_Q0JaJmH_msG5_iOzb9AL_Y">
         <GoogleMap
           mapContainerStyle={{ width: "100%", height: "100%" }}
           center={center}
-          zoom={14}
+          zoom={12}
           onClick={handleMapClick}
-          options={{disableDefaultUI: true}}
+          options={{
+            disableDefaultUI: true,
+            restriction: {
+              latLngBounds: {
+                north: 38.6,
+                south: 33.0642,
+                west: 124.1050,
+                east: 131.5223,
+              },
+              strictBounds: true,
+            },
+          }}
         >
-          {/* ✅ 내 위치 마커 */}
+          {/* 내 위치 마커 */}
           {myLocation && (
             <Marker
               position={myLocation}
@@ -70,7 +156,11 @@ const MapPage = () => {
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelected(product.id);
+                    if (isSelected) {
+                      navigate(`/product/${product.id}`);
+                    } else {
+                      setSelected(product.id);
+                    }
                   }}
                   style={{ transform: "translate(-50%, -100%)" }}
                   className={`relative cursor-pointer transition-all duration-200 ${
@@ -105,7 +195,6 @@ const MapPage = () => {
             );
           })}
         </GoogleMap>
-      </LoadScript>
     </div>
   );
 };

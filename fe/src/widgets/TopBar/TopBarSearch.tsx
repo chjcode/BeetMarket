@@ -5,12 +5,20 @@ import { useSearchHistoryStore } from "@/shared/store/useSearchHistoryStore";
 import { useNavigate } from "react-router-dom";
 
 export const TopBarSearch = () => {
-  const { query, setQuery, submitSearch, placeholder } = useSearchUIStore();
+  const { query, setQuery, placeholder } = useSearchUIStore();
   const { addKeyword } = useSearchHistoryStore();
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    submitSearch(navigate, addKeyword);
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    addKeyword(trimmed);
+
+    navigate("/", { replace: true }); // 현재 페이지를 홈으로 덮기
+    setTimeout(() => {
+      navigate(`/search/result?query=${encodeURIComponent(trimmed)}`); // 검색 결과 push
+    }, 0);
   };
 
   return (
