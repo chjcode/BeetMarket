@@ -50,7 +50,7 @@ const ChatList = () => {
   if (isError) return <div>에러</div>;
 
   return (
-    <div className="pt-2">
+    <div className="pt-2 px-4">
       {data?.pages.map((page, i) => (
         <div key={i}>
           {page.chatRooms.map((chat) => (
