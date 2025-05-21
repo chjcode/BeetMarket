@@ -20,18 +20,18 @@ const getRegionFromLatLng = async (lat: number, lng: number): Promise<string | n
         return;
       }
 
-      // console.log("results:", results)
-      // console.log("Reverse Geocode 결과:", results[0]);
-      // console.log("주소 컴포넌트:", results[0].address_components.map(c => ({
-      //   long_name: c.long_name,
-      //   types: c.types
-      // })));
+      let regionName: string | null = null;
 
-      const address = results[5].address_components;
+      for (const result of results) {
+        const component = result.address_components.find((comp) =>
+          comp.types.includes("administrative_area_level_1")
+        );
 
-      const regionName = address.find((comp: google.maps.GeocoderAddressComponent) =>
-        comp.types.includes("administrative_area_level_1")
-      )?.long_name;
+        if (component && /[가-힣]/.test(component.long_name)) {
+          regionName = component.long_name;
+          break;
+        }
+      }
 
       if (!regionName) {
         resolve(null);
