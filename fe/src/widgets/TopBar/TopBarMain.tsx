@@ -11,12 +11,12 @@ export const TopBarMain = () => {
           {/* <img src="/beet.png" className="h-[36px]" />   */}
           <div className="text-2xl font-bold font-moneygraphy pt-1">채팅</div>
         </div>
-        <NavLink
+        {/* <NavLink
           to="/alarm"
           className="flex w-[36px] h-[36px] justify-end items-center pointer-cursor"
         >
           <Icon name="bell" className="w-6 h-6 stroke-[0.5]" />
-        </NavLink>
+        </NavLink> */}
       </div>
     );
   }
@@ -30,12 +30,12 @@ export const TopBarMain = () => {
             마이페이지
           </div>
         </div>
-        <NavLink
+        {/* <NavLink
           to="/alarm"
           className="flex w-[36px] h-[36px] justify-end items-center pointer-cursor"
         >
           <Icon name="bell" className="w-6 h-6 stroke-[0.5]" />
-        </NavLink>
+        </NavLink> */}
       </div>
     );
   }
@@ -48,12 +48,12 @@ export const TopBarMain = () => {
             지도
           </div>
         </div>
-        <NavLink
+        {/* <NavLink
           to="/alarm"
           className="flex w-[36px] h-[36px] justify-end items-center pointer-cursor"
         >
           <Icon name="bell" className="w-6 h-6 stroke-[0.5]" />
-        </NavLink>
+        </NavLink> */}
       </div>
     );
   }
@@ -77,12 +77,12 @@ export const TopBarMain = () => {
         >
           <Icon name="bars" className="w-6 h-6 stroke-[0.5]" />
         </NavLink> */}
-        <NavLink
+        {/* <NavLink
           to="/alarm"
           className="flex w-[36px] h-[36px] justify-end items-center pointer-cursor"
         >
           <Icon name="bell" className="w-6 h-6 stroke-[0.5]" />
-        </NavLink>
+        </NavLink> */}
       </div>
     </div>
   );
