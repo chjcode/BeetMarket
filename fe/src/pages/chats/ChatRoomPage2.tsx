@@ -42,42 +42,30 @@ export const ChatRoomPage2 = () => {
     string | null
   >(null);
 
-  const [suggestedSchedule, setSuggestedSchedule] = useState<string | null>(
-    null
-  );
-  const [suggestedLocation, setSuggestedLocation] = useState<string | null>(
-    null
-  );
-
   const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const res = await axiosInstance.get(
-          `/api/chat/rooms/${roomId}/messages`
-        );
-        const content = res.data.content;
-        const data: ChatMessageResponse[] = content.messages.content;
+  const sendReadAck = (lastReadMessageId: string) => {
+    if (!wsRef.current || status !== "연결됨") return;
 
-        setChatMessages([...data].reverse());
+    const frameBody = JSON.stringify({
+      roomId,
+      counterpartNickname: opponentUserNickname,
+      lastReadMessageId,
+    });
 
-        setOpponentLastReadMessageId(
-          content.opponentLastReadInfo?.lastReadMessageId ?? null
-        );
-      } catch (err) {
-        console.error("메시지 불러오기 실패", err);
-      }
-    };
+    const byteLength = new TextEncoder().encode(frameBody).length;
+    const frame =
+      `SEND\n` +
+      `destination:/pub/chat/read\n` +
+      `content-type:application/json\n` +
+      `content-length:${byteLength}\n\n` +
+      `${frameBody}\u0000`;
 
-    if (roomId) fetchMessages();
-  }, [roomId]);
+    wsRef.current.send(frame);
+  };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]);
-
+  // ✅ WebSocket 연결
   useEffect(() => {
     if (!token || !roomId || status !== "연결전") return;
 
@@ -105,6 +93,10 @@ export const ChatRoomPage2 = () => {
         try {
           const parsed: ChatMessageResponse = JSON.parse(body);
           setChatMessages((prev) => [...prev, parsed]);
+
+          if (parsed.senderNickname === opponentOauthName) {
+            sendReadAck(parsed.id); // 수신 즉시 읽음 처리
+          }
         } catch (e) {
           console.error("메시지 파싱 실패", e);
         }
@@ -127,6 +119,45 @@ export const ChatRoomPage2 = () => {
       }
     };
   }, [roomId, token, status]);
+
+  // ✅ 이전 메시지 로딩 + 입장 시 읽음 처리
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await axiosInstance.get(
+          `/api/chat/rooms/${roomId}/messages`
+        );
+        const content = res.data.content;
+        const data: ChatMessageResponse[] = content.messages.content;
+
+        const reversed = [...data].reverse();
+        setChatMessages(reversed);
+
+        setOpponentLastReadMessageId(
+          content.opponentLastReadInfo?.lastReadMessageId ?? null
+        );
+
+        // ✅ 상대방이 보낸 마지막 메시지 읽음 처리
+        const lastFromOpponent = reversed
+          .slice()
+          .reverse()
+          .find((msg) => msg.senderNickname === opponentOauthName);
+        if (lastFromOpponent) {
+          sendReadAck(lastFromOpponent.id);
+        }
+      } catch (err) {
+        console.error("메시지 불러오기 실패", err);
+      }
+    };
+
+    if (roomId && status === "연결됨") {
+      fetchMessages();
+    }
+  }, [roomId, status]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
   const sendMessage = () => {
     if (!inputMessage.trim() || !wsRef.current || status !== "연결됨") return;
@@ -160,37 +191,7 @@ export const ChatRoomPage2 = () => {
           <Icon name="back" className="w-6 h-6 stroke-[0.5]" />
         </div>
         <div className="font-semibold pt-1">{opponentUserNickname}</div>
-        <div
-          className="cursor-pointer"
-          onClick={async () => {
-            try {
-              const res = await axiosInstance.get(
-                `/api/chat/rooms/${roomId}/schedule-suggestion`
-              );
-              const content = res.data.content;
-              setSuggestedSchedule(content.suggestedSchedule);
-              setSuggestedLocation(content.suggestedLocation);
-
-              // 추천 일정 받았으면 바로 예약까지
-              if (suggestedSchedule && suggestedLocation) {
-                await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, {
-                  schedule: suggestedSchedule,
-                  location: suggestedLocation,
-                });
-                alert(
-                  `일정이 성공적으로 추가되었습니다!\n\n일정: ${content.suggestedSchedule}\n장소: ${content.suggestedLocation}`
-                );
-              } else {
-                alert("추천 일정을 받을 수 없습니다.");
-              }
-            } catch (err) {
-              console.error("일정 추천 및 추가 실패", err);
-              alert("일정 추천 또는 추가 요청에 실패했습니다.");
-            }
-          }}
-        >
-          <Icon name="calendar" className="w-5 h-5" />
-        </div>
+        <div></div>
       </div>
 
       <div className="flex-1 overflow-auto p-4 space-y-2">
@@ -200,6 +201,7 @@ export const ChatRoomPage2 = () => {
             isMine &&
             opponentLastReadMessageId &&
             Number(msg.id) > Number(opponentLastReadMessageId);
+
           return (
             <div
               key={idx}
@@ -216,7 +218,7 @@ export const ChatRoomPage2 = () => {
                   />
                 )}
                 <div
-                  className={`px-3 py-2 rounded-xl ${
+                  className={`px-3 py-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap ${
                     isMine
                       ? "bg-[#f3d6f7] rounded-br-none"
                       : "bg-white rounded-bl-none border border-gray-700"
