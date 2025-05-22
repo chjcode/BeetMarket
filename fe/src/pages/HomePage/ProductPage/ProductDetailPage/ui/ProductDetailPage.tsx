@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useDragScroll } from "@/shared/hooks/useDragScroll";
 // import { productList, sameCategoryProducts, sameCategorySoldHistory } from "@/entities/Products/DummyProducts";
 import { useEffect, useState } from "react";
+import axiosInstance from "@/shared/api/axiosInstance";
 
 interface ProductDetailResponse {
   title: string;
@@ -62,11 +63,10 @@ const ProductDetailPage = () => {
     if (!id) return;
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`https://k12a307.p.ssafy.io/api/posts/${id}`);
-        const data = await res.json();
-        setProduct(data.content);
-        console.log("상품 상세 정보 불러오기 성공")
-        console.log(data.content)
+        console.log("accessToken:", localStorage.getItem("accessToken"));
+        const res = await axiosInstance.get(`/api/posts/${id}`);
+        setProduct(res.data.content);
+        console.log("상품 상세 정보 불러오기 성공");
       } catch (err) {
         console.error("상품 정보를 불러오는 데 실패했습니다.", err);
       } finally {
@@ -100,19 +100,13 @@ const ProductDetailPage = () => {
   
   const toggleLike = async (liked: boolean) => {
     if (!id) return;
-    const method = liked ? "DELETE" : "POST";
-    const token = localStorage.getItem("accessToken");
 
     try {
-      const res = await fetch(`https://k12a307.p.ssafy.io/api/posts/${id}/like`, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token ?? ""}`,
-        },
-      });
-
-      if (!res.ok) throw new Error("서버 오류");
+      if (liked) {
+        await axiosInstance.delete(`/api/posts/${id}/like`);
+      } else {
+        await axiosInstance.post(`/api/posts/${id}/like`);
+      }
 
       // 성공 시 상태 갱신
       setProduct((prev) =>
