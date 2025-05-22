@@ -2,7 +2,7 @@ import type { Product } from "@/entities/Products/types";
 import { useNavigate } from "react-router-dom";
 import { saveRecentProduct } from "@/shared/utils/localStorage";
 
-const HomeProductCard = ({ id, title, price, thumbnailUrl, categoryName, viewCount, isLiked }: Product) => {
+const HomeProductCard = ({ id, title, price, thumbnailUrl, categoryName, viewCount, favoriteCount, isLiked }: Product) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -13,6 +13,7 @@ const HomeProductCard = ({ id, title, price, thumbnailUrl, categoryName, viewCou
       thumbnailUrl, 
       categoryName,
       viewCount,
+      favoriteCount,
       isLiked
      });
     navigate(`/product/${id}`);
