@@ -52,6 +52,27 @@ export const ChatRoomPage2 = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  // 읽음 처리용 프레임 전송 함수
+  const sendReadAck = (lastReadMessageId: string) => {
+    if (!wsRef.current || status !== "연결됨") return;
+
+    const frameBody = JSON.stringify({
+      roomId,
+      counterpartNickname: opponentUserNickname,
+      lastReadMessageId,
+    });
+    const byteLength = new TextEncoder().encode(frameBody).length;
+    const frame =
+      `SEND\n` +
+      `destination:/pub/chat/read\n` +
+      `content-type:application/json\n` +
+      `content-length:${byteLength}\n\n` +
+      `${frameBody}\u0000`;
+
+    wsRef.current.send(frame);
+  };
+
+  // 과거 메시지 가져오기 및 입장 시 읽음 처리
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -60,24 +81,35 @@ export const ChatRoomPage2 = () => {
         );
         const content = res.data.content;
         const data: ChatMessageResponse[] = content.messages.content;
+        const reversed = [...data].reverse();
 
-        setChatMessages([...data].reverse());
-
+        setChatMessages(reversed);
         setOpponentLastReadMessageId(
           content.opponentLastReadInfo?.lastReadMessageId ?? null
         );
+
+        // 상대방 마지막 메시지 읽음 처리
+        const lastFromOpponent = reversed
+          .slice()
+          .reverse()
+          .find((msg) => msg.senderNickname === opponentOauthName);
+        if (lastFromOpponent) {
+          sendReadAck(lastFromOpponent.id);
+        }
       } catch (err) {
         console.error("메시지 불러오기 실패", err);
       }
     };
 
     if (roomId) fetchMessages();
-  }, [roomId]);
+  }, [roomId, status]);
 
+  // 메시지 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
+  // WebSocket 연결 및 메시지 수신
   useEffect(() => {
     if (!token || !roomId || status !== "연결전") return;
 
@@ -105,6 +137,11 @@ export const ChatRoomPage2 = () => {
         try {
           const parsed: ChatMessageResponse = JSON.parse(body);
           setChatMessages((prev) => [...prev, parsed]);
+
+          // 상대방 메시지 읽음 처리
+          if (parsed.senderNickname === opponentOauthName) {
+            sendReadAck(parsed.id);
+          }
         } catch (e) {
           console.error("메시지 파싱 실패", e);
         }
@@ -137,7 +174,6 @@ export const ChatRoomPage2 = () => {
       type: "TEXT",
       content: inputMessage.trim(),
     });
-
     const byteLength = new TextEncoder().encode(frameBody).length;
     const frame =
       `SEND\n` +
@@ -152,6 +188,7 @@ export const ChatRoomPage2 = () => {
 
   return (
     <div className="flex flex-col h-screen">
+      {/* Header */}
       <div className="h-[54px] flex items-center justify-between px-4">
         <div
           className="flex w-[36px] h-[36px] justify-start items-center cursor-pointer"
@@ -171,7 +208,6 @@ export const ChatRoomPage2 = () => {
               setSuggestedSchedule(content.suggestedSchedule);
               setSuggestedLocation(content.suggestedLocation);
 
-              // 추천 일정 받았으면 바로 예약까지
               if (suggestedSchedule && suggestedLocation) {
                 await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, {
                   schedule: suggestedSchedule,
@@ -193,6 +229,7 @@ export const ChatRoomPage2 = () => {
         </div>
       </div>
 
+      {/* Messages */}
       <div className="flex-1 overflow-auto p-4 space-y-2">
         {chatMessages.map((msg, idx) => {
           const isMine = msg.senderNickname !== opponentOauthName;
@@ -243,6 +280,7 @@ export const ChatRoomPage2 = () => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input */}
       <div className="h-[54px] flex flex-col gap-2 bg-white justify-center">
         <div className="flex w-full h-[80%] px-2 items-center justify-between">
           <input
