@@ -160,96 +160,90 @@ export const ChatRoomPage2 = () => {
           <Icon name="back" className="w-6 h-6 stroke-[0.5]" />
         </div>
         <div className="font-semibold pt-1">{opponentUserNickname}</div>
-        <div></div>
+        <div
+          className="cursor-pointer"
+          onClick={async () => {
+            try {
+              const res = await axiosInstance.get(
+                `/api/chat/rooms/${roomId}/schedule-suggestion`
+              );
+              const content = res.data.content;
+              setSuggestedSchedule(content.suggestedSchedule);
+              setSuggestedLocation(content.suggestedLocation);
 
-        <div className="flex-1 overflow-auto p-4 space-y-2">
-          {chatMessages.map((msg, idx) => {
-            const isMine = msg.senderNickname !== opponentOauthName;
-            const showUnread =
-              isMine &&
-              opponentLastReadMessageId &&
-              Number(msg.id) > Number(opponentLastReadMessageId);
-            return (
-              <div
-                key={idx}
-                className={`flex flex-col gap-1 ${
-                  isMine ? "items-end" : "items-start"
-                }`}
-              >
-                <div className="flex items-end">
-                  {!isMine && (
-                    <img
-                      src={
-                        opponentUserProfileImageUrl ?? "/default-profile.png"
-                      }
-                      alt="프로필"
-                      className="w-10 h-10 rounded-full mr-2"
-                    />
-                  )}
-                  <div
-                    className={`px-3 py-2 rounded-xl ${
-                      isMine
-                        ? "bg-[#f3d6f7] rounded-br-none"
-                        : "bg-white rounded-bl-none border border-gray-700"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                  {showUnread && (
-                    <div className="text-xs bg-red-500 text-white px-1 rounded-full ml-1">
-                      1
-                    </div>
-                  )}
-                </div>
+              // 추천 일정 받았으면 바로 예약까지
+              if (suggestedSchedule && suggestedLocation) {
+                await axiosInstance.patch(`/api/chat/rooms/${roomId}/reserve`, {
+                  schedule: suggestedSchedule,
+                  location: suggestedLocation,
+                });
+                alert(
+                  `일정이 성공적으로 추가되었습니다!\n\n일정: ${content.suggestedSchedule}\n장소: ${content.suggestedLocation}`
+                );
+              } else {
+                alert("추천 일정을 받을 수 없습니다.");
+              }
+            } catch (err) {
+              console.error("일정 추천 및 추가 실패", err);
+              alert("일정 추천 또는 추가 요청에 실패했습니다.");
+            }
+          }}
+        >
+          <Icon name="calendar" className="w-5 h-5" />
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto p-4 space-y-2">
+        {chatMessages.map((msg, idx) => {
+          const isMine = msg.senderNickname !== opponentOauthName;
+          const showUnread =
+            isMine &&
+            opponentLastReadMessageId &&
+            Number(msg.id) > Number(opponentLastReadMessageId);
+          return (
+            <div
+              key={idx}
+              className={`flex flex-col ${
+                isMine ? "items-end" : "items-start"
+              }`}
+            >
+              <div className="flex items-end">
+                {!isMine && (
+                  <img
+                    src={opponentUserProfileImageUrl ?? "/default-profile.png"}
+                    alt="프로필"
+                    className="w-10 h-10 rounded-full mr-2"
+                  />
+                )}
                 <div
-                  className={`text-xs mt-1 ${
-                    isMine ? "text-left" : "text-right"
+                  className={`px-3 py-2 rounded-xl ${
+                    isMine
+                      ? "bg-[#f3d6f7] rounded-br-none"
+                      : "bg-white rounded-bl-none"
                   }`}
                 >
-                  {dayjs(msg.timestamp).format("HH:mm")}
+                  {msg.content}
                 </div>
+                {showUnread && (
+                  <div className="text-xs bg-red-500 text-white px-1 rounded-full ml-1">
+                    1
+                  </div>
+                )}
               </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
-        </div>
+              <div
+                className={`text-xs mt-1 ${
+                  isMine ? "text-left" : "text-right"
+                }`}
+              >
+                {dayjs(msg.timestamp).format("HH:mm")}
+              </div>
+            </div>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </div>
 
-        <div className="h-[62px] flex flex-col gap-2 bg-white justify-center">
-          <div
-            className="cursor-pointer"
-            onClick={async () => {
-              try {
-                const res = await axiosInstance.get(
-                  `/api/chat/rooms/${roomId}/schedule-suggestion`
-                );
-                const content = res.data.content;
-                setSuggestedSchedule(content.suggestedSchedule);
-                setSuggestedLocation(content.suggestedLocation);
-
-                // 추천 일정 받았으면 바로 예약까지
-                if (suggestedSchedule && suggestedLocation) {
-                  await axiosInstance.patch(
-                    `/api/chat/rooms/${roomId}/reserve`,
-                    {
-                      schedule: suggestedSchedule,
-                      location: suggestedLocation,
-                    }
-                  );
-                  alert(
-                    `일정이 성공적으로 추가되었습니다!\n\n일정: ${content.suggestedSchedule}\n장소: ${content.suggestedLocation}`
-                  );
-                } else {
-                  alert("추천 일정을 받을 수 없습니다.");
-                }
-              } catch (err) {
-                console.error("일정 추천 및 추가 실패", err);
-                alert("일정 추천 또는 추가 요청에 실패했습니다.");
-              }
-            }}
-          >
-            <Icon name="calendar" className="w-5 h-5" />
-          </div>
-        </div>
+      <div className="h-[54px] flex flex-col gap-2 bg-white justify-center">
         <div className="flex w-full h-[80%] px-2 items-center justify-between">
           <input
             value={inputMessage}
