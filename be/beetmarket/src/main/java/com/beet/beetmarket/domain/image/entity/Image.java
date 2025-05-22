@@ -38,6 +38,7 @@ public class Image extends BaseTimeEntity {
     public Image(Post post, String imageOrigin, Integer sequence) {
         this.post = post;
         this.imageOrigin = imageOrigin;
+        this.imagePreview = imageOrigin;
         this.sequence = sequence;
     }
 }

@@ -63,7 +63,7 @@ public class PostService {
             ImageProcessPublisher imageProcessPublisher,
             VideoProcessPublisher videoProcessPublisher,
             ImageRepository imageRepository,
-            StringRedisTemplate redisTemplate) {
+            StringRedisTemplate redisTemplate, ChatRoomRepository chatRoomRepository) {
         this.postRepository = postRepository;
         this.searchRepository = searchRepository;
         this.userRepository = userRepository;
@@ -73,6 +73,7 @@ public class PostService {
         this.videoProcessPublisher = videoProcessPublisher;
         this.imageRepository = imageRepository;
         this.redisTemplate = redisTemplate;
+        this.chatRoomRepository = chatRoomRepository;
     }
 
 
@@ -283,6 +284,10 @@ public class PostService {
 
         favoriteRepository.deleteByPost(post);
         imageRepository.deleteByPost(post);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByPost(post);
+        for(ChatRoom chatRoom : chatRooms) {
+            chatRoom.setPost(null);
+        }
 
         searchRepository.deleteById(postId);
         postRepository.delete(post);
