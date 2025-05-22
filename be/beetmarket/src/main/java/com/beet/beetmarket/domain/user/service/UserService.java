@@ -65,8 +65,8 @@ public class UserService {
                 .ifPresent(u -> { throw new NicknameAlreadyTakenException(); });
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.updateNickname(request.nickname());
         user.updateAdditionalInfo(
-                request.nickname(),
                 request.birthDate(),
                 request.gender(),
                 request.region()
@@ -75,10 +75,11 @@ public class UserService {
 
     public void updateUserInfo(Long userId, UpdateUserInfoRequestDto request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
+        User existUser = userRepository.findByNickname(request.nickname()).orElse(null);
         if(request.nickname() != null) {
-            if(userRepository.findByNickname(request.nickname()).isPresent())
+            if(existUser != null && !existUser.getId().equals(user.getId())) {
                 throw new NicknameAlreadyTakenException();
+            }
 
             List<PostDocument> documents = postSearchRepository.findByAuthorNickname(user.getNickname());
 
@@ -87,9 +88,11 @@ public class UserService {
                 postSearchRepository.save(postDocument);
             }
         }
+        if(request.nickname() != null) {
+            user.updateNickname(request.nickname());
+        }
 
         user.updateAdditionalInfo(
-                request.nickname() == null ? user.getNickname() : request.nickname(),
                 user.getBirthDate(),
                 user.getGender(),
                 request.region() == null ? user.getRegion() : request.region()
