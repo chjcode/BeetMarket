@@ -3,12 +3,11 @@ import { FaShoppingBag, FaHeart } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegListAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
-// import { HiOutlineIdentification } from "react-icons/hi2";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/shared/api/axiosInstance";
 
 interface UserInfo {
-  email: string,
+  email: string;
   nickname: string;
   birthDate: string;
   gender: string;
@@ -34,11 +33,15 @@ export const MyPage = () => {
     fetchUserInfo();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    navigate("/login");
+  };
+
   return (
     <div className="flex flex-col items-center bg-white pt-20">
       {/* 프로필 영역 */}
       <div className="relative mb-2">
-        
         {user?.profileImage ? (
           <img
             src={user.profileImage}
@@ -60,8 +63,12 @@ export const MyPage = () => {
           <FiSettings className="text-2xl text-black" />
         </button>
       </div>
-      <div className="text-2xl font-bold mb-1">{user?.nickname ?? "닉네임을 설정하세요."}</div>
-      <div className="text-gray-400 text-base mb-1">{user?.region ?? "사용자 지역을 설정하세요."}</div>
+      <div className="text-2xl font-bold mb-1">
+        {user?.nickname ?? "닉네임을 설정하세요."}
+      </div>
+      <div className="text-gray-400 text-base mb-1">
+        {user?.region ?? "사용자 지역을 설정하세요."}
+      </div>
 
       {/* 네 개의 아이콘 메뉴 */}
       <div className="flex justify-between gap-6 w-full mb-8 px-14 py-34">
@@ -91,6 +98,13 @@ export const MyPage = () => {
         </NavLink>
       </div>
 
+      {/* 로그아웃 버튼 */}
+      <button
+        onClick={handleLogout}
+        className="mt-4 mb-10 px-6 py-2 bg-red-500 text-white text-sm rounded-full hover:bg-red-600"
+      >
+        로그아웃
+      </button>
     </div>
   );
 };
