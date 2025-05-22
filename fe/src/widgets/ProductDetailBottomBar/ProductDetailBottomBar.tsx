@@ -6,9 +6,18 @@ interface ProductDetailBottomBarProps {
   isLiked: boolean;
   onChatClick: () => void;
   onToggleLike: (liked: boolean) => void;
+  chatButtonText: string;
+  isChatDisabled: boolean;
 }
 
-const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, isLiked, onChatClick, onToggleLike }) => {
+const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ 
+  price,
+  isLiked, 
+  onChatClick, 
+  onToggleLike,
+  chatButtonText,
+  isChatDisabled, 
+}) => {
   const [liked, setLiked] = useState(isLiked);
 
   const handleLikeClick = () => {
@@ -40,9 +49,10 @@ const ProductDetailBottomBar: React.FC<ProductDetailBottomBarProps> = ({ price, 
         {/* 채팅 버튼 */}
         <button
           onClick={onChatClick}
+          disabled={isChatDisabled}
           className="bg-[#A349A4] text-white font-bold px-4 py-1.5 rounded-xl text-sm shadow-md"
         >
-          채팅 하기
+          {chatButtonText}
         </button>
       </div>
     </div>

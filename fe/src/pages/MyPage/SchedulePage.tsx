@@ -65,7 +65,7 @@ const SchedulePage = () => {
   );
 
   return (
-    <>
+    <div className="p-4">
       <StyledCalendarWrapper>
         <StyledCalendar
           value={selectedDate}
@@ -142,7 +142,7 @@ const SchedulePage = () => {
           <p className="text-sm px-4 text-gray-400">일정이 없습니다.</p>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

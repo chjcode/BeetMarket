@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Icon } from "@/shared/ui/Icon";
+// import { Icon } from "@/shared/ui/Icon";
 import { saveRecentProduct } from "@/shared/utils/localStorage";
 import dayjs from "dayjs";
 
@@ -30,6 +30,7 @@ export const ProductItem = (product: ProductItemProps) => {
       price: product.price,
       categoryName: product.categoryName,
       viewCount: product.viewCount,
+      favoriteCount: product.favoriteCount,
       isLiked: product.isLiked,
     });
 
@@ -66,15 +67,15 @@ export const ProductItem = (product: ProductItemProps) => {
         <div className="text-sm">{product.price.toLocaleString()} 원</div>
         <div className="flex gap-2 justify-end items-center">
           <div className="text-xs">조회수 {product.viewCount}</div>
-          <div className="flex gap-1 items-center">
+          {/* <div className="flex gap-1 items-center"> */}
             <div className="text-xs">찜 {product.favoriteCount}</div>
-            <Icon
+            {/* <Icon
               name={product.isLiked ? "heartfill" : "heart"}
               className={`w-5 h-5 rounded-full shadow-md bg-gray-100 p-1 text-red-400
                 ${product.isLiked ? "" : "stroke-[1.5]"}
               `}
-            />
-          </div>
+            /> */}
+          {/* </div> */}
         </div>
       </div>
     </div>
