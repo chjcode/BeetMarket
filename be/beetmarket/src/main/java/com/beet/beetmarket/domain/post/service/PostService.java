@@ -3,6 +3,7 @@ package com.beet.beetmarket.domain.post.service;
 import com.beet.beetmarket.domain.category.entity.Category;
 import com.beet.beetmarket.domain.category.exception.CategoryNotFoundException;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
+import com.beet.beetmarket.domain.chatRoom.repository.ChatRoomRepository;
 import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
 import com.beet.beetmarket.domain.favorite.repository.FavoriteRepository;
 import com.beet.beetmarket.domain.image.entity.Image;
@@ -50,6 +51,7 @@ public class PostService {
     private final VideoProcessPublisher videoProcessPublisher;
     private final ImageRepository imageRepository;
     private final StringRedisTemplate redisTemplate;
+    private final ChatRoomRepository chatRoomRepository;
 
     private static final String REDIS_VIEW_PREFIX = "post:view:";
 
