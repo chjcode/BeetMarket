@@ -86,7 +86,7 @@ const SearchResultPage = () => {
   }, [queryParam, setQuery, setPlaceholder]);
 
   return (
-  <div className="px-4">
+  <div className="p-4">
     {isLoading ? (
       <div className="text-center py-8 text-gray-500">검색 중...</div>
     ) : results.length === 0 ? (

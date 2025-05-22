@@ -27,7 +27,7 @@ const SearchPage = () => {
   }, [setOnSearch, setPlaceholder, addKeyword, navigate]);
 
   return (
-    <div className="py-4">
+    <div className="p-4">
       <SearchRecentList />
     </div>
   );
