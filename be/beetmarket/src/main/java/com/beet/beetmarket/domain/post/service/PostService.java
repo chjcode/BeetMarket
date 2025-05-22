@@ -3,6 +3,8 @@ package com.beet.beetmarket.domain.post.service;
 import com.beet.beetmarket.domain.category.entity.Category;
 import com.beet.beetmarket.domain.category.exception.CategoryNotFoundException;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
+import com.beet.beetmarket.domain.chatRoom.entity.ChatRoom;
+import com.beet.beetmarket.domain.chatRoom.repository.ChatRoomRepository;
 import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
 import com.beet.beetmarket.domain.favorite.repository.FavoriteRepository;
 import com.beet.beetmarket.domain.image.entity.Image;
@@ -50,6 +52,7 @@ public class PostService {
     private final VideoProcessPublisher videoProcessPublisher;
     private final ImageRepository imageRepository;
     private final StringRedisTemplate redisTemplate;
+    private final ChatRoomRepository chatRoomRepository;
 
     private static final String REDIS_VIEW_PREFIX = "post:view:";
 
@@ -63,7 +66,7 @@ public class PostService {
             ImageProcessPublisher imageProcessPublisher,
             VideoProcessPublisher videoProcessPublisher,
             ImageRepository imageRepository,
-            StringRedisTemplate redisTemplate) {
+            StringRedisTemplate redisTemplate, ChatRoomRepository chatRoomRepository) {
         this.postRepository = postRepository;
         this.searchRepository = searchRepository;
         this.userRepository = userRepository;
@@ -73,6 +76,7 @@ public class PostService {
         this.videoProcessPublisher = videoProcessPublisher;
         this.imageRepository = imageRepository;
         this.redisTemplate = redisTemplate;
+        this.chatRoomRepository = chatRoomRepository;
     }
 
 
@@ -283,6 +287,10 @@ public class PostService {
 
         favoriteRepository.deleteByPost(post);
         imageRepository.deleteByPost(post);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByPost(post);
+        for(ChatRoom chatRoom : chatRooms) {
+            chatRoom.setPost(null);
+        }
 
         searchRepository.deleteById(postId);
         postRepository.delete(post);
