@@ -6,10 +6,7 @@ import com.beet.beetmarket.domain.user.entity.User;
 import com.beet.beetmarket.global.jpa.base.BaseTimeEntity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +33,7 @@ public class ChatRoom extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+    @Setter
     private Post post;
 
     @Builder
@@ -52,4 +50,5 @@ public class ChatRoom extends BaseTimeEntity {
     public void updateSchedule(LocalDateTime schedule) {
         this.schedule = schedule;
     }
+
 }

@@ -67,4 +67,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
         "WHERE (cr.seller.id = :userId OR cr.buyer.id = :userId)",
         countQuery = "SELECT count(cr) FROM ChatRoom cr WHERE (cr.seller.id = :userId OR cr.buyer.id = :userId)")
     Page<ChatRoomWithFirstImageDto> findChatRoomsForUserWithFirstImage(@Param("userId") Long userId, Pageable pageable);
+
+    List<ChatRoom> findAllByPost(Post post);
 }
