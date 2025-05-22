@@ -5,7 +5,6 @@ import com.beet.beetmarket.domain.category.exception.CategoryNotFoundException;
 import com.beet.beetmarket.domain.category.repository.CategoryRepository;
 import com.beet.beetmarket.domain.chatRoom.entity.ChatRoom;
 import com.beet.beetmarket.domain.chatRoom.repository.ChatRoomRepository;
-import com.beet.beetmarket.domain.favorite.dto.LikeInfoDto;
 import com.beet.beetmarket.domain.favorite.repository.FavoriteRepository;
 import com.beet.beetmarket.domain.image.entity.Image;
 import com.beet.beetmarket.domain.image.repository.ImageRepository;
@@ -83,7 +82,9 @@ public class PostService {
     public PostDto getPost(Long userId, Long postId) {
         Post post = postRepository.findByIdWithUserAndCategory(postId).orElseThrow(PostNotFountException::new);
         List<String> images = imageRepository.findImageUrlsByPostIdOrderBySequence(postId);
-        LikeInfoDto likeInfo = favoriteRepository.fetchLikeInfo(postId, userId);
+//        LikeInfoDto likeInfo = favoriteRepository.fetchLikeInfo(postId, userId);
+        Long favoriteCount = favoriteRepository.countByPostId(postId);
+        Boolean myFavorite = favoriteRepository.findByPostIdAndUserId(postId, userId).isPresent();
         String key = REDIS_VIEW_PREFIX + postId;
         Long view = redisTemplate.opsForValue().increment(key);
 
@@ -93,8 +94,10 @@ public class PostService {
                 post,
                 images,
                 view,
-                likeInfo.likeCount(),
-                likeInfo.liked()
+                favoriteCount,
+                myFavorite
+//                likeInfo.likeCount(),
+//                likeInfo.liked()
         );
     }
 
