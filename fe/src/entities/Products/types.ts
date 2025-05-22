@@ -5,5 +5,6 @@ export interface Product {
   thumbnailUrl: string;
   categoryName: string;
   viewCount: number;
+  favoriteCount: number;
   isLiked: boolean
 }
