@@ -7,6 +7,7 @@ export interface RecentProduct {
   price: number;
   categoryName: string;
   viewCount: number;
+  favoriteCount: number;
   isLiked: boolean;
 }
 

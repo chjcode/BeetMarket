@@ -66,6 +66,7 @@ const ProductDetailPage = () => {
         const data = await res.json();
         setProduct(data.content);
         console.log("상품 상세 정보 불러오기 성공")
+        console.log(data.content)
       } catch (err) {
         console.error("상품 정보를 불러오는 데 실패했습니다.", err);
       } finally {
@@ -271,6 +272,14 @@ const ProductDetailPage = () => {
           }
         }}
         onToggleLike={toggleLike}
+        chatButtonText={
+          product.status === "AVAILABLE"
+            ? "채팅 하기"
+            : product.status === "RESERVED"
+            ? "예약 중"
+            : "판매 완료"
+        }
+        isChatDisabled={product.status !== "AVAILABLE"}
       />
     </div>
   );

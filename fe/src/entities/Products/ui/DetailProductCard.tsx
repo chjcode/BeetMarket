@@ -11,7 +11,7 @@ const DetailProductCard: React.FC<DetailProductCardProps> = ({ imageUrl, title, 
   return (
     <div className="w-24 shrink-0 flex flex-col items-center">
       <img src={imageUrl} alt={title} className="w-24 h-24 rounded-lg object-cover" draggable={false}/>
-      <div className={`text-center mt-1 text-sm ${isSold ? "line-through text-gray-400" : "text-black"}`}>
+      <div className={`w-full text-center mt-1 text-sm truncate overflow-hidden whitespace-nowrap ${isSold ? "line-through text-gray-400" : "text-black"}`}>
         {title}
       </div>
       <div className={`text-center text-xs ${isSold ? "line-through text-gray-400" : "text-gray-700"}`}>
