@@ -56,8 +56,11 @@ public class User extends BaseTimeEntity {
         this.oauthProvider = oauthProvider;
     }
 
-    public void updateAdditionalInfo(String nickname, LocalDate birthDate, GenderType gender, String region) {
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void updateAdditionalInfo(LocalDate birthDate, GenderType gender, String region) {
         this.birthDate = birthDate;
         this.gender = gender;
         this.region = region;
