@@ -1,0 +1,81 @@
+spring:
+  config:
+    import: classpath:.env.properties
+
+  application:
+    name: beetmarket
+
+  datasource:
+    driver-class-name: ${DB_DRIVER_CLASS_NAME}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: google
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_PASSWORD}
+            redirect-uri: ${OAUTH_REDIRECT_URI_PREFIX}/google
+            authorization-grant-type: authorization_code
+            scope:
+              - email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+  minio:
+    url: ${MINIO_URL}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket-name: uploads
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URL}
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PWD}
+  elasticsearch:
+    uris: ${ELASTIC_URI}
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
+    restclient:
+      ssl:
+        bundle: es-ca
+  ssl:
+    bundle:
+      jks:
+        es-ca:
+          truststore:
+            location: ${ES_TRUSTSTORE_PATH}
+            password: ${ES_TRUSTSTORE_PASSWORD}
+
+
+server:
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-store-password: ${KEYSTORE_PASSWORD}
+    enabled: ${SSL_ENABLED}
+
+jwt-secret: ${JWT_SECRET}
+login-endpoint: ${LOGIN_ENDPOINT}
+front-url: ${FRONT_URL}
+
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    url: ${OPENAI_API_URL}
+    model: ${OPENAI_API_MODEL}
