@@ -112,7 +112,6 @@ import lombok.extern.slf4j.Slf4j; // @Slf4j 어노테이션 임포트
 @Component
 public class PresenceInterceptor implements ChannelInterceptor {
 
-    // private static final Logger logger = LoggerFactory.getLogger(PresenceInterceptor.class); // @Slf4j가 자동으로 생성
     private final RedisTemplate<String, Object> redisTemplate;
     private final Map<String, Map<String, String>> sessionSubscriptions = new ConcurrentHashMap<>();
 
@@ -128,11 +127,8 @@ public class PresenceInterceptor implements ChannelInterceptor {
         Principal user = accessor.getUser();
         String username = (user != null) ? user.getName() : "anonymous";
 
-        log.debug("STOMP Inbound. Command: [{}], SessionId: [{}], User: [{}], Headers: {}",
-            command, sessionId, username, accessor.toNativeHeaderMap()); // logger -> log
-
         if (command == null) {
-            log.warn("Received message with null STOMP command. SessionId: [{}], User: [{}]", sessionId, username); // logger -> log
+            log.warn("Received message with null STOMP command. SessionId: [{}], User: [{}]", sessionId, username);
             return message;
         }
 
@@ -144,77 +140,63 @@ public class PresenceInterceptor implements ChannelInterceptor {
             case CONNECT:
                 String connectNickname = (String) accessor.getSessionAttributes().get("nickname");
                 log.info("STOMP CONNECT received. SessionId: [{}], Login Header: [{}], Passcode Header: [{}], Nickname from session attributes: [{}]",
-                    sessionId, accessor.getLogin(), (accessor.getPasscode() != null ? "******" : "null"), connectNickname); // logger -> log
+                    sessionId, accessor.getLogin(), (accessor.getPasscode() != null ? "******" : "null"), connectNickname);
                 break;
 
             case SUBSCRIBE:
                 String destination = accessor.getDestination();
                 String subscriptionId = accessor.getSubscriptionId();
-                log.info("STOMP SUBSCRIBE received. SessionId: [{}], User: [{}], Destination: [{}], SubscriptionId: [{}]",
-                    sessionId, username, destination, subscriptionId); // logger -> log
 
                 if (destination != null &&
                     (destination.startsWith("/sub/chat/room/") || destination.startsWith("/user/sub/chat/room/"))) {
                     String roomId = destination.substring(destination.lastIndexOf('/') + 1);
                     try {
-                        String key = "room:" + roomId + ":participants";
+                        String key = "chat:room:" + roomId + ":users";
                         redisTemplate.opsForSet().add(key, username);
                         sessionSubscriptions
                             .computeIfAbsent(sessionId, sid -> new ConcurrentHashMap<>())
                             .put(subscriptionId, roomId);
-                        log.info("User '{}' successfully subscribed to room '{}'. SessionId: [{}], SubscriptionId: [{}]",
-                            username, roomId, sessionId, subscriptionId); // logger -> log
                     } catch (Exception e) {
                         log.error("Error during SUBSCRIBE processing for User: '{}', Room: '{}'. SessionId: [{}], SubscriptionId: [{}]. Error: {}",
-                            username, roomId, sessionId, subscriptionId, e.getMessage(), e); // logger -> log
+                            username, roomId, sessionId, subscriptionId, e.getMessage(), e);
                     }
                 } else {
                     log.warn("User '{}' attempted to subscribe to an unhandled or malformed destination: [{}]. SessionId: [{}]",
-                        username, destination, sessionId); // logger -> log
+                        username, destination, sessionId);
                 }
                 break;
 
             case UNSUBSCRIBE:
                 String unsubSubscriptionId = accessor.getSubscriptionId();
-                log.info("STOMP UNSUBSCRIBE received. SessionId: [{}], User: [{}], SubscriptionId: [{}]",
-                    sessionId, username, unsubSubscriptionId); // logger -> log
                 Map<String,String> subs = sessionSubscriptions.get(sessionId);
                 if (subs != null && subs.containsKey(unsubSubscriptionId)) {
                     String roomId = subs.remove(unsubSubscriptionId);
                     try {
-                        String key = "room:" + roomId + ":participants";
+                        String key = "chat:room:" + roomId + ":users";
                         redisTemplate.opsForSet().remove(key, username);
-                        log.info("User '{}' successfully unsubscribed from room '{}'. SessionId: [{}], SubscriptionId: [{}]",
-                            username, roomId, sessionId, unsubSubscriptionId); // logger -> log
                         if (subs.isEmpty()) {
                             sessionSubscriptions.remove(sessionId);
-                            log.debug("Removed empty subscription map for SessionId: [{}]", sessionId); // logger -> log
                         }
                     } catch (Exception e) {
                         log.error("Error during UNSUBSCRIBE processing for User: '{}', Room: '{}'. SessionId: [{}], SubscriptionId: [{}]. Error: {}",
-                            username, roomId, sessionId, unsubSubscriptionId, e.getMessage(), e); // logger -> log
+                            username, roomId, sessionId, unsubSubscriptionId, e.getMessage(), e);
                     }
                 } else {
                     log.warn("UNSUBSCRIBE received for unknown or already removed subscription. SessionId: [{}], User: [{}], SubscriptionId: [{}]",
-                        sessionId, username, unsubSubscriptionId); // logger -> log
+                        sessionId, username, unsubSubscriptionId);
                 }
                 break;
 
             case DISCONNECT:
-                log.info("STOMP DISCONNECT received. SessionId: [{}], User: [{}]", sessionId, username); // logger -> log
                 Map<String,String> disconnectSubs = sessionSubscriptions.remove(sessionId);
                 if (disconnectSubs != null) {
-                    log.info("Processing DISCONNECT for User: '{}', SessionId: [{}]. Removing {} subscriptions.",
-                        username, sessionId, disconnectSubs.size()); // logger -> log
                     disconnectSubs.forEach((subId, roomId) -> {
                         try {
-                            String key = "room:" + roomId + ":participants";
+                            String key = "chat:room:" + roomId + ":users";
                             redisTemplate.opsForSet().remove(key, username);
-                            log.info("User '{}' removed from room '{}' due to disconnect. SessionId: [{}]",
-                                username, roomId, sessionId); // logger -> log
                         } catch (Exception e) {
                             log.error("Error removing User: '{}' from Room: '{}' during disconnect. SessionId: [{}]. Error: {}",
-                                username, roomId, sessionId, e.getMessage(), e); // logger -> log
+                                username, roomId, sessionId, e.getMessage(), e);
                         }
                     });
                 } else {
@@ -224,17 +206,17 @@ public class PresenceInterceptor implements ChannelInterceptor {
 
             case SEND:
                 log.info("STOMP SEND received. SessionId: [{}], User: [{}], Destination: [{}]",
-                    sessionId, username, accessor.getDestination()); // logger -> log
+                    sessionId, username, accessor.getDestination());
                 break;
 
             case MESSAGE:
                 log.debug("STOMP MESSAGE (inbound) received. SessionId: [{}], User: [{}], Destination: [{}]",
-                    sessionId, username, accessor.getDestination()); // logger -> log
+                    sessionId, username, accessor.getDestination());
                 break;
 
             default:
                 log.debug("Unhandled STOMP Command: [{}] received. SessionId: [{}], User: [{}]",
-                    command, sessionId, username); // logger -> log
+                    command, sessionId, username);
                 break;
         }
         return message;
@@ -251,14 +233,14 @@ public class PresenceInterceptor implements ChannelInterceptor {
 
         if (ex != null) {
             log.error("Failed to send STOMP message to broker channel. Command: [{}], SessionId: [{}], User: [{}]. Exception: {}",
-                command, sessionId, username, ex.getMessage(), ex); // logger -> log
+                command, sessionId, username, ex.getMessage(), ex);
         } else if (!sent) {
             log.warn("STOMP message was not sent to broker channel (no specific exception, possibly filtered). Command: [{}], SessionId: [{}], User: [{}]",
-                command, sessionId, username); // logger -> log
+                command, sessionId, username);
         } else {
             if (command != null && command != StompCommand.CONNECT && command != StompCommand.CONNECTED) {
                 log.debug("Successfully processed and sent STOMP message to broker channel. Command: [{}], SessionId: [{}], User: [{}]",
-                    command, sessionId, username); // logger -> log
+                    command, sessionId, username);
             }
         }
     }
